@@ -1,0 +1,5 @@
+<div ng-repeat="food in $ctrl.foods">
+    <h1>{{food.title}}</h1>
+    <button ui-sref="app.detailsFood({slug:food.slug})">Details</button> 
+    <!-- <button>Delete</button>  -->
+</div>
