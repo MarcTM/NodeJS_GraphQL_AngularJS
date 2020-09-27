@@ -49,6 +49,9 @@ require('./models/Comment');
 require('./models/Food');
 require('./config/passport');
 
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(require('./routes'));
 
 //// Swagger ////
