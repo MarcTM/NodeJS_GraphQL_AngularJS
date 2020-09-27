@@ -1,5 +1,11 @@
 <div ng-repeat="food in $ctrl.foods">
     <h1>{{food.title}}</h1>
-    <button ui-sref="app.detailsFood({slug:food.slug})">Details</button> 
-    <!-- <button>Delete</button>  -->
+    <button ui-sref="app.detailsFood({slug:food.slug})">Details</button>
 </div>
+<hr>
+
+Try Toastr: 
+<button ng-click="$ctrl.errToas()">Error</button>
+<button ng-click="$ctrl.succToas()">Success</button>
+<button ng-click="$ctrl.infoToas()">Info</button>
+<button ng-click="$ctrl.warnToas()">Warning</button>
