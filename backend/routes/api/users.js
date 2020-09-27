@@ -39,13 +39,14 @@ router.put('/user', auth.required, function(req, res, next){
   }).catch(next);
 });
 
+
 router.post('/users/login', function(req, res, next){
   if(!req.body.user.email){
-    return res.status(422).json({errors: {email: "can't be blank"}});
+    return res.status(422).json("Email can't be blank");
   }
 
   if(!req.body.user.password){
-    return res.status(422).json({errors: {password: "can't be blank"}});
+    return res.status(422).json("Password can't be blank");
   }
 
   passport.authenticate('local', {session: false}, function(err, user, info){
@@ -55,21 +56,32 @@ router.post('/users/login', function(req, res, next){
       user.token = user.generateJWT();
       return res.json({user: user.toAuthJSON()});
     } else {
-      return res.status(422).json(info);
+      return res.status(422).json("Email or password is invalid");
     }
   })(req, res, next);
 });
 
+
+
 router.post('/users', function(req, res, next){
-  var user = new User();
+ 
+  User.find({$or: [{ email: req.body.user.email }, { username: req.body.user.username }]})
+  .then(function(user) {
+    if (user[0]) {
+      return res.status(422).json("The email or username already exists");
+    } else {
+        var user = new User();
 
-  user.username = req.body.user.username;
-  user.email = req.body.user.email;
-  user.setPassword(req.body.user.password);
-
-  user.save().then(function(){
-    return res.json({user: user.toAuthJSON()});
-  }).catch(next);
+        user.idsocial = req.body.user.username;
+        user.username = req.body.user.username;
+        user.email = req.body.user.email;
+        user.setPassword(req.body.user.password);
+      
+        user.save().then(function(){
+          return res.json({user: user.toAuthJSON()});
+        }).catch(next);
+    }
+  });
 });
 
 
