@@ -149,6 +149,15 @@ router.get('/:food', auth.optional, function(req, res, next) {
 
 
 
+// obtain categories
+router.get('/food/category', function(req, res, next) {
+  Food.find().distinct('category').then(function(category){
+    return res.json({category: category});
+  }).catch(next);
+ });
+
+
+
 // update article
 // router.put('/:article', auth.required, function(req, res, next) {
 //   User.findById(req.payload.id).then(function(user){

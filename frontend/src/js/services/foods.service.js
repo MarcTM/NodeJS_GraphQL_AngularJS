@@ -34,6 +34,13 @@ export default class Foods {
       })
         .then(res => res.data.food);
     }
+
+    getCategories() {
+      return this._$http({
+        url: this._AppConstants.api + "/foods/food/category",
+        method: "GET"
+      }).then(res => res.data.category);
+    }
   
     // getFood(slug) {
     //   let deferred = this._$q.defer();

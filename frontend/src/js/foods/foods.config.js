@@ -16,6 +16,19 @@ function FoodsConfig($stateProvider, $httpProvider) {
       }
     })
 
+    .state("app.filterFoods", {
+      url: "/foods_:filter",
+      controller: "FilterFoodsCtrl",
+      controllerAs: "$ctrl",
+      templateUrl: "foods/filterfoods.html",
+      title: "Foods",
+      resolve: {
+        foods: function(Foods) {
+          return Foods.getFoods().then(foods => foods)
+        }
+      }
+    })
+
     .state('app.detailsFood', {
         url: '/foods/:slug',
         controller: 'DetailsFoodCtrl',

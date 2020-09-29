@@ -12,6 +12,9 @@ foodsModule.config(FoodsConfig);
 import FoodsCtrl from './foods.controller';
 foodsModule.controller('FoodsCtrl', FoodsCtrl);
 
+import FilterFoodsCtrl from './filterfoods.controller';
+foodsModule.controller('FilterFoodsCtrl', FilterFoodsCtrl);
+
 import DetailsFoodCtrl from './detailsfood.controller';
 foodsModule.controller('DetailsFoodCtrl', DetailsFoodCtrl);
 

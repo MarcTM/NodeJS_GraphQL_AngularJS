@@ -7,7 +7,14 @@ function HomeConfig($stateProvider) {
     controller: 'HomeCtrl',
     controllerAs: '$ctrl',
     templateUrl: 'home/home.html',
-    title: 'Home'
+    title: 'Home',
+    resolve: {
+      category: function(Foods) {
+        return Foods.getCategories().then(
+          (category) => category
+        )
+      }
+    }
   });
 
 };
