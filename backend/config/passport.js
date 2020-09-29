@@ -63,7 +63,6 @@ passport.use(new GithubStrategy({
             var user = new User({
                 idsocial: profile.id,
                 username: profile.username,
-                type: "client",
                 email: profile.emails[0].value,
                 image: profile.photos[0].value,
             });
@@ -82,9 +81,9 @@ passport.use(new GithubStrategy({
 
 // Google
 passport.use(new GoogleStrategy({
-  clientID: socialKeys.GITHUB_CLIENT_ID,
-  clientSecret: socialKeys.GITHUB_CLIENT_SECRET,
-  callbackURL: socialKeys.GITHUB_CALLBACK,
+  clientID: socialKeys.GOOGLEPLUS_CLIENT_ID,
+  clientSecret: socialKeys.GOOGLEPLUS_CLIENT_SECRET,
+  callbackURL: socialKeys.GOOGLEPLUS_CALLBACK,
   scope: 'user:email',
   passReqToCallback: true
   },
@@ -101,8 +100,7 @@ passport.use(new GoogleStrategy({
           }else{
             var user = new User({
                 idsocial: profile.id,
-                username: profile.username,
-                type: "client",
+                username: profile.given_name,
                 email: profile.emails[0].value,
                 image: profile.photos[0].value,
             });

@@ -111,7 +111,6 @@ router.post("/users/sociallogin", function(req, res, next) {
 
 // Github
 router.get("/auth/github", passport.authenticate("github"));
-
 router.get("/auth/github/callback",
   passport.authenticate("github", {
     successRedirect: "http://localhost:4000/#!/auth/sociallogin",
@@ -119,12 +118,16 @@ router.get("/auth/github/callback",
   })
 );
 
-// Google
-router.get("/auth/googleplus", passport.authenticate("google", {scope: [
-    'https://www.googleplus.com/auth/plus.login',
-    'https://googleplus.com/auth/plus.profile.emails.read']})
-);
 
+// Google
+// router.get("/auth/googleplus", passport.authenticate("google", {scope: [
+//     'https://www.googleplus.com/auth/plus.login',
+//     'https://googleplus.com/auth/plus.profile.emails.read']})
+// );
+router.get("/auth/googleplus", passport.authenticate("google", {scope: [
+  'profile',
+  'email']})
+);
 router.get("/auth/googleplus/callback",
   passport.authenticate("google", {
     successRedirect: "http://localhost:4000/#!/auth/sociallogin",

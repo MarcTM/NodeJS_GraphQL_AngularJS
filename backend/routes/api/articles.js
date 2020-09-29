@@ -301,7 +301,7 @@ router.post('/:article/comments', auth.required, function(req, res, next) {
 
 
 
-
+// delete article's comment
 router.delete('/:article/comments/:comment', auth.required, function(req, res, next) {
   if(req.comment.author.toString() === req.payload.id.toString()){
     req.article.comments.remove(req.comment._id);

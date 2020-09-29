@@ -23,14 +23,8 @@
         <form name="formData" ng-submit="$ctrl.submitForm()">
           <fieldset ng-disabled="$ctrl.isSubmitting">
 
-            <fieldset class="form-group" ng-show="$ctrl.authType === 'register'">
-              <input class="form-control form-control-lg"
-                type="text"
-                placeholder="Username"
-                ng-model="$ctrl.formData.username" />
-            </fieldset>
-
-            <!-- <fieldset class="form-group" ng-show="$ctrl.authType === 'register'">
+            <!-- Form -->
+            <fieldset class="form-group" ng-show="$ctrl.authType === 'register'" ng-disabled="$ctrl.authType != 'register'">
               <input class="form-control form-control-lg" type="text" placeholder="Username"
                 ng-model="$ctrl.formData.username" name="Username" ng-minlength="3" ng-maxlength="16" required/>
               <div ng-messages="formData.Username.$error" style="color: red;">
@@ -38,7 +32,7 @@
                 <p ng-message="minlength">Enter more than 3 characters</p>
                 <p ng-message="maxlength">Enter less than 16 characters</p>
               </div>
-            </fieldset> -->
+            </fieldset>
             
 
             <fieldset class="form-group">
@@ -61,10 +55,11 @@
             </fieldset>
 
 
+            <!-- Buttons -->
             <fieldset ng-show="$ctrl.authType === 'register'">
               <button class="btn btn-lg btn-primary pull-xs-right"
                 type="submit" ng-bind="::$ctrl.title"
-                ng-show="formData.Email.$valid && formData.Password.$valid">
+                ng-show="formData.Username.$valid && formData.Email.$valid && formData.Password.$valid">
               </button>
             </fieldset>
 
