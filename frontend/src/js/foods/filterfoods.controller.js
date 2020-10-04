@@ -11,7 +11,7 @@ class FilterFoodsCtrl {
   
       var filteredFoods = new Array();
       this.foods.forEach(food => {
-        if (food.category == this.filter) {
+        if (food.difficulty == this.filter) {
           filteredFoods.push(food);
         }
       });

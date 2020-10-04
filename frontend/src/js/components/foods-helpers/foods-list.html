@@ -1,6 +1,6 @@
 <div ng-repeat="food in $ctrl.foods">
     <h1>{{food.title}}</h1>
-    Category: {{food.category}}<br>
+    <p>Difficulty: {{food.difficulty}}</p><br>
     <button ui-sref="app.detailsFood({slug:food.slug})">Details</button><br><br>
     <hr>
 </div>

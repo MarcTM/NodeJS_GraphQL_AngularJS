@@ -1,0 +1,52 @@
+<div class="editor-page">
+    <div class="container page">
+      <div class="row">
+        <div class="col-md-10 offset-md-1 col-xs-12">
+          
+          <h1>New Recipe</h1>
+          <list-errors errors="$ctrl.errors"></list-errors>
+  
+          <form>
+            <fieldset ng-disabled="$ctrl.isSubmitting">
+  
+              <fieldset class="form-group">
+                <input class="form-control form-control-lg"
+                  ng-model="$ctrl.food.title"
+                  type="text"
+                  placeholder="Recipe Name"/>
+              </fieldset>
+  
+              <fieldset class="form-group">
+                <input class="form-control"
+                  ng-model="$ctrl.food.description"
+                  type="text"
+                  placeholder="What's this recipe about?" />
+              </fieldset>
+  
+              <fieldset class="form-group">
+                <textarea class="form-control"
+                  rows="8"
+                  ng-model="$ctrl.food.body"
+                  placeholder="Write your recipe">
+                </textarea>
+              </fieldset>
+
+              <fieldset class="form-group">
+                <textarea class="form-control"
+                  ng-model="$ctrl.food.difficulty"
+                  placeholder="Difficulty in 1 word: Easy, Medium, Hard, etc">
+                </textarea>
+              </fieldset>
+  
+              <button class="btn btn-lg pull-xs-right btn-primary" type="button" ng-click="$ctrl.submit()">
+                Publish Recipe
+              </button>
+  
+            </fieldset>
+          </form>
+  
+        </div>
+      </div>
+    </div>
+  </div>
+  

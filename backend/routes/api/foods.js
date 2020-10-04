@@ -150,11 +150,47 @@ router.get('/:food', auth.optional, function(req, res, next) {
 
 
 // obtain categories
-router.get('/food/category', function(req, res, next) {
-  Food.find().distinct('category').then(function(category){
-    return res.json({category: category});
+router.get('/food/difficulty', function(req, res, next) {
+  Food.find().distinct('difficulty').then(function(difficulty){
+    return res.json({difficulty: difficulty});
   }).catch(next);
  });
+
+
+
+ // Favorite a food
+router.post('/:food/favorite', auth.required, function(req, res, next) {
+  var foodId = req.food._id;
+
+  User.findById(req.payload.id).then(function(user){
+    if (!user) { return res.sendStatus(401); }
+
+    return user.favorite(foodId).then(function(){
+      return req.food.updateFavoriteCount().then(function(food){
+        return res.json({food: food.toJSONFor(user)});
+      });
+    });
+  }).catch(next);
+});
+
+
+
+// Unfavorite an article
+router.delete('/:food/favorite', auth.required, function(req, res, next) {
+  var foodId = req.food._id;
+
+  User.findById(req.payload.id).then(function (user){
+    if (!user) { return res.sendStatus(401); }
+
+    return user.unfavorite(foodId).then(function(){
+      return req.food.updateFavoriteCount().then(function(food){
+        return res.json({food: food.toJSONFor(user)});
+      });
+    });
+  }).catch(next);
+});
+
+
 
 
 
@@ -201,40 +237,6 @@ router.get('/food/category', function(req, res, next) {
 //     } else {
 //       return res.sendStatus(403);
 //     }
-//   }).catch(next);
-// });
-
-
-
-// Favorite a food
-// router.post('/:food/favorite', auth.required, function(req, res, next) {
-//   var foodId = req.food._id;
-
-//   User.findById(req.payload.id).then(function(user){
-//     if (!user) { return res.sendStatus(401); }
-
-//     return user.favorite(foodId).then(function(){
-//       return req.food.updateFavoriteCount().then(function(food){
-//         return res.json({food: food.toJSONFor(user)});
-//       });
-//     });
-//   }).catch(next);
-// });
-
-
-
-// Unfavorite an article
-// router.delete('/:article/favorite', auth.required, function(req, res, next) {
-//   var articleId = req.article._id;
-
-//   User.findById(req.payload.id).then(function (user){
-//     if (!user) { return res.sendStatus(401); }
-
-//     return user.unfavorite(articleId).then(function(){
-//       return req.article.updateFavoriteCount().then(function(article){
-//         return res.json({article: article.toJSONFor(user)});
-//       });
-//     });
 //   }).catch(next);
 // });
 

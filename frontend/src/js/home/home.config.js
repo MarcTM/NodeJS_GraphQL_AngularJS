@@ -9,9 +9,9 @@ function HomeConfig($stateProvider) {
     templateUrl: 'home/home.html',
     title: 'Home',
     resolve: {
-      category: function(Foods) {
-        return Foods.getCategories().then(
-          (category) => category
+      difficulty: function(Foods) {
+        return Foods.getDifficulty().then(
+          (difficulty) => difficulty
         )
       }
     }

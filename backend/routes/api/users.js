@@ -4,6 +4,8 @@ var passport = require('passport');
 var User = mongoose.model('User');
 var auth = require('../auth');
 
+
+// Get user
 router.get('/user', auth.required, function(req, res, next){
   User.findById(req.payload.id).then(function(user){
     if(!user){ return res.sendStatus(401); }
@@ -12,6 +14,8 @@ router.get('/user', auth.required, function(req, res, next){
   }).catch(next);
 });
 
+
+// Update user
 router.put('/user', auth.required, function(req, res, next){
   User.findById(req.payload.id).then(function(user){
     if(!user){ return res.sendStatus(401); }
@@ -40,6 +44,8 @@ router.put('/user', auth.required, function(req, res, next){
 });
 
 
+
+// Login
 router.post('/users/login', function(req, res, next){
   if(!req.body.user.email){
     return res.status(422).json("Email can't be blank");
@@ -62,7 +68,7 @@ router.post('/users/login', function(req, res, next){
 });
 
 
-
+// Register
 router.post('/users', function(req, res, next){
  
   User.find({$or: [{ email: req.body.user.email }, { username: req.body.user.username }]})
@@ -120,10 +126,6 @@ router.get("/auth/github/callback",
 
 
 // Google
-// router.get("/auth/googleplus", passport.authenticate("google", {scope: [
-//     'https://www.googleplus.com/auth/plus.login',
-//     'https://googleplus.com/auth/plus.profile.emails.read']})
-// );
 router.get("/auth/googleplus", passport.authenticate("google", {scope: [
   'profile',
   'email']})

@@ -18,5 +18,8 @@ foodsModule.controller('FilterFoodsCtrl', FilterFoodsCtrl);
 import DetailsFoodCtrl from './detailsfood.controller';
 foodsModule.controller('DetailsFoodCtrl', DetailsFoodCtrl);
 
+import RecipesCtrl from './recipes.controller';
+foodsModule.controller('RecipesCtrl', RecipesCtrl);
+
 
 export default foodsModule;

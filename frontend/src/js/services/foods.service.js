@@ -35,11 +35,11 @@ export default class Foods {
         .then(res => res.data.food);
     }
 
-    getCategories() {
+    getDifficulty() {
       return this._$http({
-        url: this._AppConstants.api + "/foods/food/category",
+        url: this._AppConstants.api + "/foods/food/difficulty",
         method: "GET"
-      }).then(res => res.data.category);
+      }).then(res => res.data.difficulty);
     }
   
     // getFood(slug) {
@@ -70,23 +70,23 @@ export default class Foods {
     //   })
     // }
   
-    // save(article) {
-    //   let request = {};
+    save(food) {
+      let request = {};
   
-    //   if (article.slug) {
-    //     request.url = `${this._AppConstants.api}/articles/${article.slug}`;
-    //     request.method = 'PUT';
-    //     delete article.slug;
+      if (food.slug) {
+        request.url = `${this._AppConstants.api}/foods/${food.slug}`;
+        request.method = 'PUT';
+        delete food.slug;
   
-    //   } else {
-    //     request.url = `${this._AppConstants.api}/articles`;
-    //     request.method = 'POST';
-    //   }
+      } else {
+        request.url = `${this._AppConstants.api}/foods/`;
+        request.method = 'POST';
+      }
   
-    //   request.data = { article: article };
+      request.data = { food: food };
   
-    //   return this._$http(request).then((res) => res.data.article);
-    // }
+      return this._$http(request).then((res) => res.data.food);
+    }
   
   
     // favorite(slug) {

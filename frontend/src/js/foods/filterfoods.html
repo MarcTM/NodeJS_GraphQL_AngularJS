@@ -3,6 +3,6 @@
 
 <div ng-repeat="food in $ctrl.filteredFoods">
     <h2> {{food.title}}</h2>
-    <p>{{food.category}}</p>
+    <p>Difficulty: {{food.difficulty}}</p>
    <button ui-sref="app.detailsFood({slug:food.slug})">Details</button> 
 </div>

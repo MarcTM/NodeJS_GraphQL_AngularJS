@@ -30,7 +30,7 @@ router.param('comment', function(req, res, next, id) {
 
 
 
-
+// return all articles
 router.get('/', auth.optional, function(req, res, next) {
   var query = {};
   var limit = 20;
@@ -130,7 +130,7 @@ router.get('/feed', auth.required, function(req, res, next) {
 
 
 
-
+// Create article
 router.post('/', auth.required, function(req, res, next) {
   User.findById(req.payload.id).then(function(user){
     if (!user) { return res.sendStatus(401); }
@@ -147,8 +147,6 @@ router.post('/', auth.required, function(req, res, next) {
 });
 
 
-
-
 // return a article
 router.get('/:article', auth.optional, function(req, res, next) {
   Promise.all([
@@ -160,8 +158,6 @@ router.get('/:article', auth.optional, function(req, res, next) {
     return res.json({article: req.article.toJSONFor(user)});
   }).catch(next);
 });
-
-
 
 
 // update article
@@ -194,9 +190,6 @@ router.put('/:article', auth.required, function(req, res, next) {
 });
 
 
-
-
-
 // delete article
 router.delete('/:article', auth.required, function(req, res, next) {
   User.findById(req.payload.id).then(function(user){
@@ -211,6 +204,8 @@ router.delete('/:article', auth.required, function(req, res, next) {
     }
   }).catch(next);
 });
+
+
 
 
 
@@ -232,9 +227,6 @@ router.post('/:article/favorite', auth.required, function(req, res, next) {
 });
 
 
-
-
-
 // Unfavorite an article
 router.delete('/:article/favorite', auth.required, function(req, res, next) {
   var articleId = req.article._id;
@@ -249,6 +241,8 @@ router.delete('/:article/favorite', auth.required, function(req, res, next) {
     });
   }).catch(next);
 });
+
+
 
 
 
@@ -276,9 +270,6 @@ router.get('/:article/comments', auth.optional, function(req, res, next){
 });
 
 
-
-
-
 // create a new comment
 router.post('/:article/comments', auth.required, function(req, res, next) {
   User.findById(req.payload.id).then(function(user){
@@ -297,8 +288,6 @@ router.post('/:article/comments', auth.required, function(req, res, next) {
     });
   }).catch(next);
 });
-
-
 
 
 // delete article's comment

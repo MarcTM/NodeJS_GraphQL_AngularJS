@@ -7,10 +7,9 @@ var FoodSchema = new mongoose.Schema({
   slug: {type: String, lowercase: true, unique: true},
   title: String,
   description: String,
-  category: String,
+  difficulty: String,
   body: String,
   favoritesCount: {type: Number, default: 0},
-  tagList: [{ type: String }],
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 }, {timestamps: true});
 
@@ -28,26 +27,25 @@ FoodSchema.methods.slugify = function() {
   this.slug = slug(this.title) + '-' + (Math.random() * Math.pow(36, 6) | 0).toString(36);
 };
 
-// FoodSchema.methods.updateFavoriteCount = function() {
-//   var food = this;
+FoodSchema.methods.updateFavoriteCount = function() {
+  var food = this;
 
-//   return User.count({favorites: {$in: [food._id]}}).then(function(count){
-//     food.favoritesCount = count;
+  return User.count({favorites: {$in: [food._id]}}).then(function(count){
+    food.favoritesCount = count;
 
-//     return food.save();
-//   });
-// };
+    return food.save();
+  });
+};
 
 FoodSchema.methods.toJSONFor = function(user){
   return {
     slug: this.slug,
     title: this.title,
     description: this.description,
-    category: this.category,
+    difficulty: this.difficulty,
     body: this.body,
     createdAt: this.createdAt,
     updatedAt: this.updatedAt,
-    tagList: this.tagList,
     favorited: user ? user.isFavorite(this._id) : false,
     favoritesCount: this.favoritesCount,
     author: this.author.toProfileJSONFor(user)
