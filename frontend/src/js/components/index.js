@@ -18,6 +18,9 @@ componentsModule.component('articleMeta', ArticleMeta);
 import FavoriteBtn from './buttons/favorite-btn.component';
 componentsModule.component('favoriteBtn', FavoriteBtn);
 
+import FavoriteFoodBtn from './buttons/favorite-food-btn.component';
+componentsModule.component('favoriteFoodBtn', FavoriteFoodBtn);
+
 import ArticlePreview from './article-helpers/article-preview.component';
 componentsModule.component('articlePreview', ArticlePreview);
 

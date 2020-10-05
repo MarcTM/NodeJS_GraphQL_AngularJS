@@ -19,6 +19,9 @@ export default class Foods {
     //   return this._$http(request).then((res) => res.data);
     // }
 
+
+
+    // Get all foods
     getFoods() {
       return this._$http({
         url: this._AppConstants.api + '/foods',
@@ -27,6 +30,8 @@ export default class Foods {
     }
     
 
+
+    // Get one food(details)
     getFood(slug) {
       return this._$http({
         url: this._AppConstants.api + "/foods/" + slug,
@@ -35,6 +40,9 @@ export default class Foods {
         .then(res => res.data.food);
     }
 
+
+
+    // Obtain categories(difficulty of food recipe)
     getDifficulty() {
       return this._$http({
         url: this._AppConstants.api + "/foods/food/difficulty",
@@ -42,6 +50,10 @@ export default class Foods {
       }).then(res => res.data.difficulty);
     }
   
+
+
+
+
     // getFood(slug) {
     //   let deferred = this._$q.defer();
   
@@ -70,6 +82,10 @@ export default class Foods {
     //   })
     // }
   
+
+
+
+    // Create a food
     save(food) {
       let request = {};
   
@@ -88,20 +104,23 @@ export default class Foods {
       return this._$http(request).then((res) => res.data.food);
     }
   
+
+
+
+  // Favorite and unfavorite
+    favorite(slug) {
+      return this._$http({
+        url: this._AppConstants.api + '/foods/' + slug + '/favorite',
+        method: 'POST'
+      })
+    }
   
-    // favorite(slug) {
-    //   return this._$http({
-    //     url: this._AppConstants.api + '/articles/' + slug + '/favorite',
-    //     method: 'POST'
-    //   })
-    // }
-  
-    // unfavorite(slug) {
-    //   return this._$http({
-    //     url: this._AppConstants.api + '/articles/' + slug + '/favorite',
-    //     method: 'DELETE'
-    //   })
-    // }
+    unfavorite(slug) {
+      return this._$http({
+        url: this._AppConstants.api + '/foods/' + slug + '/favorite',
+        method: 'DELETE'
+      })
+    }
   
   
   }

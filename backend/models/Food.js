@@ -10,6 +10,7 @@ var FoodSchema = new mongoose.Schema({
   difficulty: String,
   body: String,
   favoritesCount: {type: Number, default: 0},
+  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 }, {timestamps: true});
 

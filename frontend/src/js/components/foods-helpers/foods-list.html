@@ -1,4 +1,8 @@
 <div ng-repeat="food in $ctrl.foods">
+    <a class="author"
+      ui-sref="app.profile.main({ username:food.author.username })"
+      ng-bind="food.author.username">
+    </a>
     <h1>{{food.title}}</h1>
     <p>Difficulty: {{food.difficulty}}</p><br>
     <button ui-sref="app.detailsFood({slug:food.slug})">Details</button><br><br>

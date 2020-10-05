@@ -51813,7 +51813,7 @@ _angular2.default.bootstrap(document, ['app'], {
   strictDi: true
 });
 
-},{"./article":16,"./auth":19,"./components":29,"./config/app.config":32,"./config/app.constants":33,"./config/app.run":34,"./config/app.templates":35,"./editor":39,"./foods":44,"./home":49,"./layout":52,"./profile":53,"./services":60,"./settings":66,"angular":9,"angular-messages":2,"angular-toastr":4,"angular-ui-bootstrap":6,"angular-ui-router":7}],12:[function(require,module,exports){
+},{"./article":16,"./auth":19,"./components":30,"./config/app.config":33,"./config/app.constants":34,"./config/app.run":35,"./config/app.templates":36,"./editor":40,"./foods":45,"./home":50,"./layout":53,"./profile":54,"./services":61,"./settings":67,"angular":9,"angular-messages":2,"angular-toastr":4,"angular-ui-bootstrap":6,"angular-ui-router":7}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52495,6 +52495,71 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var FavoriteFoodBtnCtrl = function () {
+  FavoriteFoodBtnCtrl.$inject = ["User", "Foods", "$state"];
+  function FavoriteFoodBtnCtrl(User, Foods, $state) {
+    'ngInject';
+
+    _classCallCheck(this, FavoriteFoodBtnCtrl);
+
+    this._User = User;
+    this._Foods = Foods;
+    this._$state = $state;
+  }
+
+  _createClass(FavoriteFoodBtnCtrl, [{
+    key: 'submit',
+    value: function submit() {
+      var _this = this;
+
+      this.isSubmitting = true;
+
+      if (!this._User.current) {
+        this._$state.go('app.login');
+        return;
+      }
+
+      if (this.food.favorited) {
+        this._Foods.unfavorite(this.food.slug).then(function () {
+          _this.isSubmitting = false;
+          _this.food.favorited = false;
+          _this.food.favoritesCount--;
+        });
+      } else {
+        this._Foods.favorite(this.food.slug).then(function () {
+          _this.isSubmitting = false;
+          _this.food.favorited = true;
+          _this.food.favoritesCount++;
+        });
+      }
+    }
+  }]);
+
+  return FavoriteFoodBtnCtrl;
+}();
+
+var FavoriteFoodBtn = {
+  bindings: {
+    food: '='
+  },
+  transclude: true,
+  controller: FavoriteFoodBtnCtrl,
+  templateUrl: 'components/buttons/favorite-food-btn.html'
+};
+
+exports.default = FavoriteFoodBtn;
+
+},{}],27:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var FollowBtnCtrl = function () {
   FollowBtnCtrl.$inject = ["Profile", "User", "$state"];
   function FollowBtnCtrl(Profile, User, $state) {
@@ -52550,7 +52615,7 @@ var FollowBtn = {
 
 exports.default = FollowBtn;
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52565,7 +52630,7 @@ var FoodDetails = {
 
 exports.default = FoodDetails;
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -52607,7 +52672,7 @@ var FoodsList = {
 
 exports.default = FoodsList;
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52637,6 +52702,10 @@ var _articleMeta2 = _interopRequireDefault(_articleMeta);
 var _favoriteBtn = require('./buttons/favorite-btn.component');
 
 var _favoriteBtn2 = _interopRequireDefault(_favoriteBtn);
+
+var _favoriteFoodBtn = require('./buttons/favorite-food-btn.component');
+
+var _favoriteFoodBtn2 = _interopRequireDefault(_favoriteFoodBtn);
 
 var _articlePreview = require('./article-helpers/article-preview.component');
 
@@ -52672,6 +52741,8 @@ componentsModule.component('articleMeta', _articleMeta2.default);
 
 componentsModule.component('favoriteBtn', _favoriteBtn2.default);
 
+componentsModule.component('favoriteFoodBtn', _favoriteFoodBtn2.default);
+
 componentsModule.component('articlePreview', _articlePreview2.default);
 
 componentsModule.component('articleList', _articleList2.default);
@@ -52684,7 +52755,7 @@ componentsModule.component('listPagination', _listPagination2.default);
 
 exports.default = componentsModule;
 
-},{"./article-helpers/article-list.component":21,"./article-helpers/article-meta.component":22,"./article-helpers/article-preview.component":23,"./article-helpers/list-pagination.component":24,"./buttons/favorite-btn.component":25,"./buttons/follow-btn.component":26,"./foods-helpers/food-details.component":27,"./foods-helpers/foods-list.component":28,"./list-errors.component":30,"./show-authed.directive":31,"angular":9}],30:[function(require,module,exports){
+},{"./article-helpers/article-list.component":21,"./article-helpers/article-meta.component":22,"./article-helpers/article-preview.component":23,"./article-helpers/list-pagination.component":24,"./buttons/favorite-btn.component":25,"./buttons/favorite-food-btn.component":26,"./buttons/follow-btn.component":27,"./foods-helpers/food-details.component":28,"./foods-helpers/foods-list.component":29,"./list-errors.component":31,"./show-authed.directive":32,"angular":9}],31:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52699,7 +52770,7 @@ var ListErrors = {
 
 exports.default = ListErrors;
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 'use strict';
 
 ShowAuthed.$inject = ["User"];
@@ -52738,7 +52809,7 @@ function ShowAuthed(User) {
 
 exports.default = ShowAuthed;
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 'use strict';
 
 AppConfig.$inject = ["$httpProvider", "$stateProvider", "$locationProvider", "$urlRouterProvider"];
@@ -52778,7 +52849,7 @@ function AppConfig($httpProvider, $stateProvider, $locationProvider, $urlRouterP
 
 exports.default = AppConfig;
 
-},{"./auth.interceptor":36}],33:[function(require,module,exports){
+},{"./auth.interceptor":37}],34:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52793,7 +52864,7 @@ var AppConstants = {
 
 exports.default = AppConstants;
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 'use strict';
 
 AppRun.$inject = ["AppConstants", "$rootScope"];
@@ -52822,7 +52893,7 @@ function AppRun(AppConstants, $rootScope) {
 
 exports.default = AppRun;
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict";
 
 angular.module("templates", []).run(["$templateCache", function ($templateCache) {
@@ -52837,7 +52908,7 @@ angular.module("templates", []).run(["$templateCache", function ($templateCache)
   $templateCache.put("foods/foods.html", "<foods-list foods=\"$ctrl.foods\"></foods-list>");
   $templateCache.put("foods/recipes.html", "<div class=\"editor-page\">\n    <div class=\"container page\">\n      <div class=\"row\">\n        <div class=\"col-md-10 offset-md-1 col-xs-12\">\n          \n          <h1>New Recipe</h1>\n          <list-errors errors=\"$ctrl.errors\"></list-errors>\n  \n          <form>\n            <fieldset ng-disabled=\"$ctrl.isSubmitting\">\n  \n              <fieldset class=\"form-group\">\n                <input class=\"form-control form-control-lg\"\n                  ng-model=\"$ctrl.food.title\"\n                  type=\"text\"\n                  placeholder=\"Recipe Name\"/>\n              </fieldset>\n  \n              <fieldset class=\"form-group\">\n                <input class=\"form-control\"\n                  ng-model=\"$ctrl.food.description\"\n                  type=\"text\"\n                  placeholder=\"What\'s this recipe about?\" />\n              </fieldset>\n  \n              <fieldset class=\"form-group\">\n                <textarea class=\"form-control\"\n                  rows=\"8\"\n                  ng-model=\"$ctrl.food.body\"\n                  placeholder=\"Write your recipe\">\n                </textarea>\n              </fieldset>\n\n              <fieldset class=\"form-group\">\n                <textarea class=\"form-control\"\n                  ng-model=\"$ctrl.food.difficulty\"\n                  placeholder=\"Difficulty in 1 word: Easy, Medium, Hard, etc\">\n                </textarea>\n              </fieldset>\n  \n              <button class=\"btn btn-lg pull-xs-right btn-primary\" type=\"button\" ng-click=\"$ctrl.submit()\">\n                Publish Recipe\n              </button>\n  \n            </fieldset>\n          </form>\n  \n        </div>\n      </div>\n    </div>\n  </div>\n  ");
   $templateCache.put("home/home-slider.html", "<div style=\"height: 400px\">\n    <div uib-carousel active=\"active\" interval=\"$ctrl.myInterval\" no-wrap=\"$ctrl.noWrapSlides\">\n        <div uib-slide ng-repeat=\"slide in $ctrl.slides track by slide.id\" index=\"slide.id\" style=\"height: 400px\">\n            <img ng-src=\"{{slide.image}}\" class=\"img-fluid\" style=\"filter: blur(2px);\">\n            <div class = \"carousel-caption\" style = \"padding-bottom: 100px;\">\n                <h2>{{slide.text}}</h2>\n            </div>\n        </div>\n    </div>\n</div>");
-  $templateCache.put("home/home.html", " <div class=\"home-page\">\n\n  <!-- Splash banner that only shows when not logged in -->\n  <div class=\"banner\" show-authed=\"false\">\n    <div class=\"container\">\n      <h1 class=\"logo-font\" ng-bind=\"::$ctrl.appName | lowercase\"></h1>\n      <p>A place to share your knowledge.</p>\n    </div>\n  </div>\n\n\n<home-slider></home-slider><br><br>\n\n<h2>FOODS</h2>\n<p>Difficulty</p>\n<div ng-repeat=\"d in $ctrl.difficulty\">\n  <button ui-sref=\"app.filterFoods({filter:d})\">{{ d }}</button>\n</div><br><br>\n\n<div class=\"container page\">\n  <div class=\"row\">\n\n\n    <!-- Main view - contains tabs & article list -->\n    <div class=\"col-md-9\">\n      <!-- Tabs for toggling between feed, article lists -->\n      <div class=\"feed-toggle\">\n        <ul class=\"nav nav-pills outline-active\">\n\n          <li class=\"nav-item\" show-authed=\"true\">\n            <a href=\"\" class=\"nav-link\"\n              ng-class=\"{ active: $ctrl.listConfig.type === \'feed\' }\"\n              ng-click=\"$ctrl.changeList({ type: \'feed\' })\">\n              Your Feed\n            </a>\n          </li>\n\n          <li class=\"nav-item\">\n            <a href=\"\" class=\"nav-link\"\n              ng-class=\"{ active: $ctrl.listConfig.type === \'all\' && !$ctrl.listConfig.filters }\"\n              ng-click=\"$ctrl.changeList({ type: \'all\' })\">\n              Global Feed\n            </a>\n          </li>\n\n          <li class=\"nav-item\" ng-show=\"$ctrl.listConfig.filters.tag\">\n            <a href=\"\" class=\"nav-link active\">\n              <i class=\"ion-pound\"></i> {{$ctrl.listConfig.filters.tag}}\n            </a>\n          </li>\n\n        </ul>\n      </div>\n\n      <!-- List the current articles -->\n      <article-list limit=\"10\" list-config=\"$ctrl.listConfig\"></article-list>\n\n    </div>\n\n    <!-- Sidebar where popular tags are listed -->\n    <div class=\"col-md-3\">\n      <div class=\"sidebar\">\n\n        <p>Popular Tags</p>\n\n        <div class=\"tag-list\" ng-show=\"$ctrl.tags\">\n          <a href=\"\" class=\"tag-default tag-pill\"\n            ng-click=\"$ctrl.changeList({ type: \'all\', filters: { tag: tagName } })\"\n            ng-repeat=\"tagName in $ctrl.tags\"\n            ng-bind=\"tagName\">\n          </a>\n        </div>\n\n        <div ng-show=\"!$ctrl.tagsLoaded\">\n          Loading tags...\n        </div>\n\n        <div class=\"post-preview\"\n          ng-show=\"$ctrl.tagsLoaded && !$ctrl.tags.length\">\n          No tags are here... yet.\n        </div>\n\n      </div>\n    </div>\n\n    <!-- End the row & container divs -->\n  </div>\n</div>\n\n</div>\n");
+  $templateCache.put("home/home.html", " <div class=\"home-page\">\n\n  <!-- Splash banner that only shows when not logged in -->\n  <div class=\"banner\" show-authed=\"false\">\n    <div class=\"container\">\n      <h1 class=\"logo-font\" ng-bind=\"::$ctrl.appName | lowercase\"></h1>\n      <p>A place to share your knowledge.</p>\n    </div>\n  </div>\n\n\n<home-slider></home-slider><br><br>\n\n<h2>FOODS</h2>\n<p>Difficulty</p>\n<div ng-repeat=\"d in $ctrl.difficulty\">\n  <button ui-sref=\"app.filterFoods({filter:d})\">{{ d }}</button>\n</div><br><br>\n\n<div class=\"container page\">\n  <div class=\"row\">\n\n\n    <!-- Main view - contains tabs & article list -->\n    <div class=\"col-md-9\">\n      <!-- Tabs for toggling between feed, article lists -->\n      <div class=\"feed-toggle\">\n        <ul class=\"nav nav-pills outline-active\">\n\n          <li class=\"nav-item\" show-authed=\"true\">\n            <a href=\"\" class=\"nav-link\"\n              ng-class=\"{ active: $ctrl.listConfig.type === \'feed\' }\"\n              ng-click=\"$ctrl.changeList({ type: \'feed\' })\">\n              Your Feed\n            </a>\n          </li>\n\n          <li class=\"nav-item\">\n            <a href=\"\" class=\"nav-link\"\n              ng-class=\"{ active: $ctrl.listConfig.type === \'all\' && !$ctrl.listConfig.filters }\"\n              ng-click=\"$ctrl.changeList({ type: \'all\' })\">\n              Global Feed\n            </a>\n          </li>\n\n          <li class=\"nav-item\" ng-show=\"$ctrl.listConfig.filters.tag\">\n            <a href=\"\" class=\"nav-link active\">\n              <i class=\"ion-pound\"></i> {{$ctrl.listConfig.filters.tag}}\n            </a>\n          </li>\n\n        </ul>\n      </div>\n\n      <!-- List the current articles -->\n      <article-list limit=\"10\" list-config=\"$ctrl.listConfig\"></article-list>\n\n    </div>\n\n    <!-- End the row & container divs -->\n  </div>\n</div>\n\n</div>\n");
   $templateCache.put("layout/app-view.html", "<app-header></app-header>\n\n<div ui-view></div>\n\n<app-footer></app-footer>\n");
   $templateCache.put("layout/footer.html", "<footer>\n  <div class=\"container\">\n    <a class=\"logo-font\" ui-sref=\"app.home\" ng-bind=\"::$ctrl.appName | lowercase\"></a>\n    <span class=\"attribution\">\n      &copy; {{::$ctrl.date | date:\'yyyy\'}}.\n      An interactive learning project from <a href=\"https://thinkster.io\">Thinkster</a>.\n      Code licensed under MIT.\n    </span>\n  </div>\n</footer>\n");
   $templateCache.put("layout/header.html", "<nav class=\"navbar navbar-light\">\n  <div class=\"container\">\n\n    <a class=\"navbar-brand\"\n      ui-sref=\"app.home\"\n      ng-bind=\"::$ctrl.appName | lowercase\">\n    </a>\n\n<!--  -->\n    <!-- Show this for logged out users -->\n    <ul show-authed=\"false\"\n      class=\"nav navbar-nav pull-xs-right\">\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.home\">\n          Home\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.login\">\n          Sign in\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.register\">\n          Sign up\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.foods\">\n          Foods\n        </a>\n      </li>\n\n    </ul>\n\n<!--  -->\n    <!-- Show this for logged in users -->\n    <ul show-authed=\"true\"\n      class=\"nav navbar-nav pull-xs-right\">\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.home\">\n          Home\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.recipes\">\n          <i class=\"ion-compose\"></i>&nbsp;New Recipe\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.editor\">\n          <i class=\"ion-compose\"></i>&nbsp;New Article\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.settings\">\n          <i class=\"ion-gear-a\"></i>&nbsp;Settings\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.profile.main({ username: $ctrl.currentUser.username})\">\n          <img ng-src=\"{{$ctrl.currentUser.image}}\" class=\"user-pic\" />\n          {{ $ctrl.currentUser.username }}\n        </a>\n      </li>\n\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.foods\">\n          Foods\n        </a>\n      </li>\n\n    </ul>\n\n\n  </div>\n</nav>\n");
@@ -52848,13 +52919,14 @@ angular.module("templates", []).run(["$templateCache", function ($templateCache)
   $templateCache.put("components/article-helpers/article-meta.html", "<div class=\"article-meta\">\n  <a ui-sref=\"app.profile.main({ username:$ctrl.article.author.username })\">\n    <img ng-src=\"{{$ctrl.article.author.image}}\" />\n  </a>\n\n  <div class=\"info\">\n    <a class=\"author\"\n      ui-sref=\"app.profile.main({ username:$ctrl.article.author.username })\"\n      ng-bind=\"$ctrl.article.author.username\">\n    </a>\n    <span class=\"date\"\n      ng-bind=\"$ctrl.article.createdAt | date: \'longDate\' \">\n    </span>\n  </div>\n\n  <ng-transclude></ng-transclude>\n</div>\n");
   $templateCache.put("components/article-helpers/article-preview.html", "<div class=\"article-preview\">\n  <article-meta article=\"$ctrl.article\">\n    <favorite-btn\n      article=\"$ctrl.article\"\n      class=\"pull-xs-right\">\n      {{$ctrl.article.favoritesCount}}\n    </favorite-btn>\n  </article-meta>\n\n  <a ui-sref=\"app.article({ slug: $ctrl.article.slug })\" class=\"preview-link\">\n    <h1 ng-bind=\"$ctrl.article.title\"></h1>\n    <p ng-bind=\"$ctrl.article.description\"></p>\n    <span>Read more...</span>\n    <ul class=\"tag-list\">\n      <li class=\"tag-default tag-pill tag-outline\"\n        ng-repeat=\"tag in $ctrl.article.tagList\">\n        {{tag}}\n      </li>\n    </ul>\n  </a>\n</div>\n");
   $templateCache.put("components/article-helpers/list-pagination.html", "<nav>\n  <ul class=\"pagination\">\n\n    <li class=\"page-item\"\n      ng-class=\"{active: pageNumber === $ctrl.currentPage }\"\n      ng-repeat=\"pageNumber in $ctrl.pageRange($ctrl.totalPages)\"\n      ng-click=\"$ctrl.changePage(pageNumber)\">\n\n      <a class=\"page-link\" href=\"\">{{ pageNumber }}</a>\n\n    </li>\n\n  </ul>\n</nav>\n");
-  $templateCache.put("components/foods-helpers/food-details.html", "<div>\n    <h1>{{$ctrl.food.title}}</h1>\n    <p>{{$ctrl.food.description}}</p>\n    <p>{{$ctrl.food.body}}</p>\n</div>");
-  $templateCache.put("components/foods-helpers/foods-list.html", "<div ng-repeat=\"food in $ctrl.foods\">\n    <h1>{{food.title}}</h1>\n    <p>Difficulty: {{food.difficulty}}</p><br>\n    <button ui-sref=\"app.detailsFood({slug:food.slug})\">Details</button><br><br>\n    <hr>\n</div>\n<hr>\n\nTry Toastr: \n<button ng-click=\"$ctrl.errToas()\">Error</button>\n<button ng-click=\"$ctrl.succToas()\">Success</button>\n<button ng-click=\"$ctrl.infoToas()\">Info</button>\n<button ng-click=\"$ctrl.warnToas()\">Warning</button>");
   $templateCache.put("components/buttons/favorite-btn.html", "<button class=\"btn btn-sm\"\n  ng-class=\"{ \'disabled\' : $ctrl.isSubmitting,\n              \'btn-outline-primary\': !$ctrl.article.favorited,\n              \'btn-primary\': $ctrl.article.favorited }\"\n  ng-click=\"$ctrl.submit()\">\n  <i class=\"ion-heart\"></i> <ng-transclude></ng-transclude>\n</button>\n");
+  $templateCache.put("components/buttons/favorite-food-btn.html", "<button class=\"btn btn-sm\"\n  ng-class=\"{ \'disabled\' : $ctrl.isSubmitting,\n              \'btn-outline-primary\': !$ctrl.food.favorited,\n              \'btn-primary\': $ctrl.food.favorited }\"\n  ng-click=\"$ctrl.submit()\">\n  <i class=\"ion-heart\"></i> <ng-transclude></ng-transclude>\n</button>\n");
   $templateCache.put("components/buttons/follow-btn.html", "<button\n  class=\"btn btn-sm action-btn\"\n  ng-class=\"{ \'disabled\': $ctrl.isSubmitting,\n              \'btn-outline-secondary\': !$ctrl.user.following,\n              \'btn-secondary\': $ctrl.user.following }\"\n  ng-click=\"$ctrl.submit()\">\n  <i class=\"ion-plus-round\"></i>\n  &nbsp;\n  {{ $ctrl.user.following ? \'Unfollow\' : \'Follow\' }} {{ $ctrl.user.username }}\n</button>\n");
+  $templateCache.put("components/foods-helpers/food-details.html", "<div>\n    <h1>{{$ctrl.food.title}}</h1>\n    <p>{{$ctrl.food.description}}</p>\n    <p>{{$ctrl.food.body}}</p>\n    \n    <favorite-food-btn\n      food=\"$ctrl.food\"\n      class=\"pull-xs-right\">\n      {{$ctrl.food.favoritesCount}}\n    </favorite-food-btn>\n\n    <follow-btn user=\"$ctrl.food.author\" ng-hide=\"$ctrl.isUser\"></follow-btn>\n</div>");
+  $templateCache.put("components/foods-helpers/foods-list.html", "<div ng-repeat=\"food in $ctrl.foods\">\n    <a class=\"author\"\n      ui-sref=\"app.profile.main({ username:food.author.username })\"\n      ng-bind=\"food.author.username\">\n    </a>\n    <h1>{{food.title}}</h1>\n    <p>Difficulty: {{food.difficulty}}</p><br>\n    <button ui-sref=\"app.detailsFood({slug:food.slug})\">Details</button><br><br>\n    <hr>\n</div>\n<hr>\n\nTry Toastr: \n<button ng-click=\"$ctrl.errToas()\">Error</button>\n<button ng-click=\"$ctrl.succToas()\">Success</button>\n<button ng-click=\"$ctrl.infoToas()\">Info</button>\n<button ng-click=\"$ctrl.warnToas()\">Warning</button>");
 }]);
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 'use strict';
 
 authInterceptor.$inject = ["JWT", "AppConstants", "$window", "$q"];
@@ -52889,7 +52961,7 @@ function authInterceptor(JWT, AppConstants, $window, $q) {
 
 exports.default = authInterceptor;
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 'use strict';
 
 EditorConfig.$inject = ["$stateProvider"];
@@ -52932,7 +53004,7 @@ function EditorConfig($stateProvider) {
 
 exports.default = EditorConfig;
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53001,7 +53073,7 @@ var EditorCtrl = function () {
 
 exports.default = EditorCtrl;
 
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53035,7 +53107,7 @@ editorModule.controller('EditorCtrl', _editor4.default);
 
 exports.default = editorModule;
 
-},{"./editor.config":37,"./editor.controller":38,"angular":9}],40:[function(require,module,exports){
+},{"./editor.config":38,"./editor.controller":39,"angular":9}],41:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53056,7 +53128,7 @@ DetailsFoodCtrl.$inject = ["food"];
 
 exports.default = DetailsFoodCtrl;
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -53090,7 +53162,7 @@ FilterFoodsCtrl.$inject = ["foods", "$state", "$scope", "$stateParams"];
 
 exports.default = FilterFoodsCtrl;
 
-},{}],42:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 'use strict';
 
 FoodsConfig.$inject = ["$stateProvider", "$httpProvider"];
@@ -53171,7 +53243,7 @@ function FoodsConfig($stateProvider, $httpProvider) {
 
 exports.default = FoodsConfig;
 
-},{}],43:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53192,7 +53264,7 @@ FoodsCtrl.$inject = ["foods", "$state", "$scope"];
 
 exports.default = FoodsCtrl;
 
-},{}],44:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53244,7 +53316,7 @@ foodsModule.controller('RecipesCtrl', _recipes2.default);
 
 exports.default = foodsModule;
 
-},{"./detailsfood.controller":40,"./filterfoods.controller":41,"./foods.config":42,"./foods.controller":43,"./recipes.controller":45,"angular":9}],45:[function(require,module,exports){
+},{"./detailsfood.controller":41,"./filterfoods.controller":42,"./foods.config":43,"./foods.controller":44,"./recipes.controller":46,"angular":9}],46:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53298,7 +53370,7 @@ var RecipesCtrl = function () {
 
 exports.default = RecipesCtrl;
 
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53313,7 +53385,7 @@ var HomeSliderCtrl = function HomeSliderCtrl() {
     this.myInterval = 5000;
     this.noWrapSlides = false;
 
-    this.slides = [{ image: '/images/food1.jpg', text: "This is arros a la cubana", id: 0 }, { image: '/images/food2.jpg', text: "This is arros a banda", id: 1 }];
+    this.slides = [{ image: '/images/food1.jpg', text: "Arros a la cubana", id: 0 }, { image: '/images/food2.jpg', text: "Arros a banda", id: 1 }];
 };
 
 var HomeSlider = {
@@ -53323,7 +53395,7 @@ var HomeSlider = {
 
 exports.default = HomeSlider;
 
-},{}],47:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 'use strict';
 
 HomeConfig.$inject = ["$stateProvider"];
@@ -53351,7 +53423,7 @@ function HomeConfig($stateProvider) {
 
 exports.default = HomeConfig;
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53399,7 +53471,7 @@ var HomeCtrl = function () {
 
 exports.default = HomeCtrl;
 
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53441,7 +53513,7 @@ homeModule.component('homeSlider', _homeSlider2.default);
 
 exports.default = homeModule;
 
-},{"./home-slider.component":46,"./home.config":47,"./home.controller":48,"angular":9}],50:[function(require,module,exports){
+},{"./home-slider.component":47,"./home.config":48,"./home.controller":49,"angular":9}],51:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53469,7 +53541,7 @@ var AppFooter = {
 
 exports.default = AppFooter;
 
-},{}],51:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53501,7 +53573,7 @@ var AppHeader = {
 
 exports.default = AppHeader;
 
-},{}],52:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53533,7 +53605,7 @@ layoutModule.component('appFooter', _footer2.default);
 
 exports.default = layoutModule;
 
-},{"./footer.component":50,"./header.component":51,"angular":9}],53:[function(require,module,exports){
+},{"./footer.component":51,"./header.component":52,"angular":9}],54:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53573,7 +53645,7 @@ profileModule.controller('ProfileArticlesCtrl', _profileArticles2.default);
 
 exports.default = profileModule;
 
-},{"./profile-articles.controller":54,"./profile.config":55,"./profile.controller":56,"angular":9}],54:[function(require,module,exports){
+},{"./profile-articles.controller":55,"./profile.config":56,"./profile.controller":57,"angular":9}],55:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53611,7 +53683,7 @@ ProfileArticlesCtrl.$inject = ["profile", "$state", "$rootScope"];
 
 exports.default = ProfileArticlesCtrl;
 
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 'use strict';
 
 ProfileConfig.$inject = ["$stateProvider"];
@@ -53654,7 +53726,7 @@ function ProfileConfig($stateProvider) {
 
 exports.default = ProfileConfig;
 
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53681,7 +53753,7 @@ ProfileCtrl.$inject = ["profile", "User"];
 
 exports.default = ProfileCtrl;
 
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53798,7 +53870,7 @@ var Articles = function () {
 
 exports.default = Articles;
 
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53859,7 +53931,7 @@ var Comments = function () {
 
 exports.default = Comments;
 
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53892,6 +53964,10 @@ var Foods = function () {
   //   return this._$http(request).then((res) => res.data);
   // }
 
+
+  // Get all foods
+
+
   _createClass(Foods, [{
     key: 'getFoods',
     value: function getFoods() {
@@ -53902,6 +53978,9 @@ var Foods = function () {
         return res.data.foods;
       });
     }
+
+    // Get one food(details)
+
   }, {
     key: 'getFood',
     value: function getFood(slug) {
@@ -53912,6 +53991,9 @@ var Foods = function () {
         return res.data.food;
       });
     }
+
+    // Obtain categories(difficulty of food recipe)
+
   }, {
     key: 'getDifficulty',
     value: function getDifficulty() {
@@ -53950,6 +54032,9 @@ var Foods = function () {
     //   })
     // }
 
+
+    // Create a food
+
   }, {
     key: 'save',
     value: function save(food) {
@@ -53971,21 +54056,24 @@ var Foods = function () {
       });
     }
 
-    // favorite(slug) {
-    //   return this._$http({
-    //     url: this._AppConstants.api + '/articles/' + slug + '/favorite',
-    //     method: 'POST'
-    //   })
-    // }
+    // Favorite and unfavorite
 
-    // unfavorite(slug) {
-    //   return this._$http({
-    //     url: this._AppConstants.api + '/articles/' + slug + '/favorite',
-    //     method: 'DELETE'
-    //   })
-    // }
-
-
+  }, {
+    key: 'favorite',
+    value: function favorite(slug) {
+      return this._$http({
+        url: this._AppConstants.api + '/foods/' + slug + '/favorite',
+        method: 'POST'
+      });
+    }
+  }, {
+    key: 'unfavorite',
+    value: function unfavorite(slug) {
+      return this._$http({
+        url: this._AppConstants.api + '/foods/' + slug + '/favorite',
+        method: 'DELETE'
+      });
+    }
   }]);
 
   return Foods;
@@ -53993,7 +54081,7 @@ var Foods = function () {
 
 exports.default = Foods;
 
-},{}],60:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54059,7 +54147,7 @@ servicesModule.service('Tags', _tags2.default);
 
 exports.default = servicesModule;
 
-},{"./articles.service":57,"./comments.service":58,"./foods.service":59,"./jwt.service":61,"./profile.service":62,"./tags.service":63,"./toastr.service":64,"./user.service":65,"angular":9}],61:[function(require,module,exports){
+},{"./articles.service":58,"./comments.service":59,"./foods.service":60,"./jwt.service":62,"./profile.service":63,"./tags.service":64,"./toastr.service":65,"./user.service":66,"angular":9}],62:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54103,7 +54191,7 @@ var JWT = function () {
 
 exports.default = JWT;
 
-},{}],62:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54162,7 +54250,7 @@ var Profile = function () {
 
 exports.default = Profile;
 
-},{}],63:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54202,7 +54290,7 @@ var Tags = function () {
 
 exports.default = Tags;
 
-},{}],64:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54249,7 +54337,7 @@ var Toastr = function () {
 
 exports.default = Toastr;
 
-},{}],65:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -54380,7 +54468,7 @@ var User = function () {
 
 exports.default = User;
 
-},{}],66:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54413,7 +54501,7 @@ settingsModule.controller('SettingsCtrl', _settings4.default);
 
 exports.default = settingsModule;
 
-},{"./settings.config":67,"./settings.controller":68,"angular":9}],67:[function(require,module,exports){
+},{"./settings.config":68,"./settings.controller":69,"angular":9}],68:[function(require,module,exports){
 'use strict';
 
 SettingsConfig.$inject = ["$stateProvider"];
@@ -54439,7 +54527,7 @@ function SettingsConfig($stateProvider) {
 
 exports.default = SettingsConfig;
 
-},{}],68:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

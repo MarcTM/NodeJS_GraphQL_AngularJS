@@ -2,4 +2,12 @@
     <h1>{{$ctrl.food.title}}</h1>
     <p>{{$ctrl.food.description}}</p>
     <p>{{$ctrl.food.body}}</p>
+    
+    <favorite-food-btn
+      food="$ctrl.food"
+      class="pull-xs-right">
+      {{$ctrl.food.favoritesCount}}
+    </favorite-food-btn>
+
+    <follow-btn user="$ctrl.food.author" ng-hide="$ctrl.isUser"></follow-btn>
 </div>

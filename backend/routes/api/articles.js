@@ -273,6 +273,8 @@ router.get('/:article/comments', auth.optional, function(req, res, next){
 // create a new comment
 router.post('/:article/comments', auth.required, function(req, res, next) {
   User.findById(req.payload.id).then(function(user){
+    console.log(user);
+    console.log(req.article);
     if(!user){ return res.sendStatus(401); }
 
     var comment = new Comment(req.body.comment);
@@ -280,7 +282,7 @@ router.post('/:article/comments', auth.required, function(req, res, next) {
     comment.author = user;
 
     return comment.save().then(function(){
-      req.article.comments.push(comment);
+      req.article.comments = req.article.comments.concat(comment);
 
       return req.article.save().then(function(article) {
         res.json({comment: comment.toJSONFor(user)});
