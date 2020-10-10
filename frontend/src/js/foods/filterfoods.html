@@ -1,8 +1,21 @@
-<button ui-sref="app.foods">Delete filters</button>
-<br><br>
+<hr>
+<blockquote>
+  <button class="button-deletefilters" ui-sref="app.foods">DELETE FILTERS</button>
+  <br><br>
 
-<div ng-repeat="food in $ctrl.filteredFoods">
-    <h2> {{food.title}}</h2>
-    <p>Difficulty: {{food.difficulty}}</p>
-   <button ui-sref="app.detailsFood({slug:food.slug})">Details</button> 
-</div>
+  <div ng-repeat="food in $ctrl.filteredFoods">
+      <hr>
+      <label>Author:</label> <a class="author"
+        ui-sref="app.profile.main({ username:food.author.username })"
+        ng-bind="food.author.username">
+      </a>
+
+      <a ui-sref="app.detailsFood({ slug:food.slug })" class="preview-link">
+        <h1 ng-bind="food.title"></h1>
+        <p style="font-size: 12px;">Difficulty: {{food.difficulty}}</p>
+        <p ng-bind="food.description"></p>
+        <button class="button-details">Read recipe...</span>
+      </a>
+  </div>
+  <hr>
+</blockquote>

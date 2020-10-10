@@ -74,13 +74,13 @@ export default class Foods {
     // }
 
    
-  
-    // destroy(slug) {
-    //   return this._$http({
-    //     url: this._AppConstants.api + '/articles/' + slug,
-    //     method: 'DELETE'
-    //   })
-    // }
+    // Delete a food
+    destroy(slug) {
+      return this._$http({
+        url: this._AppConstants.api + '/foods/' + slug,
+        method: 'DELETE'
+      })
+    }
   
 
 

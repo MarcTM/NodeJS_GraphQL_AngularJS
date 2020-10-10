@@ -1,0 +1,21 @@
+<!-- Your article -->
+<span ng-show="$ctrl.canModify">
+    <a class="btn btn-sm btn-outline-secondary"
+    ui-sref="app.editRecipe({ slug: $ctrl.article.slug })">
+    <i class="ion-edit"></i> Edit Recipe
+    </a>
+
+    <button class="btn btn-sm btn-outline-danger"
+    ng-class="{disabled: $ctrl.isDeleting}"
+    ng-click="$ctrl.deleteRecipe()">
+    <i class="ion-trash-a"></i> Delete Recipe
+    </button>
+</span>
+
+<!-- Not your article -->
+<span ng-hide="$ctrl.canModify">
+    <follow-btn user="$ctrl.food.author"></follow-btn>
+    <favorite-food-btn food="$ctrl.food">
+    {{ $ctrl.food.favorited ? 'Unfavorite' : 'Favorite' }} Recipe <span class="counter">({{$ctrl.food.favoritesCount}})</span>
+    </favorite-food-btn>
+</span>

@@ -8,14 +8,15 @@
     </div>
   </div>
 
-
 <home-slider></home-slider><br><br>
 
-<h2>FOODS</h2>
-<p>Difficulty</p>
-<div ng-repeat="d in $ctrl.difficulty">
-  <button ui-sref="app.filterFoods({filter:d})">{{ d }}</button>
-</div><br><br>
+<blockquote>
+  <h1><u>RECIPES</u></h1>
+  <h2>Difficulty</h2>
+  <div class="cats" ng-repeat="d in $ctrl.difficulty">
+    <button class="button-categories" ui-sref="app.filterFoods({filter:d})">{{ d }}</button>
+  </div><br><br>
+</blockquote>
 
 <div class="container page">
   <div class="row">

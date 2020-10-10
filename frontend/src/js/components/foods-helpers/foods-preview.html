@@ -1,0 +1,15 @@
+<div class="food-preview">
+  <label>Author:</label> <a class="author"
+    ui-sref="app.profile.main({ username:$ctrl.food.author.username })"
+    ng-bind="$ctrl.food.author.username">
+  </a>
+
+  <a ui-sref="app.detailsFood({ slug: $ctrl.food.slug })" class="preview-link">
+    <h1 ng-bind="$ctrl.food.title"></h1>
+    <p style="font-size: 12px;">Difficulty: {{$ctrl.food.difficulty}}</p>
+    <p ng-bind="$ctrl.food.description"></p>
+    <button class="button-details">Read recipe...</span>
+  </a>
+
+</div>  
+<hr>

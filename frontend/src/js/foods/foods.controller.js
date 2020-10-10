@@ -4,7 +4,7 @@ class FoodsCtrl {
       this.foods = foods;
       console.log(this.foods);
     }
-  }
+}
   
-  export default FoodsCtrl;
+export default FoodsCtrl;
   

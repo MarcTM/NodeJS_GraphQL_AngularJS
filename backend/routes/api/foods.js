@@ -225,20 +225,20 @@ router.delete('/:food/favorite', auth.required, function(req, res, next) {
 
 
 
-// delete article
-// router.delete('/:article', auth.required, function(req, res, next) {
-//   User.findById(req.payload.id).then(function(user){
-//     if (!user) { return res.sendStatus(401); }
+// delete recipe/food
+router.delete('/:food', auth.required, function(req, res, next) {
+  User.findById(req.payload.id).then(function(user){
+    if (!user) { return res.sendStatus(401); }
 
-//     if(req.article.author._id.toString() === req.payload.id.toString()){
-//       return req.article.remove().then(function(){
-//         return res.sendStatus(204);
-//       });
-//     } else {
-//       return res.sendStatus(403);
-//     }
-//   }).catch(next);
-// });
+    if(req.food.author._id.toString() === req.payload.id.toString()){
+      return req.food.remove().then(function(){
+        return res.sendStatus(204);
+      });
+    } else {
+      return res.sendStatus(403);
+    }
+  }).catch(next);
+});
 
 
 module.exports = router;

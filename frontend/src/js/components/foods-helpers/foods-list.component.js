@@ -6,6 +6,8 @@ class FoodsListCtrl {
       this._$scope = $scope;
       this._toastr = Toastr;
 
+
+      // Toastr
       this.errToas = function () {
         Toastr.showToastr("error", "Error example");
       };

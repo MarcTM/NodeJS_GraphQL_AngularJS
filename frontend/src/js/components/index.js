@@ -30,8 +30,14 @@ componentsModule.component('articleList', ArticleList);
 import FoodsList from './foods-helpers/foods-list.component';
 componentsModule.component('foodsList', FoodsList);
 
+import FoodsPreview from './foods-helpers/foods-preview.component';
+componentsModule.component('foodsPreview', FoodsPreview);
+
 import FoodDetails from './foods-helpers/food-details.component';
 componentsModule.component('foodDetails', FoodDetails);
+
+import FoodActions from './foods-helpers/food-actions.component';
+componentsModule.component('foodActions', FoodActions);
 
 import ListPagination from './article-helpers/list-pagination.component';
 componentsModule.component('listPagination', ListPagination);

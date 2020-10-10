@@ -1,17 +1,11 @@
-<div ng-repeat="food in $ctrl.foods">
-    <a class="author"
-      ui-sref="app.profile.main({ username:food.author.username })"
-      ng-bind="food.author.username">
-    </a>
-    <h1>{{food.title}}</h1>
-    <p>Difficulty: {{food.difficulty}}</p><br>
-    <button ui-sref="app.detailsFood({slug:food.slug})">Details</button><br><br>
-    <hr>
-</div>
 <hr>
+<blockquote>
+  <foods-preview food="food" ng-repeat="food in $ctrl.foods"></foods-preview>
+  <hr>
 
-Try Toastr: 
-<button ng-click="$ctrl.errToas()">Error</button>
-<button ng-click="$ctrl.succToas()">Success</button>
-<button ng-click="$ctrl.infoToas()">Info</button>
-<button ng-click="$ctrl.warnToas()">Warning</button>
+  <label>Toastr:</label> 
+  <button class="button-toastrexample" ng-click="$ctrl.errToas()">Error</button>
+  <button class="button-toastrexample" ng-click="$ctrl.succToas()">Success</button>
+  <button class="button-toastrexample" ng-click="$ctrl.infoToas()">Info</button>
+  <button class="button-toastrexample" ng-click="$ctrl.warnToas()">Warning</button>
+</blockquote>

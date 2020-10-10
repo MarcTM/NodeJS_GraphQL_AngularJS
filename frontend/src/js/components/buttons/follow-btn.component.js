@@ -12,7 +12,7 @@ class FollowBtnCtrl {
     this.isSubmitting = true;
 
     if (!this._User.current) {
-      this._$state.go('app.register');
+      this._$state.go('app.login');
       return;
     }
 

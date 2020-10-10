@@ -1,7 +1,7 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 /**
- * @license AngularJS v1.8.0
- * (c) 2010-2020 Google, Inc. http://angularjs.org
+ * @license AngularJS v1.8.1
+ * (c) 2010-2020 Google LLC. http://angularjs.org
  * License: MIT
  */
 (function(window, angular) {'use strict';
@@ -292,7 +292,7 @@ angular.module('ngMessages', [], function initAngularHelpers() {
   isString = angular.isString;
   jqLite = angular.element;
 })
-  .info({ angularVersion: '1.8.0' })
+  .info({ angularVersion: '1.8.1' })
 
   /**
    * @ngdoc directive
@@ -13844,8 +13844,8 @@ angular.module('ui.router.state')
 })(window, window.angular);
 },{}],8:[function(require,module,exports){
 /**
- * @license AngularJS v1.8.0
- * (c) 2010-2020 Google, Inc. http://angularjs.org
+ * @license AngularJS v1.8.1
+ * (c) 2010-2020 Google LLC. http://angularjs.org
  * License: MIT
  */
 (function(window) {'use strict';
@@ -13944,7 +13944,7 @@ function isValidObjectMaxDepth(maxDepth) {
 function minErr(module, ErrorConstructor) {
   ErrorConstructor = ErrorConstructor || Error;
 
-  var url = 'https://errors.angularjs.org/1.8.0/';
+  var url = 'https://errors.angularjs.org/1.8.1/';
   var regex = url.replace('.', '\\.') + '[\\s\\S]*';
   var errRegExp = new RegExp(regex, 'g');
 
@@ -15516,7 +15516,7 @@ function allowAutoBootstrap(document) {
     link.href = src.value;
 
     if (document.location.origin === link.origin) {
-      // Same-origin resources are always allowed, even for non-whitelisted schemes.
+      // Same-origin resources are always allowed, even for banned URL schemes.
       return true;
     }
     // Disabled bootstrapping unless angular.js was loaded from a known scheme used on the web.
@@ -16673,11 +16673,11 @@ function toDebugString(obj, maxDepth) {
 var version = {
   // These placeholder strings will be replaced by grunt's `build` task.
   // They need to be double- or single-quoted.
-  full: '1.8.0',
+  full: '1.8.1',
   major: 1,
   minor: 8,
-  dot: 0,
-  codeName: 'nested-vaccination'
+  dot: 1,
+  codeName: 'mutually-supporting'
 };
 
 
@@ -16828,7 +16828,7 @@ function publishExternalAPI(angular) {
       });
     }
   ])
-  .info({ angularVersion: '1.8.0' });
+  .info({ angularVersion: '1.8.1' });
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -22273,8 +22273,8 @@ function $TemplateCacheProvider() {
  *
  * Based on the context, other options may exist to mark a value as trusted / configure the behavior
  * of {@link ng.$sce}. For example, to restrict the `RESOURCE_URL` context to specific origins, use
- * the {@link $sceDelegateProvider#resourceUrlWhitelist resourceUrlWhitelist()}
- * and {@link $sceDelegateProvider#resourceUrlBlacklist resourceUrlBlacklist()}.
+ * the {@link $sceDelegateProvider#trustedResourceUrlList trustedResourceUrlList()}
+ * and {@link $sceDelegateProvider#bannedResourceUrlList bannedResourceUrlList()}.
  *
  * {@link ng.$sce#what-trusted-context-types-are-supported- Find out more about the different context types}.
  *
@@ -22283,7 +22283,7 @@ function $TemplateCacheProvider() {
  * By default, `$sce` will throw an error if it detects untrusted HTML content, and will not bind the
  * content.
  * However, if you include the {@link ngSanitize ngSanitize module}, it will try to sanitize the
- * potentially dangerous HTML, e.g. strip non-whitelisted tags and attributes when binding to
+ * potentially dangerous HTML, e.g. strip non-trusted tags and attributes when binding to
  * `innerHTML`.
  *
  * @example
@@ -22865,30 +22865,81 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
 
   /**
    * @ngdoc method
-   * @name $compileProvider#aHrefSanitizationWhitelist
+   * @name $compileProvider#aHrefSanitizationTrustedUrlList
    * @kind function
    *
    * @description
-   * Retrieves or overrides the default regular expression that is used for whitelisting of safe
+   * Retrieves or overrides the default regular expression that is used for determining trusted safe
    * urls during a[href] sanitization.
    *
    * The sanitization is a security measure aimed at preventing XSS attacks via html links.
    *
    * Any url about to be assigned to a[href] via data-binding is first normalized and turned into
-   * an absolute url. Afterwards, the url is matched against the `aHrefSanitizationWhitelist`
+   * an absolute url. Afterwards, the url is matched against the `aHrefSanitizationTrustedUrlList`
    * regular expression. If a match is found, the original url is written into the dom. Otherwise,
    * the absolute url is prefixed with `'unsafe:'` string and only then is it written into the DOM.
    *
-   * @param {RegExp=} regexp New regexp to whitelist urls with.
+   * @param {RegExp=} regexp New regexp to trust urls with.
    * @returns {RegExp|ng.$compileProvider} Current RegExp if called without value or self for
    *    chaining otherwise.
    */
-  this.aHrefSanitizationWhitelist = function(regexp) {
+  this.aHrefSanitizationTrustedUrlList = function(regexp) {
     if (isDefined(regexp)) {
-      $$sanitizeUriProvider.aHrefSanitizationWhitelist(regexp);
+      $$sanitizeUriProvider.aHrefSanitizationTrustedUrlList(regexp);
       return this;
     } else {
-      return $$sanitizeUriProvider.aHrefSanitizationWhitelist();
+      return $$sanitizeUriProvider.aHrefSanitizationTrustedUrlList();
+    }
+  };
+
+
+  /**
+   * @ngdoc method
+   * @name $compileProvider#aHrefSanitizationWhitelist
+   * @kind function
+   *
+   * @deprecated
+   * sinceVersion="1.8.1"
+   *
+   * This function is deprecated. Use {@link $compileProvider#aHrefSanitizationTrustedUrlList
+   * aHrefSanitizationTrustedUrlList} instead.
+   */
+  Object.defineProperty(this, 'aHrefSanitizationWhitelist', {
+    get: function() {
+      return this.aHrefSanitizationTrustedUrlList;
+    },
+    set: function(regexp) {
+      this.aHrefSanitizationTrustedUrlList = regexp;
+    }
+  });
+
+
+  /**
+   * @ngdoc method
+   * @name $compileProvider#imgSrcSanitizationTrustedUrlList
+   * @kind function
+   *
+   * @description
+   * Retrieves or overrides the default regular expression that is used for determining trusted safe
+   * urls during img[src] sanitization.
+   *
+   * The sanitization is a security measure aimed at prevent XSS attacks via html links.
+   *
+   * Any url about to be assigned to img[src] via data-binding is first normalized and turned into
+   * an absolute url. Afterwards, the url is matched against the `imgSrcSanitizationTrustedUrlList`
+   * regular expression. If a match is found, the original url is written into the dom. Otherwise,
+   * the absolute url is prefixed with `'unsafe:'` string and only then is it written into the DOM.
+   *
+   * @param {RegExp=} regexp New regexp to trust urls with.
+   * @returns {RegExp|ng.$compileProvider} Current RegExp if called without value or self for
+   *    chaining otherwise.
+   */
+  this.imgSrcSanitizationTrustedUrlList = function(regexp) {
+    if (isDefined(regexp)) {
+      $$sanitizeUriProvider.imgSrcSanitizationTrustedUrlList(regexp);
+      return this;
+    } else {
+      return $$sanitizeUriProvider.imgSrcSanitizationTrustedUrlList();
     }
   };
 
@@ -22898,29 +22949,20 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
    * @name $compileProvider#imgSrcSanitizationWhitelist
    * @kind function
    *
-   * @description
-   * Retrieves or overrides the default regular expression that is used for whitelisting of safe
-   * urls during img[src] sanitization.
+   * @deprecated
+   * sinceVersion="1.8.1"
    *
-   * The sanitization is a security measure aimed at prevent XSS attacks via html links.
-   *
-   * Any url about to be assigned to img[src] via data-binding is first normalized and turned into
-   * an absolute url. Afterwards, the url is matched against the `imgSrcSanitizationWhitelist`
-   * regular expression. If a match is found, the original url is written into the dom. Otherwise,
-   * the absolute url is prefixed with `'unsafe:'` string and only then is it written into the DOM.
-   *
-   * @param {RegExp=} regexp New regexp to whitelist urls with.
-   * @returns {RegExp|ng.$compileProvider} Current RegExp if called without value or self for
-   *    chaining otherwise.
+   * This function is deprecated. Use {@link $compileProvider#imgSrcSanitizationTrustedUrlList
+   * imgSrcSanitizationTrustedUrlList} instead.
    */
-  this.imgSrcSanitizationWhitelist = function(regexp) {
-    if (isDefined(regexp)) {
-      $$sanitizeUriProvider.imgSrcSanitizationWhitelist(regexp);
-      return this;
-    } else {
-      return $$sanitizeUriProvider.imgSrcSanitizationWhitelist();
+  Object.defineProperty(this, 'imgSrcSanitizationWhitelist', {
+    get: function() {
+      return this.imgSrcSanitizationTrustedUrlList;
+    },
+    set: function(regexp) {
+      this.imgSrcSanitizationTrustedUrlList = regexp;
     }
-  };
+  });
 
   /**
    * @ngdoc method
@@ -26172,7 +26214,7 @@ function $HttpProvider() {
 
   /**
    * @ngdoc property
-   * @name $httpProvider#xsrfWhitelistedOrigins
+   * @name $httpProvider#xsrfTrustedOrigins
    * @description
    *
    * Array containing URLs whose origins are trusted to receive the XSRF token. See the
@@ -26186,7 +26228,7 @@ function $HttpProvider() {
    * Examples: `http://example.com`, `https://api.example.com:9876`
    *
    * <div class="alert alert-warning">
-   *   It is not possible to whitelist specific URLs/paths. The `path`, `query` and `fragment` parts
+   *   It is not possible to trust specific URLs/paths. The `path`, `query` and `fragment` parts
    *   of a URL will be ignored. For example, `https://foo.com/path/bar?query=baz#fragment` will be
    *   treated as `https://foo.com`, meaning that **all** requests to URLs starting with
    *   `https://foo.com/` will include the XSRF token.
@@ -26197,9 +26239,9 @@ function $HttpProvider() {
    * ```js
    * // App served from `https://example.com/`.
    * angular.
-   *   module('xsrfWhitelistedOriginsExample', []).
+   *   module('xsrfTrustedOriginsExample', []).
    *   config(['$httpProvider', function($httpProvider) {
-   *     $httpProvider.xsrfWhitelistedOrigins.push('https://api.example.com');
+   *     $httpProvider.xsrfTrustedOrigins.push('https://api.example.com');
    *   }]).
    *   run(['$http', function($http) {
    *     // The XSRF token will be sent.
@@ -26210,7 +26252,27 @@ function $HttpProvider() {
    *   }]);
    * ```
    */
-  var xsrfWhitelistedOrigins = this.xsrfWhitelistedOrigins = [];
+  var xsrfTrustedOrigins = this.xsrfTrustedOrigins = [];
+
+  /**
+   * @ngdoc property
+   * @name $httpProvider#xsrfWhitelistedOrigins
+   * @description
+   *
+   * @deprecated
+   * sinceVersion="1.8.1"
+   *
+   * This function is deprecated. Use {@link $httpProvider#xsrfTrustedOrigins xsrfTrustedOrigins}
+   * instead.
+   */
+  Object.defineProperty(this, 'xsrfWhitelistedOrigins', {
+    get: function() {
+      return this.xsrfTrustedOrigins;
+    },
+    set: function(origins) {
+      this.xsrfTrustedOrigins = origins;
+    }
+  });
 
   this.$get = ['$browser', '$httpBackend', '$$cookieReader', '$cacheFactory', '$rootScope', '$q', '$injector', '$sce',
       function($browser, $httpBackend, $$cookieReader, $cacheFactory, $rootScope, $q, $injector, $sce) {
@@ -26238,7 +26300,7 @@ function $HttpProvider() {
     /**
      * A function to check request URLs against a list of allowed origins.
      */
-    var urlIsAllowedOrigin = urlIsAllowedOriginFactory(xsrfWhitelistedOrigins);
+    var urlIsAllowedOrigin = urlIsAllowedOriginFactory(xsrfTrustedOrigins);
 
     /**
      * @ngdoc service
@@ -26612,16 +26674,16 @@ function $HttpProvider() {
      * The header will &mdash; by default &mdash; **not** be set for cross-domain requests. This
      * prevents unauthorized servers (e.g. malicious or compromised 3rd-party APIs) from gaining
      * access to your users' XSRF tokens and exposing them to Cross Site Request Forgery. If you
-     * want to, you can whitelist additional origins to also receive the XSRF token, by adding them
-     * to {@link ng.$httpProvider#xsrfWhitelistedOrigins xsrfWhitelistedOrigins}. This might be
+     * want to, you can trust additional origins to also receive the XSRF token, by adding them
+     * to {@link ng.$httpProvider#xsrfTrustedOrigins xsrfTrustedOrigins}. This might be
      * useful, for example, if your application, served from `example.com`, needs to access your API
      * at `api.example.com`.
-     * See {@link ng.$httpProvider#xsrfWhitelistedOrigins $httpProvider.xsrfWhitelistedOrigins} for
+     * See {@link ng.$httpProvider#xsrfTrustedOrigins $httpProvider.xsrfTrustedOrigins} for
      * more details.
      *
      * <div class="alert alert-danger">
      *   **Warning**<br />
-     *   Only whitelist origins that you have control over and make sure you understand the
+     *   Only trusted origins that you have control over and make sure you understand the
      *   implications of doing so.
      * </div>
      *
@@ -26748,8 +26810,8 @@ function $HttpProvider() {
 <file name="script.js">
   angular.module('httpExample', [])
     .config(['$sceDelegateProvider', function($sceDelegateProvider) {
-      // We must whitelist the JSONP endpoint that we are using to show that we trust it
-      $sceDelegateProvider.resourceUrlWhitelist([
+      // We must add the JSONP endpoint that we are using to the trusted list to show that we trust it
+      $sceDelegateProvider.trustedResourceUrlList([
         'self',
         'https://angularjs.org/**'
       ]);
@@ -27006,8 +27068,8 @@ function $HttpProvider() {
      *
      * Note that, since JSONP requests are sensitive because the response is given full access to the browser,
      * the url must be declared, via {@link $sce} as a trusted resource URL.
-     * You can trust a URL by adding it to the whitelist via
-     * {@link $sceDelegateProvider#resourceUrlWhitelist  `$sceDelegateProvider.resourceUrlWhitelist`} or
+     * You can trust a URL by adding it to the trusted resource URL list via
+     * {@link $sceDelegateProvider#trustedResourceUrlList  `$sceDelegateProvider.trustedResourceUrlList`} or
      * by explicitly trusting the URL via {@link $sce#trustAsResourceUrl `$sce.trustAsResourceUrl(url)`}.
      *
      * You should avoid generating the URL for the JSONP request from user provided data.
@@ -33743,12 +33805,12 @@ function $RootScopeProvider() {
  */
 function $$SanitizeUriProvider() {
 
-  var aHrefSanitizationWhitelist = /^\s*(https?|s?ftp|mailto|tel|file):/,
-    imgSrcSanitizationWhitelist = /^\s*((https?|ftp|file|blob):|data:image\/)/;
+  var aHrefSanitizationTrustedUrlList = /^\s*(https?|s?ftp|mailto|tel|file):/,
+    imgSrcSanitizationTrustedUrlList = /^\s*((https?|ftp|file|blob):|data:image\/)/;
 
   /**
    * @description
-   * Retrieves or overrides the default regular expression that is used for whitelisting of safe
+   * Retrieves or overrides the default regular expression that is used for determining trusted safe
    * urls during a[href] sanitization.
    *
    * The sanitization is a security measure aimed at prevent XSS attacks via HTML anchor links.
@@ -33757,27 +33819,27 @@ function $$SanitizeUriProvider() {
    * the $sce.URL security context. When interpolation occurs a call is made to `$sce.trustAsUrl(url)`
    * which in turn may call `$$sanitizeUri(url, isMedia)` to sanitize the potentially malicious URL.
    *
-   * If the URL matches the `aHrefSanitizationWhitelist` regular expression, it is returned unchanged.
+   * If the URL matches the `aHrefSanitizationTrustedUrlList` regular expression, it is returned unchanged.
    *
    * If there is no match the URL is returned prefixed with `'unsafe:'` to ensure that when it is written
    * to the DOM it is inactive and potentially malicious code will not be executed.
    *
-   * @param {RegExp=} regexp New regexp to whitelist urls with.
+   * @param {RegExp=} regexp New regexp to trust urls with.
    * @returns {RegExp|ng.$compileProvider} Current RegExp if called without value or self for
    *    chaining otherwise.
    */
-  this.aHrefSanitizationWhitelist = function(regexp) {
+  this.aHrefSanitizationTrustedUrlList = function(regexp) {
     if (isDefined(regexp)) {
-      aHrefSanitizationWhitelist = regexp;
+      aHrefSanitizationTrustedUrlList = regexp;
       return this;
     }
-    return aHrefSanitizationWhitelist;
+    return aHrefSanitizationTrustedUrlList;
   };
 
 
   /**
    * @description
-   * Retrieves or overrides the default regular expression that is used for whitelisting of safe
+   * Retrieves or overrides the default regular expression that is used for determining trusted safe
    * urls during img[src] sanitization.
    *
    * The sanitization is a security measure aimed at prevent XSS attacks via HTML image src links.
@@ -33787,27 +33849,28 @@ function $$SanitizeUriProvider() {
    * `$sce.trustAsMediaUrl(url)` which in turn may call `$$sanitizeUri(url, isMedia)` to sanitize
    * the potentially malicious URL.
    *
-   * If the URL matches the `aImgSanitizationWhitelist` regular expression, it is returned unchanged.
+   * If the URL matches the `imgSrcSanitizationTrustedUrlList` regular expression, it is returned
+   * unchanged.
    *
    * If there is no match the URL is returned prefixed with `'unsafe:'` to ensure that when it is written
    * to the DOM it is inactive and potentially malicious code will not be executed.
    *
-   * @param {RegExp=} regexp New regexp to whitelist urls with.
+   * @param {RegExp=} regexp New regexp to trust urls with.
    * @returns {RegExp|ng.$compileProvider} Current RegExp if called without value or self for
    *    chaining otherwise.
    */
-  this.imgSrcSanitizationWhitelist = function(regexp) {
+  this.imgSrcSanitizationTrustedUrlList = function(regexp) {
     if (isDefined(regexp)) {
-      imgSrcSanitizationWhitelist = regexp;
+      imgSrcSanitizationTrustedUrlList = regexp;
       return this;
     }
-    return imgSrcSanitizationWhitelist;
+    return imgSrcSanitizationTrustedUrlList;
   };
 
   this.$get = function() {
     return function sanitizeUri(uri, isMediaUrl) {
       // if (!uri) return uri;
-      var regex = isMediaUrl ? imgSrcSanitizationWhitelist : aHrefSanitizationWhitelist;
+      var regex = isMediaUrl ? imgSrcSanitizationTrustedUrlList : aHrefSanitizationTrustedUrlList;
       var normalizedVal = urlResolve(uri && uri.trim()).href;
       if (normalizedVal !== '' && !normalizedVal.match(regex)) {
         return 'unsafe:' + normalizedVal;
@@ -33935,10 +33998,10 @@ function adjustMatchers(matchers) {
  * The default instance of `$sceDelegate` should work out of the box with little pain.  While you
  * can override it completely to change the behavior of `$sce`, the common case would
  * involve configuring the {@link ng.$sceDelegateProvider $sceDelegateProvider} instead by setting
- * your own whitelists and blacklists for trusting URLs used for loading AngularJS resources such as
- * templates.  Refer {@link ng.$sceDelegateProvider#resourceUrlWhitelist
- * $sceDelegateProvider.resourceUrlWhitelist} and {@link
- * ng.$sceDelegateProvider#resourceUrlBlacklist $sceDelegateProvider.resourceUrlBlacklist}
+ * your own trusted and banned resource lists for trusting URLs used for loading AngularJS resources
+ * such as templates.  Refer {@link ng.$sceDelegateProvider#trustedResourceUrlList
+ * $sceDelegateProvider.trustedResourceUrlList} and {@link
+ * ng.$sceDelegateProvider#bannedResourceUrlList $sceDelegateProvider.bannedResourceUrlList}
  */
 
 /**
@@ -33951,12 +34014,12 @@ function adjustMatchers(matchers) {
  * The `$sceDelegateProvider` provider allows developers to configure the {@link ng.$sceDelegate
  * $sceDelegate service}, used as a delegate for {@link ng.$sce Strict Contextual Escaping (SCE)}.
  *
- * The `$sceDelegateProvider` allows one to get/set the whitelists and blacklists used to ensure
- * that the URLs used for sourcing AngularJS templates and other script-running URLs are safe (all
- * places that use the `$sce.RESOURCE_URL` context). See
- * {@link ng.$sceDelegateProvider#resourceUrlWhitelist $sceDelegateProvider.resourceUrlWhitelist}
- * and
- * {@link ng.$sceDelegateProvider#resourceUrlBlacklist $sceDelegateProvider.resourceUrlBlacklist},
+ * The `$sceDelegateProvider` allows one to get/set the `trustedResourceUrlList` and
+ * `bannedResourceUrlList` used to ensure that the URLs used for sourcing AngularJS templates and
+ * other script-running URLs are safe (all places that use the `$sce.RESOURCE_URL` context). See
+ * {@link ng.$sceDelegateProvider#trustedResourceUrlList
+ * $sceDelegateProvider.trustedResourceUrlList} and
+ * {@link ng.$sceDelegateProvider#bannedResourceUrlList $sceDelegateProvider.bannedResourceUrlList},
  *
  * For the general details about this service in AngularJS, read the main page for {@link ng.$sce
  * Strict Contextual Escaping (SCE)}.
@@ -33972,64 +34035,99 @@ function adjustMatchers(matchers) {
  *
  * ```
  *  angular.module('myApp', []).config(function($sceDelegateProvider) {
- *    $sceDelegateProvider.resourceUrlWhitelist([
+ *    $sceDelegateProvider.trustedResourceUrlList([
  *      // Allow same origin resource loads.
  *      'self',
  *      // Allow loading from our assets domain.  Notice the difference between * and **.
  *      'http://srv*.assets.example.com/**'
  *    ]);
  *
- *    // The blacklist overrides the whitelist so the open redirect here is blocked.
- *    $sceDelegateProvider.resourceUrlBlacklist([
+ *    // The banned resource URL list overrides the trusted resource URL list so the open redirect
+ *    // here is blocked.
+ *    $sceDelegateProvider.bannedResourceUrlList([
  *      'http://myapp.example.com/clickThru**'
  *    ]);
  *  });
  * ```
- * Note that an empty whitelist will block every resource URL from being loaded, and will require
+ * Note that an empty trusted resource URL list will block every resource URL from being loaded, and will require
  * you to manually mark each one as trusted with `$sce.trustAsResourceUrl`. However, templates
  * requested by {@link ng.$templateRequest $templateRequest} that are present in
  * {@link ng.$templateCache $templateCache} will not go through this check. If you have a mechanism
  * to populate your templates in that cache at config time, then it is a good idea to remove 'self'
- * from that whitelist. This helps to mitigate the security impact of certain types of issues, like
- * for instance attacker-controlled `ng-includes`.
+ * from the trusted resource URL lsit. This helps to mitigate the security impact of certain types
+ * of issues, like for instance attacker-controlled `ng-includes`.
  */
 
 function $SceDelegateProvider() {
   this.SCE_CONTEXTS = SCE_CONTEXTS;
 
   // Resource URLs can also be trusted by policy.
-  var resourceUrlWhitelist = ['self'],
-      resourceUrlBlacklist = [];
+  var trustedResourceUrlList = ['self'],
+      bannedResourceUrlList = [];
 
   /**
    * @ngdoc method
-   * @name $sceDelegateProvider#resourceUrlWhitelist
+   * @name $sceDelegateProvider#trustedResourceUrlList
    * @kind function
    *
-   * @param {Array=} whitelist When provided, replaces the resourceUrlWhitelist with the value
-   *     provided.  This must be an array or null.  A snapshot of this array is used so further
-   *     changes to the array are ignored.
+   * @param {Array=} trustedResourceUrlList When provided, replaces the trustedResourceUrlList with
+   *     the value provided.  This must be an array or null.  A snapshot of this array is used so
+   *     further changes to the array are ignored.
    *     Follow {@link ng.$sce#resourceUrlPatternItem this link} for a description of the items
    *     allowed in this array.
    *
-   * @return {Array} The currently set whitelist array.
+   * @return {Array} The currently set trusted resource URL array.
    *
    * @description
-   * Sets/Gets the whitelist of trusted resource URLs.
+   * Sets/Gets the list trusted of resource URLs.
    *
-   * The **default value** when no whitelist has been explicitly set is `['self']` allowing only
-   * same origin resource requests.
+   * The **default value** when no `trustedResourceUrlList` has been explicitly set is `['self']`
+   * allowing only same origin resource requests.
    *
    * <div class="alert alert-warning">
-   * **Note:** the default whitelist of 'self' is not recommended if your app shares its origin
-   * with other apps! It is a good idea to limit it to only your application's directory.
+   * **Note:** the default `trustedResourceUrlList` of 'self' is not recommended if your app shares
+   * its origin with other apps! It is a good idea to limit it to only your application's directory.
    * </div>
    */
-  this.resourceUrlWhitelist = function(value) {
+  this.trustedResourceUrlList = function(value) {
     if (arguments.length) {
-      resourceUrlWhitelist = adjustMatchers(value);
+      trustedResourceUrlList = adjustMatchers(value);
     }
-    return resourceUrlWhitelist;
+    return trustedResourceUrlList;
+  };
+  this.resourceUrlWhitelist = this.trustedResourceUrlList;
+
+  /**
+   * @ngdoc method
+   * @name $sceDelegateProvider#bannedResourceUrlList
+   * @kind function
+   *
+   * @param {Array=} bannedResourceUrlList When provided, replaces the `bannedResourceUrlList` with
+   *     the value provided. This must be an array or null. A snapshot of this array is used so
+   *     further changes to the array are ignored.</p><p>
+   *     Follow {@link ng.$sce#resourceUrlPatternItem this link} for a description of the items
+   *     allowed in this array.</p><p>
+   *     The typical usage for the `bannedResourceUrlList` is to **block
+   *     [open redirects](http://cwe.mitre.org/data/definitions/601.html)** served by your domain as
+   *     these would otherwise be trusted but actually return content from the redirected domain.
+   *     </p><p>
+   *     Finally, **the banned resource URL list overrides the trusted resource URL list** and has
+   *     the final say.
+   *
+   * @return {Array} The currently set `bannedResourceUrlList` array.
+   *
+   * @description
+   * Sets/Gets the `bannedResourceUrlList` of trusted resource URLs.
+   *
+   * The **default value** when no trusted resource URL list has been explicitly set is the empty
+   * array (i.e. there is no `bannedResourceUrlList`.)
+   */
+
+  this.bannedResourceUrlList = function(value) {
+    if (arguments.length) {
+      bannedResourceUrlList = adjustMatchers(value);
+    }
+    return bannedResourceUrlList;
   };
 
   /**
@@ -34037,32 +34135,20 @@ function $SceDelegateProvider() {
    * @name $sceDelegateProvider#resourceUrlBlacklist
    * @kind function
    *
-   * @param {Array=} blacklist When provided, replaces the resourceUrlBlacklist with the value
-   *     provided.  This must be an array or null.  A snapshot of this array is used so further
-   *     changes to the array are ignored.</p><p>
-   *     Follow {@link ng.$sce#resourceUrlPatternItem this link} for a description of the items
-   *     allowed in this array.</p><p>
-   *     The typical usage for the blacklist is to **block
-   *     [open redirects](http://cwe.mitre.org/data/definitions/601.html)** served by your domain as
-   *     these would otherwise be trusted but actually return content from the redirected domain.
-   *     </p><p>
-   *     Finally, **the blacklist overrides the whitelist** and has the final say.
+   * @deprecated
+   * sinceVersion="1.8.1"
    *
-   * @return {Array} The currently set blacklist array.
-   *
-   * @description
-   * Sets/Gets the blacklist of trusted resource URLs.
-   *
-   * The **default value** when no whitelist has been explicitly set is the empty array (i.e. there
-   * is no blacklist.)
+   * This function is deprecated. Use {@link $sceDelegateProvider#bannedResourceUrlList
+   * bannedResourceUrlList} instead.
    */
-
-  this.resourceUrlBlacklist = function(value) {
-    if (arguments.length) {
-      resourceUrlBlacklist = adjustMatchers(value);
+  Object.defineProperty(this, 'resourceUrlBlacklist', {
+    get: function() {
+      return this.bannedResourceUrlList;
+    },
+    set: function(value) {
+      this.bannedResourceUrlList = value;
     }
-    return resourceUrlBlacklist;
-  };
+  });
 
   this.$get = ['$injector', '$$sanitizeUri', function($injector, $$sanitizeUri) {
 
@@ -34087,17 +34173,17 @@ function $SceDelegateProvider() {
     function isResourceUrlAllowedByPolicy(url) {
       var parsedUrl = urlResolve(url.toString());
       var i, n, allowed = false;
-      // Ensure that at least one item from the whitelist allows this url.
-      for (i = 0, n = resourceUrlWhitelist.length; i < n; i++) {
-        if (matchUrl(resourceUrlWhitelist[i], parsedUrl)) {
+      // Ensure that at least one item from the trusted resource URL list allows this url.
+      for (i = 0, n = trustedResourceUrlList.length; i < n; i++) {
+        if (matchUrl(trustedResourceUrlList[i], parsedUrl)) {
           allowed = true;
           break;
         }
       }
       if (allowed) {
-        // Ensure that no item from the blacklist blocked this url.
-        for (i = 0, n = resourceUrlBlacklist.length; i < n; i++) {
-          if (matchUrl(resourceUrlBlacklist[i], parsedUrl)) {
+        // Ensure that no item from the banned resource URL list has blocked this url.
+        for (i = 0, n = bannedResourceUrlList.length; i < n; i++) {
+          if (matchUrl(bannedResourceUrlList[i], parsedUrl)) {
             allowed = false;
             break;
           }
@@ -34218,9 +34304,9 @@ function $SceDelegateProvider() {
      * The contexts that can be sanitized are $sce.MEDIA_URL, $sce.URL and $sce.HTML. The first two are available
      * by default, and the third one relies on the `$sanitize` service (which may be loaded through
      * the `ngSanitize` module). Furthermore, for $sce.RESOURCE_URL context, a plain string may be
-     * accepted if the resource url policy defined by {@link ng.$sceDelegateProvider#resourceUrlWhitelist
-     * `$sceDelegateProvider.resourceUrlWhitelist`} and {@link ng.$sceDelegateProvider#resourceUrlBlacklist
-     * `$sceDelegateProvider.resourceUrlBlacklist`} accepts that resource.
+     * accepted if the resource url policy defined by {@link ng.$sceDelegateProvider#trustedResourceUrlList
+     * `$sceDelegateProvider.trustedResourceUrlList`} and {@link ng.$sceDelegateProvider#bannedResourceUrlList
+     * `$sceDelegateProvider.bannedResourceUrlList`} accepts that resource.
      *
      * This function will throw if the safe type isn't appropriate for this context, or if the
      * value given cannot be accepted in the context (which might be caused by sanitization not
@@ -34314,9 +34400,9 @@ function $SceDelegateProvider() {
  *
  * To systematically block XSS security bugs, AngularJS treats all values as untrusted by default in
  * HTML or sensitive URL bindings. When binding untrusted values, AngularJS will automatically
- * run security checks on them (sanitizations, whitelists, depending on context), or throw when it
- * cannot guarantee the security of the result. That behavior depends strongly on contexts: HTML
- * can be sanitized, but template URLs cannot, for instance.
+ * run security checks on them (sanitizations, trusted URL resource, depending on context), or throw
+ * when it cannot guarantee the security of the result. That behavior depends strongly on contexts:
+ * HTML can be sanitized, but template URLs cannot, for instance.
  *
  * To illustrate this, consider the `ng-bind-html` directive. It renders its value directly as HTML:
  * we call that the *context*. When given an untrusted input, AngularJS will attempt to sanitize it
@@ -34395,8 +34481,8 @@ function $SceDelegateProvider() {
  * By default, AngularJS only loads templates from the same domain and protocol as the application
  * document.  This is done by calling {@link ng.$sce#getTrustedResourceUrl
  * $sce.getTrustedResourceUrl} on the template URL.  To load templates from other domains and/or
- * protocols, you may either {@link ng.$sceDelegateProvider#resourceUrlWhitelist whitelist
- * them} or {@link ng.$sce#trustAsResourceUrl wrap it} into a trusted value.
+ * protocols, you may either add them to the {@link ng.$sceDelegateProvider#trustedResourceUrlList
+ * trustedResourceUrlList} or {@link ng.$sce#trustAsResourceUrl wrap them} into trusted values.
  *
  * *Please note*:
  * The browser's
@@ -34424,8 +34510,8 @@ function $SceDelegateProvider() {
  * templates in `ng-include` from your application's domain without having to even know about SCE.
  * It blocks loading templates from other domains or loading templates over http from an https
  * served document.  You can change these by setting your own custom {@link
- * ng.$sceDelegateProvider#resourceUrlWhitelist whitelists} and {@link
- * ng.$sceDelegateProvider#resourceUrlBlacklist blacklists} for matching such URLs.
+ * ng.$sceDelegateProvider#trustedResourceUrlList trusted resource URL list} and {@link
+ * ng.$sceDelegateProvider#bannedResourceUrlList banned resource URL list} for matching such URLs.
  *
  * This significantly reduces the overhead.  It is far easier to pay the small overhead and have an
  * application that's secure and can be audited to verify that with much more ease than bolting
@@ -34440,7 +34526,7 @@ function $SceDelegateProvider() {
  * | `$sce.CSS`          | For CSS that's safe to source into the application.  Currently unused.  Feel free to use it in your own directives. |
  * | `$sce.MEDIA_URL`    | For URLs that are safe to render as media. Is automatically converted from string by sanitizing when needed. |
  * | `$sce.URL`          | For URLs that are safe to follow as links. Is automatically converted from string by sanitizing when needed. Note that `$sce.URL` makes a stronger statement about the URL than `$sce.MEDIA_URL` does and therefore contexts requiring values trusted for `$sce.URL` can be used anywhere that values trusted for `$sce.MEDIA_URL` are required.|
- * | `$sce.RESOURCE_URL` | For URLs that are not only safe to follow as links, but whose contents are also safe to include in your application.  Examples include `ng-include`, `src` / `ngSrc` bindings for tags other than `IMG` (e.g. `IFRAME`, `OBJECT`, etc.)  <br><br>Note that `$sce.RESOURCE_URL` makes a stronger statement about the URL than `$sce.URL` or `$sce.MEDIA_URL` do and therefore contexts requiring values trusted for `$sce.RESOURCE_URL` can be used anywhere that values trusted for `$sce.URL` or `$sce.MEDIA_URL` are required. <br><br> The {@link $sceDelegateProvider#resourceUrlWhitelist $sceDelegateProvider#resourceUrlWhitelist()} and {@link $sceDelegateProvider#resourceUrlBlacklist $sceDelegateProvider#resourceUrlBlacklist()} can be used to restrict trusted origins for `RESOURCE_URL` |
+ * | `$sce.RESOURCE_URL` | For URLs that are not only safe to follow as links, but whose contents are also safe to include in your application.  Examples include `ng-include`, `src` / `ngSrc` bindings for tags other than `IMG` (e.g. `IFRAME`, `OBJECT`, etc.)  <br><br>Note that `$sce.RESOURCE_URL` makes a stronger statement about the URL than `$sce.URL` or `$sce.MEDIA_URL` do and therefore contexts requiring values trusted for `$sce.RESOURCE_URL` can be used anywhere that values trusted for `$sce.URL` or `$sce.MEDIA_URL` are required. <br><br> The {@link $sceDelegateProvider#trustedResourceUrlList $sceDelegateProvider#trustedResourceUrlList()} and {@link $sceDelegateProvider#bannedResourceUrlList $sceDelegateProvider#bannedResourceUrlList()} can be used to restrict trusted origins for `RESOURCE_URL` |
  * | `$sce.JS`           | For JavaScript that is safe to execute in your application's context.  Currently unused.  Feel free to use it in your own directives. |
  *
  *
@@ -34458,7 +34544,7 @@ function $SceDelegateProvider() {
  * There are no CSS or JS context bindings in AngularJS currently, so their corresponding `$sce.trustAs`
  * functions aren't useful yet. This might evolve.
  *
- * ### Format of items in {@link ng.$sceDelegateProvider#resourceUrlWhitelist resourceUrlWhitelist}/{@link ng.$sceDelegateProvider#resourceUrlBlacklist Blacklist} <a name="resourceUrlPatternItem"></a>
+ * ### Format of items in {@link ng.$sceDelegateProvider#trustedResourceUrlList trustedResourceUrlList}/{@link ng.$sceDelegateProvider#bannedResourceUrlList bannedResourceUrlList} <a name="resourceUrlPatternItem"></a>
  *
  *  Each element in these arrays must be one of the following:
  *
@@ -34472,7 +34558,7 @@ function $SceDelegateProvider() {
  *      match themselves.
  *    - `*`: matches zero or more occurrences of any character other than one of the following 6
  *      characters: '`:`', '`/`', '`.`', '`?`', '`&`' and '`;`'.  It's a useful wildcard for use
- *      in a whitelist.
+ *      for matching resource URL lists.
  *    - `**`: matches zero or more occurrences of *any* character.  As such, it's not
  *      appropriate for use in a scheme, domain, etc. as it would match too much.  (e.g.
  *      http://**.example.com/ would match http://evil.com/?ignore=.example.com/ and that might
@@ -35276,10 +35362,10 @@ function $TemplateRequestProvider() {
         handleRequestFn.totalPendingRequests++;
 
         // We consider the template cache holds only trusted templates, so
-        // there's no need to go through whitelisting again for keys that already
-        // are included in there. This also makes AngularJS accept any script
-        // directive, no matter its name. However, we still need to unwrap trusted
-        // types.
+        // there's no need to go through adding the template again to the trusted
+        // resources for keys that already are included in there. This also makes
+        // AngularJS accept any script directive, no matter its name. However, we
+        // still need to unwrap trusted types.
         if (!isString(tpl) || isUndefined($templateCache.get(tpl))) {
           tpl = $sce.getTrustedResourceUrl(tpl);
         }
@@ -35684,20 +35770,20 @@ function urlIsSameOriginAsBaseUrl(requestUrl) {
 }
 
 /**
- * Create a function that can check a URL's origin against a list of allowed/whitelisted origins.
+ * Create a function that can check a URL's origin against a list of allowed/trusted origins.
  * The current location's origin is implicitly trusted.
  *
- * @param {string[]} whitelistedOriginUrls - A list of URLs (strings), whose origins are trusted.
+ * @param {string[]} trustedOriginUrls - A list of URLs (strings), whose origins are trusted.
  *
  * @returns {Function} - A function that receives a URL (string or parsed URL object) and returns
  *     whether it is of an allowed origin.
  */
-function urlIsAllowedOriginFactory(whitelistedOriginUrls) {
-  var parsedAllowedOriginUrls = [originUrl].concat(whitelistedOriginUrls.map(urlResolve));
+function urlIsAllowedOriginFactory(trustedOriginUrls) {
+  var parsedAllowedOriginUrls = [originUrl].concat(trustedOriginUrls.map(urlResolve));
 
   /**
    * Check whether the specified URL (string or parsed URL object) has an origin that is allowed
-   * based on a list of whitelisted-origin URLs. The current location's origin is implicitly
+   * based on a list of trusted-origin URLs. The current location's origin is implicitly
    * trusted.
    *
    * @param {string|Object} requestUrl - The URL to be checked (provided as a string that will be
@@ -43444,9 +43530,9 @@ var ngIfDirective = ['$animate', '$compile', function($animate, $compile) {
  * By default, the template URL is restricted to the same domain and protocol as the
  * application document. This is done by calling {@link $sce#getTrustedResourceUrl
  * $sce.getTrustedResourceUrl} on it. To load templates from other domains or protocols
- * you may either {@link ng.$sceDelegateProvider#resourceUrlWhitelist whitelist them} or
- * {@link $sce#trustAsResourceUrl wrap them} as trusted values. Refer to AngularJS's {@link
- * ng.$sce Strict Contextual Escaping}.
+ * you may either add them to your {@link ng.$sceDelegateProvider#trustedResourceUrlList trusted
+ * resource URL list} or {@link $sce#trustAsResourceUrl wrap them} as trusted values. Refer to
+ * AngularJS's {@link ng.$sce Strict Contextual Escaping}.
  *
  * In addition, the browser's
  * [Same Origin Policy](https://code.google.com/p/browsersec/wiki/Part2#Same-origin_policy_for_XMLHttpRequest)
@@ -51813,7 +51899,7 @@ _angular2.default.bootstrap(document, ['app'], {
   strictDi: true
 });
 
-},{"./article":16,"./auth":19,"./components":30,"./config/app.config":33,"./config/app.constants":34,"./config/app.run":35,"./config/app.templates":36,"./editor":40,"./foods":45,"./home":50,"./layout":53,"./profile":54,"./services":61,"./settings":67,"angular":9,"angular-messages":2,"angular-toastr":4,"angular-ui-bootstrap":6,"angular-ui-router":7}],12:[function(require,module,exports){
+},{"./article":16,"./auth":19,"./components":32,"./config/app.config":35,"./config/app.constants":36,"./config/app.run":37,"./config/app.templates":38,"./editor":42,"./foods":47,"./home":52,"./layout":55,"./profile":56,"./services":63,"./settings":69,"angular":9,"angular-messages":2,"angular-toastr":4,"angular-ui-bootstrap":6,"angular-ui-router":7}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52581,7 +52667,7 @@ var FollowBtnCtrl = function () {
       this.isSubmitting = true;
 
       if (!this._User.current) {
-        this._$state.go('app.register');
+        this._$state.go('app.login');
         return;
       }
 
@@ -52621,6 +52707,65 @@ exports.default = FollowBtn;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var FoodActionsCtrl = function () {
+  FoodActionsCtrl.$inject = ["Foods", "User", "$state"];
+  function FoodActionsCtrl(Foods, User, $state) {
+    'ngInject';
+
+    var _this = this;
+
+    _classCallCheck(this, FoodActionsCtrl);
+
+    this._Foods = Foods;
+    this._$state = $state;
+
+    this.$onInit = function () {
+      if (User.current) {
+        _this.canModify = User.current.username === _this.food.author.username;
+      } else {
+        _this.canModify = false;
+      }
+    };
+  }
+
+  _createClass(FoodActionsCtrl, [{
+    key: 'deleteRecipe',
+    value: function deleteRecipe() {
+      var _this2 = this;
+
+      this.isDeleting = true;
+      this._Foods.destroy(this.food.slug).then(function (success) {
+        return _this2._$state.go('app.foods');
+      }, function (err) {
+        return _this2._$state.go('app.home');
+      });
+    }
+  }]);
+
+  return FoodActionsCtrl;
+}();
+
+var FoodActions = {
+  bindings: {
+    food: '='
+  },
+  controller: FoodActionsCtrl,
+  templateUrl: 'components/foods-helpers/food-actions.html'
+};
+
+exports.default = FoodActions;
+
+},{}],29:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 var FoodDetails = {
   bindings: {
     food: '='
@@ -52630,7 +52775,7 @@ var FoodDetails = {
 
 exports.default = FoodDetails;
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -52647,6 +52792,7 @@ var FoodsListCtrl = function FoodsListCtrl($scope, $state, Toastr) {
   this._$scope = $scope;
   this._toastr = Toastr;
 
+  // Toastr
   this.errToas = function () {
     Toastr.showToastr("error", "Error example");
   };
@@ -52672,7 +52818,22 @@ var FoodsList = {
 
 exports.default = FoodsList;
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var FoodsPreview = {
+  bindings: {
+    food: '='
+  },
+  templateUrl: 'components/foods-helpers/foods-preview.html'
+};
+
+exports.default = FoodsPreview;
+
+},{}],32:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52719,9 +52880,17 @@ var _foodsList = require('./foods-helpers/foods-list.component');
 
 var _foodsList2 = _interopRequireDefault(_foodsList);
 
+var _foodsPreview = require('./foods-helpers/foods-preview.component');
+
+var _foodsPreview2 = _interopRequireDefault(_foodsPreview);
+
 var _foodDetails = require('./foods-helpers/food-details.component');
 
 var _foodDetails2 = _interopRequireDefault(_foodDetails);
+
+var _foodActions = require('./foods-helpers/food-actions.component');
+
+var _foodActions2 = _interopRequireDefault(_foodActions);
 
 var _listPagination = require('./article-helpers/list-pagination.component');
 
@@ -52749,13 +52918,17 @@ componentsModule.component('articleList', _articleList2.default);
 
 componentsModule.component('foodsList', _foodsList2.default);
 
+componentsModule.component('foodsPreview', _foodsPreview2.default);
+
 componentsModule.component('foodDetails', _foodDetails2.default);
+
+componentsModule.component('foodActions', _foodActions2.default);
 
 componentsModule.component('listPagination', _listPagination2.default);
 
 exports.default = componentsModule;
 
-},{"./article-helpers/article-list.component":21,"./article-helpers/article-meta.component":22,"./article-helpers/article-preview.component":23,"./article-helpers/list-pagination.component":24,"./buttons/favorite-btn.component":25,"./buttons/favorite-food-btn.component":26,"./buttons/follow-btn.component":27,"./foods-helpers/food-details.component":28,"./foods-helpers/foods-list.component":29,"./list-errors.component":31,"./show-authed.directive":32,"angular":9}],31:[function(require,module,exports){
+},{"./article-helpers/article-list.component":21,"./article-helpers/article-meta.component":22,"./article-helpers/article-preview.component":23,"./article-helpers/list-pagination.component":24,"./buttons/favorite-btn.component":25,"./buttons/favorite-food-btn.component":26,"./buttons/follow-btn.component":27,"./foods-helpers/food-actions.component":28,"./foods-helpers/food-details.component":29,"./foods-helpers/foods-list.component":30,"./foods-helpers/foods-preview.component":31,"./list-errors.component":33,"./show-authed.directive":34,"angular":9}],33:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52770,7 +52943,7 @@ var ListErrors = {
 
 exports.default = ListErrors;
 
-},{}],32:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 'use strict';
 
 ShowAuthed.$inject = ["User"];
@@ -52809,7 +52982,7 @@ function ShowAuthed(User) {
 
 exports.default = ShowAuthed;
 
-},{}],33:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 'use strict';
 
 AppConfig.$inject = ["$httpProvider", "$stateProvider", "$locationProvider", "$urlRouterProvider"];
@@ -52849,7 +53022,7 @@ function AppConfig($httpProvider, $stateProvider, $locationProvider, $urlRouterP
 
 exports.default = AppConfig;
 
-},{"./auth.interceptor":37}],34:[function(require,module,exports){
+},{"./auth.interceptor":39}],36:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52864,7 +53037,7 @@ var AppConstants = {
 
 exports.default = AppConstants;
 
-},{}],35:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 'use strict';
 
 AppRun.$inject = ["AppConstants", "$rootScope"];
@@ -52893,22 +53066,22 @@ function AppRun(AppConstants, $rootScope) {
 
 exports.default = AppRun;
 
-},{}],36:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 "use strict";
 
 angular.module("templates", []).run(["$templateCache", function ($templateCache) {
+  $templateCache.put("components/list-errors.html", "<ul class=\"error-messages\" ng-show=\"$ctrl.errors\">\n  <div ng-repeat=\"(field, errors) in $ctrl.errors\">\n    <li ng-repeat=\"error in errors\">\n      {{field}} {{error}}\n    </li>\n  </div>\n</ul>\n");
+  $templateCache.put("auth/auth.html", "<div class=\"auth-page\">\n  <div class=\"container page\">\n    <div class=\"row\">\n\n      <div class=\"col-md-6 offset-md-3 col-xs-12\">\n        <h1 class=\"text-xs-center\" ng-bind=\"::$ctrl.title\"></h1>\n        <p class=\"text-xs-center\">\n          <a ui-sref=\"app.login\"\n            ng-show=\"$ctrl.authType === \'register\'\">\n            Have an account?\n          </a>\n          <a ui-sref=\"app.register\"\n            ng-show=\"$ctrl.authType === \'login\'\">\n            Need an account?\n          </a>\n        </p>\n\n        <a href=\"http://localhost:3000/api/auth/github\" style=\"font-size: 25px; color:black\">Github</a><br>\n        <a href=\"http://localhost:3000/api/auth/googleplus\" style=\"font-size: 25px; color:black\">Google</a>\n\n        <list-errors errors=\"$ctrl.errors\"></list-errors>\n\n        <form name=\"formData\" ng-submit=\"$ctrl.submitForm()\">\n          <fieldset ng-disabled=\"$ctrl.isSubmitting\">\n\n            <!-- Form -->\n            <fieldset class=\"form-group\" ng-show=\"$ctrl.authType === \'register\'\" ng-disabled=\"$ctrl.authType != \'register\'\">\n              <input class=\"form-control form-control-lg\" type=\"text\" placeholder=\"Username\"\n                ng-model=\"$ctrl.formData.username\" name=\"Username\" ng-minlength=\"3\" ng-maxlength=\"16\" required/>\n              <div ng-messages=\"formData.Username.$error\" style=\"color: red;\">\n                <p ng-message=\"required\" ng-show = \"formData.Username.$dirty\">Username is required</p>\n                <p ng-message=\"minlength\">Enter more than 3 characters</p>\n                <p ng-message=\"maxlength\">Enter less than 16 characters</p>\n              </div>\n            </fieldset>\n            \n\n            <fieldset class=\"form-group\">\n              <input class=\"form-control form-control-lg\" type=\"email\" placeholder=\"Email\"\n                ng-model=\"$ctrl.formData.email\" name=\"Email\" required/>\n              <div ng-messages=\"formData.Email.$error\" style=\"color: red;\">\n                <p ng-message=\"required\" ng-show=\"formData.Email.$dirty\">Email is required</p>\n              </div>\n            </fieldset>\n\n\n            <fieldset class=\"form-group\">\n              <input required class=\"form-control form-control-lg\" type=\"password\" placeholder=\"Password\"\n                 ng-model=\"$ctrl.formData.password\" name=\"Password\" ng-minlength=\"6\" ng-maxlength=\"20\"/>\n              <div ng-messages=\"formData.Password.$error\" style=\"color: red;\">\n                <p ng-message=\"required\" ng-show=\"formData.Password.$dirty\">Password is required</p>\n                <p ng-message=\"minlength\">Enter more than 6 charecters</p>\n                <p ng-message=\"maxlength\">Enter less than 20 characters</p>\n              </div>\n            </fieldset>\n\n\n            <!-- Buttons -->\n            <fieldset ng-show=\"$ctrl.authType === \'register\'\">\n              <button class=\"btn btn-lg btn-primary pull-xs-right\"\n                type=\"submit\" ng-bind=\"::$ctrl.title\"\n                ng-show=\"formData.Username.$valid && formData.Email.$valid && formData.Password.$valid\">\n              </button>\n            </fieldset>\n\n            <fieldset ng-show=\"$ctrl.authType === \'login\'\">\n              <button class=\"btn btn-lg btn-primary pull-xs-right\"\n                type=\"submit\" ng-bind=\"::$ctrl.title\"\n                ng-show=\"formData.Email.$valid && formData.Password.$valid\">\n              </button>\n            </fieldset> \n\n          </fieldset>\n        </form>\n      </div>\n\n    </div>\n  </div>\n</div>\n\n\n\n\n\n       ");
   $templateCache.put("article/article-actions.html", "<article-meta article=\"$ctrl.article\">\n\n  <span ng-show=\"$ctrl.canModify\">\n    <a class=\"btn btn-sm btn-outline-secondary\"\n      ui-sref=\"app.editor({ slug: $ctrl.article.slug })\">\n      <i class=\"ion-edit\"></i> Edit Article\n    </a>\n\n    <button class=\"btn btn-sm btn-outline-danger\"\n      ng-class=\"{disabled: $ctrl.isDeleting}\"\n      ng-click=\"$ctrl.deleteArticle()\">\n      <i class=\"ion-trash-a\"></i> Delete Article\n    </button>\n  </span>\n\n  <span ng-hide=\"$ctrl.canModify\">\n    <follow-btn user=\"$ctrl.article.author\"></follow-btn>\n    <favorite-btn article=\"$ctrl.article\">\n      {{ $ctrl.article.favorited ? \'Unfavorite\' : \'Favorite\' }} Article <span class=\"counter\">({{$ctrl.article.favoritesCount}})</span>\n    </favorite-btn>\n  </span>\n\n</article-meta>\n");
   $templateCache.put("article/article.html", "<div class=\"article-page\">\n\n  <!-- Banner for article title, action buttons -->\n  <div class=\"banner\">\n    <div class=\"container\">\n\n      <h1 ng-bind=\"::$ctrl.article.title\"></h1>\n\n      <div class=\"article-meta\">\n        <!-- Show author info + favorite & follow buttons -->\n        <article-actions article=\"$ctrl.article\"></article-actions>\n\n      </div>\n\n    </div>\n  </div>\n\n\n\n  <!-- Main view. Contains article html and comments -->\n  <div class=\"container page\">\n\n    <!-- Article\'s HTML & tags rendered here -->\n    <div class=\"row article-content\">\n      <div class=\"col-xs-12\">\n\n        <div ng-bind-html=\"::$ctrl.article.body\"></div>\n\n        <ul class=\"tag-list\">\n          <li class=\"tag-default tag-pill tag-outline\"\n            ng-repeat=\"tag in ::$ctrl.article.tagList\">\n            {{ tag }}\n          </li>\n        </ul>\n\n      </div>\n    </div>\n\n    <hr />\n\n    <div class=\"article-actions\">\n\n      <!-- Show author info + favorite & follow buttons -->\n      <article-actions article=\"$ctrl.article\"></article-actions>\n\n    </div>\n\n    <!-- Comments section -->\n    <div class=\"row\">\n      <div class=\"col-xs-12 col-md-8 offset-md-2\">\n\n        <div show-authed=\"true\">\n          <list-errors from=\"$crl.commentForm.errors\"></list-errors>\n          <form class=\"card comment-form\" ng-submit=\"$ctrl.addComment()\">\n            <fieldset ng-disabled=\"$ctrl.commentForm.isSubmitting\">\n              <div class=\"card-block\">\n                <textarea class=\"form-control\"\n                  placeholder=\"Write a comment...\"\n                  rows=\"3\"\n                  ng-model=\"$ctrl.commentForm.body\"></textarea>\n              </div>\n              <div class=\"card-footer\">\n                <img ng-src=\"{{::$ctrl.currentUser.image}}\" class=\"comment-author-img\" />\n                <button class=\"btn btn-sm btn-primary\" type=\"submit\">\n                 Post Comment\n                </button>\n              </div>\n            </fieldset>\n          </form>\n        </div>\n\n        <div show-authed=\"false\">\n          <a ui-sref=\"app.login\">Sign in</a> or <a ui-sref=\"app.register\">sign up</a> to add comments on this article.\n        </div>\n\n        <comment ng-repeat=\"cmt in $ctrl.comments\"\n          data=\"cmt\"\n          delete-cb=\"$ctrl.deleteComment(cmt.id, $index)\">\n        </comment>\n\n\n      </div>\n    </div>\n\n  </div>\n\n\n\n</div>\n");
   $templateCache.put("article/comment.html", "<div class=\"card\">\n  <div class=\"card-block\">\n    <p class=\"card-text\" ng-bind=\"::$ctrl.data.body\"></p>\n  </div>\n  <div class=\"card-footer\">\n    <a class=\"comment-author\" ui-sref=\"app.profile.main({ username: $ctrl.data.author.username })\">\n      <img ng-src=\"{{::$ctrl.data.author.image}}\" class=\"comment-author-img\" />\n    </a>\n    &nbsp;\n    <a class=\"comment-author\" ui-sref=\"app.profile.main({ username: $ctrl.data.author.username })\" ng-bind=\"::$ctrl.data.author.username\">\n    </a>\n    <span class=\"date-posted\"\n      ng-bind=\"::$ctrl.data.createdAt | date: \'longDate\'\">\n    </span>\n    <span class=\"mod-options\" ng-show=\"$ctrl.canModify\">\n      <i class=\"ion-trash-a\" ng-click=\"$ctrl.deleteCb()\"></i>\n    </span>\n  </div>\n</div>\n");
-  $templateCache.put("auth/auth.html", "<div class=\"auth-page\">\n  <div class=\"container page\">\n    <div class=\"row\">\n\n      <div class=\"col-md-6 offset-md-3 col-xs-12\">\n        <h1 class=\"text-xs-center\" ng-bind=\"::$ctrl.title\"></h1>\n        <p class=\"text-xs-center\">\n          <a ui-sref=\"app.login\"\n            ng-show=\"$ctrl.authType === \'register\'\">\n            Have an account?\n          </a>\n          <a ui-sref=\"app.register\"\n            ng-show=\"$ctrl.authType === \'login\'\">\n            Need an account?\n          </a>\n        </p>\n\n        <a href=\"http://localhost:3000/api/auth/github\" style=\"font-size: 25px; color:black\">Github</a><br>\n        <a href=\"http://localhost:3000/api/auth/googleplus\" style=\"font-size: 25px; color:black\">Google</a>\n\n        <list-errors errors=\"$ctrl.errors\"></list-errors>\n\n        <form name=\"formData\" ng-submit=\"$ctrl.submitForm()\">\n          <fieldset ng-disabled=\"$ctrl.isSubmitting\">\n\n            <!-- Form -->\n            <fieldset class=\"form-group\" ng-show=\"$ctrl.authType === \'register\'\" ng-disabled=\"$ctrl.authType != \'register\'\">\n              <input class=\"form-control form-control-lg\" type=\"text\" placeholder=\"Username\"\n                ng-model=\"$ctrl.formData.username\" name=\"Username\" ng-minlength=\"3\" ng-maxlength=\"16\" required/>\n              <div ng-messages=\"formData.Username.$error\" style=\"color: red;\">\n                <p ng-message=\"required\" ng-show = \"formData.Username.$dirty\">Username is required</p>\n                <p ng-message=\"minlength\">Enter more than 3 characters</p>\n                <p ng-message=\"maxlength\">Enter less than 16 characters</p>\n              </div>\n            </fieldset>\n            \n\n            <fieldset class=\"form-group\">\n              <input class=\"form-control form-control-lg\" type=\"email\" placeholder=\"Email\"\n                ng-model=\"$ctrl.formData.email\" name=\"Email\" required/>\n              <div ng-messages=\"formData.Email.$error\" style=\"color: red;\">\n                <p ng-message=\"required\" ng-show=\"formData.Email.$dirty\">Email is required</p>\n              </div>\n            </fieldset>\n\n\n            <fieldset class=\"form-group\">\n              <input required class=\"form-control form-control-lg\" type=\"password\" placeholder=\"Password\"\n                 ng-model=\"$ctrl.formData.password\" name=\"Password\" ng-minlength=\"6\" ng-maxlength=\"20\"/>\n              <div ng-messages=\"formData.Password.$error\" style=\"color: red;\">\n                <p ng-message=\"required\" ng-show=\"formData.Password.$dirty\">Password is required</p>\n                <p ng-message=\"minlength\">Enter more than 6 charecters</p>\n                <p ng-message=\"maxlength\">Enter less than 20 characters</p>\n              </div>\n            </fieldset>\n\n\n            <!-- Buttons -->\n            <fieldset ng-show=\"$ctrl.authType === \'register\'\">\n              <button class=\"btn btn-lg btn-primary pull-xs-right\"\n                type=\"submit\" ng-bind=\"::$ctrl.title\"\n                ng-show=\"formData.Username.$valid && formData.Email.$valid && formData.Password.$valid\">\n              </button>\n            </fieldset>\n\n            <fieldset ng-show=\"$ctrl.authType === \'login\'\">\n              <button class=\"btn btn-lg btn-primary pull-xs-right\"\n                type=\"submit\" ng-bind=\"::$ctrl.title\"\n                ng-show=\"formData.Email.$valid && formData.Password.$valid\">\n              </button>\n            </fieldset> \n\n          </fieldset>\n        </form>\n      </div>\n\n    </div>\n  </div>\n</div>\n\n\n\n\n\n       ");
-  $templateCache.put("components/list-errors.html", "<ul class=\"error-messages\" ng-show=\"$ctrl.errors\">\n  <div ng-repeat=\"(field, errors) in $ctrl.errors\">\n    <li ng-repeat=\"error in errors\">\n      {{field}} {{error}}\n    </li>\n  </div>\n</ul>\n");
   $templateCache.put("editor/editor.html", "<div class=\"editor-page\">\n  <div class=\"container page\">\n    <div class=\"row\">\n      <div class=\"col-md-10 offset-md-1 col-xs-12\">\n\n        <h1>New Article</h1>\n        <list-errors errors=\"$ctrl.errors\"></list-errors>\n\n        <form>\n          <fieldset ng-disabled=\"$ctrl.isSubmitting\">\n\n            <fieldset class=\"form-group\">\n              <input class=\"form-control form-control-lg\"\n                ng-model=\"$ctrl.article.title\"\n                type=\"text\"\n                placeholder=\"Article Title\" />\n            </fieldset>\n\n            <fieldset class=\"form-group\">\n              <input class=\"form-control\"\n                ng-model=\"$ctrl.article.description\"\n                type=\"text\"\n                placeholder=\"What\'s this article about?\" />\n            </fieldset>\n\n            <fieldset class=\"form-group\">\n              <textarea class=\"form-control\"\n                rows=\"8\"\n                ng-model=\"$ctrl.article.body\"\n                placeholder=\"Write your article (in markdown)\">\n              </textarea>\n            </fieldset>\n\n            <fieldset class=\"form-group\">\n              <input class=\"form-control\"\n                type=\"text\"\n                placeholder=\"Enter tags\"\n                ng-model=\"$ctrl.tagField\"\n                ng-keyup=\"$event.keyCode == 13 && $ctrl.addTag()\" />\n\n              <div class=\"tag-list\">\n                <span ng-repeat=\"tag in $ctrl.article.tagList\"\n                  class=\"tag-default tag-pill\">\n                  <i class=\"ion-close-round\" ng-click=\"$ctrl.removeTag(tag)\"></i>\n                  {{ tag }}\n                </span>\n              </div>\n            </fieldset>\n\n            <button class=\"btn btn-lg pull-xs-right btn-primary\" type=\"button\" ng-click=\"$ctrl.submit()\">\n              Publish Article\n            </button>\n\n          </fieldset>\n        </form>\n\n      </div>\n    </div>\n  </div>\n</div>\n");
   $templateCache.put("foods/detailsfood.html", "<food-details food=\"$ctrl.food\"></food-details>");
-  $templateCache.put("foods/filterfoods.html", "<button ui-sref=\"app.foods\">Delete filters</button>\n<br><br>\n\n<div ng-repeat=\"food in $ctrl.filteredFoods\">\n    <h2> {{food.title}}</h2>\n    <p>Difficulty: {{food.difficulty}}</p>\n   <button ui-sref=\"app.detailsFood({slug:food.slug})\">Details</button> \n</div>");
+  $templateCache.put("foods/filterfoods.html", "<hr>\n<blockquote>\n  <button class=\"button-deletefilters\" ui-sref=\"app.foods\">DELETE FILTERS</button>\n  <br><br>\n\n  <div ng-repeat=\"food in $ctrl.filteredFoods\">\n      <hr>\n      <label>Author:</label> <a class=\"author\"\n        ui-sref=\"app.profile.main({ username:food.author.username })\"\n        ng-bind=\"food.author.username\">\n      </a>\n\n      <a ui-sref=\"app.detailsFood({ slug:food.slug })\" class=\"preview-link\">\n        <h1 ng-bind=\"food.title\"></h1>\n        <p style=\"font-size: 12px;\">Difficulty: {{food.difficulty}}</p>\n        <p ng-bind=\"food.description\"></p>\n        <button class=\"button-details\">Read recipe...</span>\n      </a>\n  </div>\n  <hr>\n</blockquote>");
   $templateCache.put("foods/foods.html", "<foods-list foods=\"$ctrl.foods\"></foods-list>");
-  $templateCache.put("foods/recipes.html", "<div class=\"editor-page\">\n    <div class=\"container page\">\n      <div class=\"row\">\n        <div class=\"col-md-10 offset-md-1 col-xs-12\">\n          \n          <h1>New Recipe</h1>\n          <list-errors errors=\"$ctrl.errors\"></list-errors>\n  \n          <form>\n            <fieldset ng-disabled=\"$ctrl.isSubmitting\">\n  \n              <fieldset class=\"form-group\">\n                <input class=\"form-control form-control-lg\"\n                  ng-model=\"$ctrl.food.title\"\n                  type=\"text\"\n                  placeholder=\"Recipe Name\"/>\n              </fieldset>\n  \n              <fieldset class=\"form-group\">\n                <input class=\"form-control\"\n                  ng-model=\"$ctrl.food.description\"\n                  type=\"text\"\n                  placeholder=\"What\'s this recipe about?\" />\n              </fieldset>\n  \n              <fieldset class=\"form-group\">\n                <textarea class=\"form-control\"\n                  rows=\"8\"\n                  ng-model=\"$ctrl.food.body\"\n                  placeholder=\"Write your recipe\">\n                </textarea>\n              </fieldset>\n\n              <fieldset class=\"form-group\">\n                <textarea class=\"form-control\"\n                  ng-model=\"$ctrl.food.difficulty\"\n                  placeholder=\"Difficulty in 1 word: Easy, Medium, Hard, etc\">\n                </textarea>\n              </fieldset>\n  \n              <button class=\"btn btn-lg pull-xs-right btn-primary\" type=\"button\" ng-click=\"$ctrl.submit()\">\n                Publish Recipe\n              </button>\n  \n            </fieldset>\n          </form>\n  \n        </div>\n      </div>\n    </div>\n  </div>\n  ");
+  $templateCache.put("foods/recipes.html", "<div class=\"editor-page\">\n    <div class=\"container page\">\n      <div class=\"row\">\n        <div class=\"col-md-10 offset-md-1 col-xs-12\">\n          \n          <h1>New Recipe</h1>\n          <list-errors errors=\"$ctrl.errors\"></list-errors>\n  \n          <form>\n            <fieldset ng-disabled=\"$ctrl.isSubmitting\">\n  \n              <fieldset class=\"form-group\">\n                <input class=\"form-control form-control-lg\"\n                  ng-model=\"$ctrl.food.title\"\n                  type=\"text\"\n                  placeholder=\"Recipe Name\"/>\n              </fieldset>\n  \n              <fieldset class=\"form-group\">\n                <input class=\"form-control\"\n                  ng-model=\"$ctrl.food.description\"\n                  type=\"text\"\n                  placeholder=\"What\'s this recipe about?\" />\n              </fieldset>\n  \n              <fieldset class=\"form-group\">\n                <textarea class=\"form-control\"\n                  rows=\"8\"\n                  ng-model=\"$ctrl.food.body\"\n                  placeholder=\"Write your recipe\">\n                </textarea>\n              </fieldset>\n\n              <fieldset class=\"form-group\">\n                <textarea class=\"form-control\"\n                  ng-model=\"$ctrl.food.difficulty\"\n                  placeholder=\"Describe the difficulty in one or two words: Easy, Medium, Hard, etc\">\n                </textarea>\n              </fieldset>\n  \n              <button class=\"btn btn-lg pull-xs-right btn-primary\" type=\"button\" ng-click=\"$ctrl.submit()\">\n                Publish Recipe\n              </button>\n  \n            </fieldset>\n          </form>\n  \n        </div>\n      </div>\n    </div>\n  </div>\n  ");
   $templateCache.put("home/home-slider.html", "<div style=\"height: 400px\">\n    <div uib-carousel active=\"active\" interval=\"$ctrl.myInterval\" no-wrap=\"$ctrl.noWrapSlides\">\n        <div uib-slide ng-repeat=\"slide in $ctrl.slides track by slide.id\" index=\"slide.id\" style=\"height: 400px\">\n            <img ng-src=\"{{slide.image}}\" class=\"img-fluid\" style=\"filter: blur(2px);\">\n            <div class = \"carousel-caption\" style = \"padding-bottom: 100px;\">\n                <h2>{{slide.text}}</h2>\n            </div>\n        </div>\n    </div>\n</div>");
-  $templateCache.put("home/home.html", " <div class=\"home-page\">\n\n  <!-- Splash banner that only shows when not logged in -->\n  <div class=\"banner\" show-authed=\"false\">\n    <div class=\"container\">\n      <h1 class=\"logo-font\" ng-bind=\"::$ctrl.appName | lowercase\"></h1>\n      <p>A place to share your knowledge.</p>\n    </div>\n  </div>\n\n\n<home-slider></home-slider><br><br>\n\n<h2>FOODS</h2>\n<p>Difficulty</p>\n<div ng-repeat=\"d in $ctrl.difficulty\">\n  <button ui-sref=\"app.filterFoods({filter:d})\">{{ d }}</button>\n</div><br><br>\n\n<div class=\"container page\">\n  <div class=\"row\">\n\n\n    <!-- Main view - contains tabs & article list -->\n    <div class=\"col-md-9\">\n      <!-- Tabs for toggling between feed, article lists -->\n      <div class=\"feed-toggle\">\n        <ul class=\"nav nav-pills outline-active\">\n\n          <li class=\"nav-item\" show-authed=\"true\">\n            <a href=\"\" class=\"nav-link\"\n              ng-class=\"{ active: $ctrl.listConfig.type === \'feed\' }\"\n              ng-click=\"$ctrl.changeList({ type: \'feed\' })\">\n              Your Feed\n            </a>\n          </li>\n\n          <li class=\"nav-item\">\n            <a href=\"\" class=\"nav-link\"\n              ng-class=\"{ active: $ctrl.listConfig.type === \'all\' && !$ctrl.listConfig.filters }\"\n              ng-click=\"$ctrl.changeList({ type: \'all\' })\">\n              Global Feed\n            </a>\n          </li>\n\n          <li class=\"nav-item\" ng-show=\"$ctrl.listConfig.filters.tag\">\n            <a href=\"\" class=\"nav-link active\">\n              <i class=\"ion-pound\"></i> {{$ctrl.listConfig.filters.tag}}\n            </a>\n          </li>\n\n        </ul>\n      </div>\n\n      <!-- List the current articles -->\n      <article-list limit=\"10\" list-config=\"$ctrl.listConfig\"></article-list>\n\n    </div>\n\n    <!-- End the row & container divs -->\n  </div>\n</div>\n\n</div>\n");
+  $templateCache.put("home/home.html", " <div class=\"home-page\">\n\n  <!-- Splash banner that only shows when not logged in -->\n  <div class=\"banner\" show-authed=\"false\">\n    <div class=\"container\">\n      <h1 class=\"logo-font\" ng-bind=\"::$ctrl.appName | lowercase\"></h1>\n      <p>A place to share your knowledge.</p>\n    </div>\n  </div>\n\n<home-slider></home-slider><br><br>\n\n<blockquote>\n  <h1><u>RECIPES</u></h1>\n  <h2>Difficulty</h2>\n  <div class=\"cats\" ng-repeat=\"d in $ctrl.difficulty\">\n    <button class=\"button-categories\" ui-sref=\"app.filterFoods({filter:d})\">{{ d }}</button>\n  </div><br><br>\n</blockquote>\n\n<div class=\"container page\">\n  <div class=\"row\">\n\n\n    <!-- Main view - contains tabs & article list -->\n    <div class=\"col-md-9\">\n      <!-- Tabs for toggling between feed, article lists -->\n      <div class=\"feed-toggle\">\n        <ul class=\"nav nav-pills outline-active\">\n\n          <li class=\"nav-item\" show-authed=\"true\">\n            <a href=\"\" class=\"nav-link\"\n              ng-class=\"{ active: $ctrl.listConfig.type === \'feed\' }\"\n              ng-click=\"$ctrl.changeList({ type: \'feed\' })\">\n              Your Feed\n            </a>\n          </li>\n\n          <li class=\"nav-item\">\n            <a href=\"\" class=\"nav-link\"\n              ng-class=\"{ active: $ctrl.listConfig.type === \'all\' && !$ctrl.listConfig.filters }\"\n              ng-click=\"$ctrl.changeList({ type: \'all\' })\">\n              Global Feed\n            </a>\n          </li>\n\n          <li class=\"nav-item\" ng-show=\"$ctrl.listConfig.filters.tag\">\n            <a href=\"\" class=\"nav-link active\">\n              <i class=\"ion-pound\"></i> {{$ctrl.listConfig.filters.tag}}\n            </a>\n          </li>\n\n        </ul>\n      </div>\n\n      <!-- List the current articles -->\n      <article-list limit=\"10\" list-config=\"$ctrl.listConfig\"></article-list>\n\n    </div>\n\n    <!-- End the row & container divs -->\n  </div>\n</div>\n\n</div>\n");
   $templateCache.put("layout/app-view.html", "<app-header></app-header>\n\n<div ui-view></div>\n\n<app-footer></app-footer>\n");
   $templateCache.put("layout/footer.html", "<footer>\n  <div class=\"container\">\n    <a class=\"logo-font\" ui-sref=\"app.home\" ng-bind=\"::$ctrl.appName | lowercase\"></a>\n    <span class=\"attribution\">\n      &copy; {{::$ctrl.date | date:\'yyyy\'}}.\n      An interactive learning project from <a href=\"https://thinkster.io\">Thinkster</a>.\n      Code licensed under MIT.\n    </span>\n  </div>\n</footer>\n");
   $templateCache.put("layout/header.html", "<nav class=\"navbar navbar-light\">\n  <div class=\"container\">\n\n    <a class=\"navbar-brand\"\n      ui-sref=\"app.home\"\n      ng-bind=\"::$ctrl.appName | lowercase\">\n    </a>\n\n<!--  -->\n    <!-- Show this for logged out users -->\n    <ul show-authed=\"false\"\n      class=\"nav navbar-nav pull-xs-right\">\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.home\">\n          Home\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.login\">\n          Sign in\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.register\">\n          Sign up\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.foods\">\n          Foods\n        </a>\n      </li>\n\n    </ul>\n\n<!--  -->\n    <!-- Show this for logged in users -->\n    <ul show-authed=\"true\"\n      class=\"nav navbar-nav pull-xs-right\">\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.home\">\n          Home\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.recipes\">\n          <i class=\"ion-compose\"></i>&nbsp;New Recipe\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.editor\">\n          <i class=\"ion-compose\"></i>&nbsp;New Article\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.settings\">\n          <i class=\"ion-gear-a\"></i>&nbsp;Settings\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.profile.main({ username: $ctrl.currentUser.username})\">\n          <img ng-src=\"{{$ctrl.currentUser.image}}\" class=\"user-pic\" />\n          {{ $ctrl.currentUser.username }}\n        </a>\n      </li>\n\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.foods\">\n          Foods\n        </a>\n      </li>\n\n    </ul>\n\n\n  </div>\n</nav>\n");
@@ -52922,11 +53095,13 @@ angular.module("templates", []).run(["$templateCache", function ($templateCache)
   $templateCache.put("components/buttons/favorite-btn.html", "<button class=\"btn btn-sm\"\n  ng-class=\"{ \'disabled\' : $ctrl.isSubmitting,\n              \'btn-outline-primary\': !$ctrl.article.favorited,\n              \'btn-primary\': $ctrl.article.favorited }\"\n  ng-click=\"$ctrl.submit()\">\n  <i class=\"ion-heart\"></i> <ng-transclude></ng-transclude>\n</button>\n");
   $templateCache.put("components/buttons/favorite-food-btn.html", "<button class=\"btn btn-sm\"\n  ng-class=\"{ \'disabled\' : $ctrl.isSubmitting,\n              \'btn-outline-primary\': !$ctrl.food.favorited,\n              \'btn-primary\': $ctrl.food.favorited }\"\n  ng-click=\"$ctrl.submit()\">\n  <i class=\"ion-heart\"></i> <ng-transclude></ng-transclude>\n</button>\n");
   $templateCache.put("components/buttons/follow-btn.html", "<button\n  class=\"btn btn-sm action-btn\"\n  ng-class=\"{ \'disabled\': $ctrl.isSubmitting,\n              \'btn-outline-secondary\': !$ctrl.user.following,\n              \'btn-secondary\': $ctrl.user.following }\"\n  ng-click=\"$ctrl.submit()\">\n  <i class=\"ion-plus-round\"></i>\n  &nbsp;\n  {{ $ctrl.user.following ? \'Unfollow\' : \'Follow\' }} {{ $ctrl.user.username }}\n</button>\n");
-  $templateCache.put("components/foods-helpers/food-details.html", "<div>\n    <h1>{{$ctrl.food.title}}</h1>\n    <p>{{$ctrl.food.description}}</p>\n    <p>{{$ctrl.food.body}}</p>\n    \n    <favorite-food-btn\n      food=\"$ctrl.food\"\n      class=\"pull-xs-right\">\n      {{$ctrl.food.favoritesCount}}\n    </favorite-food-btn>\n\n    <follow-btn user=\"$ctrl.food.author\" ng-hide=\"$ctrl.isUser\"></follow-btn>\n</div>");
-  $templateCache.put("components/foods-helpers/foods-list.html", "<div ng-repeat=\"food in $ctrl.foods\">\n    <a class=\"author\"\n      ui-sref=\"app.profile.main({ username:food.author.username })\"\n      ng-bind=\"food.author.username\">\n    </a>\n    <h1>{{food.title}}</h1>\n    <p>Difficulty: {{food.difficulty}}</p><br>\n    <button ui-sref=\"app.detailsFood({slug:food.slug})\">Details</button><br><br>\n    <hr>\n</div>\n<hr>\n\nTry Toastr: \n<button ng-click=\"$ctrl.errToas()\">Error</button>\n<button ng-click=\"$ctrl.succToas()\">Success</button>\n<button ng-click=\"$ctrl.infoToas()\">Info</button>\n<button ng-click=\"$ctrl.warnToas()\">Warning</button>");
+  $templateCache.put("components/foods-helpers/food-actions.html", "<!-- Your article -->\n<span ng-show=\"$ctrl.canModify\">\n    <a class=\"btn btn-sm btn-outline-secondary\"\n    ui-sref=\"app.editRecipe({ slug: $ctrl.article.slug })\">\n    <i class=\"ion-edit\"></i> Edit Recipe\n    </a>\n\n    <button class=\"btn btn-sm btn-outline-danger\"\n    ng-class=\"{disabled: $ctrl.isDeleting}\"\n    ng-click=\"$ctrl.deleteRecipe()\">\n    <i class=\"ion-trash-a\"></i> Delete Recipe\n    </button>\n</span>\n\n<!-- Not your article -->\n<span ng-hide=\"$ctrl.canModify\">\n    <follow-btn user=\"$ctrl.food.author\"></follow-btn>\n    <favorite-food-btn food=\"$ctrl.food\">\n    {{ $ctrl.food.favorited ? \'Unfavorite\' : \'Favorite\' }} Recipe <span class=\"counter\">({{$ctrl.food.favoritesCount}})</span>\n    </favorite-food-btn>\n</span>");
+  $templateCache.put("components/foods-helpers/food-details.html", "<hr>\n<blockquote>\n  <div>\n    <label>Author:</label> <a class=\"author\"\n      ui-sref=\"app.profile.main({ username:$ctrl.food.author.username })\"\n      ng-bind=\"$ctrl.food.author.username\">\n    </a>\n    <food-actions food=\"$ctrl.food\"></food-actions>\n  \n    <h1>{{$ctrl.food.title}}</h1>\n    <p style=\"font-size: 12px;\">Difficulty: {{$ctrl.food.difficulty}}</p>\n    <p>{{$ctrl.food.description}}</p>\n    <p>{{$ctrl.food.body}}</p>\n  </div>\n</blockquote>");
+  $templateCache.put("components/foods-helpers/foods-list.html", "<hr>\n<blockquote>\n  <foods-preview food=\"food\" ng-repeat=\"food in $ctrl.foods\"></foods-preview>\n  <hr>\n\n  <label>Toastr:</label> \n  <button class=\"button-toastrexample\" ng-click=\"$ctrl.errToas()\">Error</button>\n  <button class=\"button-toastrexample\" ng-click=\"$ctrl.succToas()\">Success</button>\n  <button class=\"button-toastrexample\" ng-click=\"$ctrl.infoToas()\">Info</button>\n  <button class=\"button-toastrexample\" ng-click=\"$ctrl.warnToas()\">Warning</button>\n</blockquote>");
+  $templateCache.put("components/foods-helpers/foods-preview.html", "<div class=\"food-preview\">\n  <label>Author:</label> <a class=\"author\"\n    ui-sref=\"app.profile.main({ username:$ctrl.food.author.username })\"\n    ng-bind=\"$ctrl.food.author.username\">\n  </a>\n\n  <a ui-sref=\"app.detailsFood({ slug: $ctrl.food.slug })\" class=\"preview-link\">\n    <h1 ng-bind=\"$ctrl.food.title\"></h1>\n    <p style=\"font-size: 12px;\">Difficulty: {{$ctrl.food.difficulty}}</p>\n    <p ng-bind=\"$ctrl.food.description\"></p>\n    <button class=\"button-details\">Read recipe...</span>\n  </a>\n\n</div>  \n<hr>");
 }]);
 
-},{}],37:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 'use strict';
 
 authInterceptor.$inject = ["JWT", "AppConstants", "$window", "$q"];
@@ -52961,7 +53136,7 @@ function authInterceptor(JWT, AppConstants, $window, $q) {
 
 exports.default = authInterceptor;
 
-},{}],38:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 'use strict';
 
 EditorConfig.$inject = ["$stateProvider"];
@@ -53004,7 +53179,7 @@ function EditorConfig($stateProvider) {
 
 exports.default = EditorConfig;
 
-},{}],39:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53073,7 +53248,7 @@ var EditorCtrl = function () {
 
 exports.default = EditorCtrl;
 
-},{}],40:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53107,7 +53282,7 @@ editorModule.controller('EditorCtrl', _editor4.default);
 
 exports.default = editorModule;
 
-},{"./editor.config":38,"./editor.controller":39,"angular":9}],41:[function(require,module,exports){
+},{"./editor.config":40,"./editor.controller":41,"angular":9}],43:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53128,7 +53303,7 @@ DetailsFoodCtrl.$inject = ["food"];
 
 exports.default = DetailsFoodCtrl;
 
-},{}],42:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -53162,7 +53337,7 @@ FilterFoodsCtrl.$inject = ["foods", "$state", "$scope", "$stateParams"];
 
 exports.default = FilterFoodsCtrl;
 
-},{}],43:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 'use strict';
 
 FoodsConfig.$inject = ["$stateProvider", "$httpProvider"];
@@ -53243,7 +53418,7 @@ function FoodsConfig($stateProvider, $httpProvider) {
 
 exports.default = FoodsConfig;
 
-},{}],44:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53264,7 +53439,7 @@ FoodsCtrl.$inject = ["foods", "$state", "$scope"];
 
 exports.default = FoodsCtrl;
 
-},{}],45:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53316,7 +53491,7 @@ foodsModule.controller('RecipesCtrl', _recipes2.default);
 
 exports.default = foodsModule;
 
-},{"./detailsfood.controller":41,"./filterfoods.controller":42,"./foods.config":43,"./foods.controller":44,"./recipes.controller":46,"angular":9}],46:[function(require,module,exports){
+},{"./detailsfood.controller":43,"./filterfoods.controller":44,"./foods.config":45,"./foods.controller":46,"./recipes.controller":48,"angular":9}],48:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53370,7 +53545,7 @@ var RecipesCtrl = function () {
 
 exports.default = RecipesCtrl;
 
-},{}],47:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53395,7 +53570,7 @@ var HomeSlider = {
 
 exports.default = HomeSlider;
 
-},{}],48:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 'use strict';
 
 HomeConfig.$inject = ["$stateProvider"];
@@ -53423,7 +53598,7 @@ function HomeConfig($stateProvider) {
 
 exports.default = HomeConfig;
 
-},{}],49:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53471,7 +53646,7 @@ var HomeCtrl = function () {
 
 exports.default = HomeCtrl;
 
-},{}],50:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53513,7 +53688,7 @@ homeModule.component('homeSlider', _homeSlider2.default);
 
 exports.default = homeModule;
 
-},{"./home-slider.component":47,"./home.config":48,"./home.controller":49,"angular":9}],51:[function(require,module,exports){
+},{"./home-slider.component":49,"./home.config":50,"./home.controller":51,"angular":9}],53:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53541,7 +53716,7 @@ var AppFooter = {
 
 exports.default = AppFooter;
 
-},{}],52:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53573,7 +53748,7 @@ var AppHeader = {
 
 exports.default = AppHeader;
 
-},{}],53:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53605,7 +53780,7 @@ layoutModule.component('appFooter', _footer2.default);
 
 exports.default = layoutModule;
 
-},{"./footer.component":51,"./header.component":52,"angular":9}],54:[function(require,module,exports){
+},{"./footer.component":53,"./header.component":54,"angular":9}],56:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53645,7 +53820,7 @@ profileModule.controller('ProfileArticlesCtrl', _profileArticles2.default);
 
 exports.default = profileModule;
 
-},{"./profile-articles.controller":55,"./profile.config":56,"./profile.controller":57,"angular":9}],55:[function(require,module,exports){
+},{"./profile-articles.controller":57,"./profile.config":58,"./profile.controller":59,"angular":9}],57:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53683,7 +53858,7 @@ ProfileArticlesCtrl.$inject = ["profile", "$state", "$rootScope"];
 
 exports.default = ProfileArticlesCtrl;
 
-},{}],56:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 'use strict';
 
 ProfileConfig.$inject = ["$stateProvider"];
@@ -53726,7 +53901,7 @@ function ProfileConfig($stateProvider) {
 
 exports.default = ProfileConfig;
 
-},{}],57:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53753,7 +53928,7 @@ ProfileCtrl.$inject = ["profile", "User"];
 
 exports.default = ProfileCtrl;
 
-},{}],58:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53870,7 +54045,7 @@ var Articles = function () {
 
 exports.default = Articles;
 
-},{}],59:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53931,7 +54106,7 @@ var Comments = function () {
 
 exports.default = Comments;
 
-},{}],60:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54025,13 +54200,16 @@ var Foods = function () {
     // }
 
 
-    // destroy(slug) {
-    //   return this._$http({
-    //     url: this._AppConstants.api + '/articles/' + slug,
-    //     method: 'DELETE'
-    //   })
-    // }
+    // Delete a food
 
+  }, {
+    key: 'destroy',
+    value: function destroy(slug) {
+      return this._$http({
+        url: this._AppConstants.api + '/foods/' + slug,
+        method: 'DELETE'
+      });
+    }
 
     // Create a food
 
@@ -54081,7 +54259,7 @@ var Foods = function () {
 
 exports.default = Foods;
 
-},{}],61:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54147,7 +54325,7 @@ servicesModule.service('Tags', _tags2.default);
 
 exports.default = servicesModule;
 
-},{"./articles.service":58,"./comments.service":59,"./foods.service":60,"./jwt.service":62,"./profile.service":63,"./tags.service":64,"./toastr.service":65,"./user.service":66,"angular":9}],62:[function(require,module,exports){
+},{"./articles.service":60,"./comments.service":61,"./foods.service":62,"./jwt.service":64,"./profile.service":65,"./tags.service":66,"./toastr.service":67,"./user.service":68,"angular":9}],64:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54191,7 +54369,7 @@ var JWT = function () {
 
 exports.default = JWT;
 
-},{}],63:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54250,7 +54428,7 @@ var Profile = function () {
 
 exports.default = Profile;
 
-},{}],64:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54290,7 +54468,7 @@ var Tags = function () {
 
 exports.default = Tags;
 
-},{}],65:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54337,7 +54515,7 @@ var Toastr = function () {
 
 exports.default = Toastr;
 
-},{}],66:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -54468,7 +54646,7 @@ var User = function () {
 
 exports.default = User;
 
-},{}],67:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54501,7 +54679,7 @@ settingsModule.controller('SettingsCtrl', _settings4.default);
 
 exports.default = settingsModule;
 
-},{"./settings.config":68,"./settings.controller":69,"angular":9}],68:[function(require,module,exports){
+},{"./settings.config":70,"./settings.controller":71,"angular":9}],70:[function(require,module,exports){
 'use strict';
 
 SettingsConfig.$inject = ["$stateProvider"];
@@ -54527,7 +54705,7 @@ function SettingsConfig($stateProvider) {
 
 exports.default = SettingsConfig;
 
-},{}],69:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
