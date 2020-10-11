@@ -51899,7 +51899,7 @@ _angular2.default.bootstrap(document, ['app'], {
   strictDi: true
 });
 
-},{"./article":16,"./auth":19,"./components":32,"./config/app.config":35,"./config/app.constants":36,"./config/app.run":37,"./config/app.templates":38,"./editor":42,"./foods":47,"./home":52,"./layout":55,"./profile":56,"./services":63,"./settings":69,"angular":9,"angular-messages":2,"angular-toastr":4,"angular-ui-bootstrap":6,"angular-ui-router":7}],12:[function(require,module,exports){
+},{"./article":16,"./auth":19,"./components":31,"./config/app.config":34,"./config/app.constants":35,"./config/app.run":36,"./config/app.templates":37,"./editor":41,"./foods":47,"./home":52,"./layout":55,"./profile":56,"./services":63,"./settings":69,"angular":9,"angular-messages":2,"angular-toastr":4,"angular-ui-bootstrap":6,"angular-ui-router":7}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -51991,8 +51991,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _marked = require('marked');
 
 var _marked2 = _interopRequireDefault(_marked);
@@ -52001,68 +51999,20 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var ArticleCtrl = function () {
-  ArticleCtrl.$inject = ["article", "User", "Comments", "$sce", "$rootScope"];
-  function ArticleCtrl(article, User, Comments, $sce, $rootScope) {
-    'ngInject';
+var ArticleCtrl = function ArticleCtrl(article, User, $sce, $rootScope) {
+  'ngInject';
 
-    var _this = this;
+  _classCallCheck(this, ArticleCtrl);
 
-    _classCallCheck(this, ArticleCtrl);
+  this.article = article;
 
-    this.article = article;
-    this._Comments = Comments;
+  this.currentUser = User.current;
 
-    this.currentUser = User.current;
+  $rootScope.setPageTitle(this.article.title);
 
-    $rootScope.setPageTitle(this.article.title);
-
-    this.article.body = $sce.trustAsHtml((0, _marked2.default)(this.article.body, { sanitize: true }));
-
-    Comments.getAll(this.article.slug).then(function (comments) {
-      return _this.comments = comments;
-    });
-
-    this.resetCommentForm();
-  }
-
-  _createClass(ArticleCtrl, [{
-    key: 'resetCommentForm',
-    value: function resetCommentForm() {
-      this.commentForm = {
-        isSubmitting: false,
-        body: '',
-        errors: []
-      };
-    }
-  }, {
-    key: 'addComment',
-    value: function addComment() {
-      var _this2 = this;
-
-      this.commentForm.isSubmitting = true;
-
-      this._Comments.add(this.article.slug, this.commentForm.body).then(function (comment) {
-        _this2.comments.unshift(comment);
-        _this2.resetCommentForm();
-      }, function (err) {
-        _this2.commentForm.isSubmitting = false;
-        _this2.commentForm.errors = err.data.errors;
-      });
-    }
-  }, {
-    key: 'deleteComment',
-    value: function deleteComment(commentId, index) {
-      var _this3 = this;
-
-      this._Comments.destroy(commentId, this.article.slug).then(function (success) {
-        _this3.comments.splice(index, 1);
-      });
-    }
-  }]);
-
-  return ArticleCtrl;
-}();
+  this.article.body = $sce.trustAsHtml((0, _marked2.default)(this.article.body, { sanitize: true }));
+};
+ArticleCtrl.$inject = ["article", "User", "$sce", "$rootScope"];
 
 exports.default = ArticleCtrl;
 
@@ -52761,21 +52711,6 @@ var FoodActions = {
 exports.default = FoodActions;
 
 },{}],29:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-var FoodDetails = {
-  bindings: {
-    food: '='
-  },
-  templateUrl: 'components/foods-helpers/food-details.html'
-};
-
-exports.default = FoodDetails;
-
-},{}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -52818,7 +52753,7 @@ var FoodsList = {
 
 exports.default = FoodsList;
 
-},{}],31:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52833,7 +52768,7 @@ var FoodsPreview = {
 
 exports.default = FoodsPreview;
 
-},{}],32:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52884,10 +52819,6 @@ var _foodsPreview = require('./foods-helpers/foods-preview.component');
 
 var _foodsPreview2 = _interopRequireDefault(_foodsPreview);
 
-var _foodDetails = require('./foods-helpers/food-details.component');
-
-var _foodDetails2 = _interopRequireDefault(_foodDetails);
-
 var _foodActions = require('./foods-helpers/food-actions.component');
 
 var _foodActions2 = _interopRequireDefault(_foodActions);
@@ -52920,15 +52851,13 @@ componentsModule.component('foodsList', _foodsList2.default);
 
 componentsModule.component('foodsPreview', _foodsPreview2.default);
 
-componentsModule.component('foodDetails', _foodDetails2.default);
-
 componentsModule.component('foodActions', _foodActions2.default);
 
 componentsModule.component('listPagination', _listPagination2.default);
 
 exports.default = componentsModule;
 
-},{"./article-helpers/article-list.component":21,"./article-helpers/article-meta.component":22,"./article-helpers/article-preview.component":23,"./article-helpers/list-pagination.component":24,"./buttons/favorite-btn.component":25,"./buttons/favorite-food-btn.component":26,"./buttons/follow-btn.component":27,"./foods-helpers/food-actions.component":28,"./foods-helpers/food-details.component":29,"./foods-helpers/foods-list.component":30,"./foods-helpers/foods-preview.component":31,"./list-errors.component":33,"./show-authed.directive":34,"angular":9}],33:[function(require,module,exports){
+},{"./article-helpers/article-list.component":21,"./article-helpers/article-meta.component":22,"./article-helpers/article-preview.component":23,"./article-helpers/list-pagination.component":24,"./buttons/favorite-btn.component":25,"./buttons/favorite-food-btn.component":26,"./buttons/follow-btn.component":27,"./foods-helpers/food-actions.component":28,"./foods-helpers/foods-list.component":29,"./foods-helpers/foods-preview.component":30,"./list-errors.component":32,"./show-authed.directive":33,"angular":9}],32:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52943,7 +52872,7 @@ var ListErrors = {
 
 exports.default = ListErrors;
 
-},{}],34:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 'use strict';
 
 ShowAuthed.$inject = ["User"];
@@ -52982,7 +52911,7 @@ function ShowAuthed(User) {
 
 exports.default = ShowAuthed;
 
-},{}],35:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 'use strict';
 
 AppConfig.$inject = ["$httpProvider", "$stateProvider", "$locationProvider", "$urlRouterProvider"];
@@ -53022,7 +52951,7 @@ function AppConfig($httpProvider, $stateProvider, $locationProvider, $urlRouterP
 
 exports.default = AppConfig;
 
-},{"./auth.interceptor":39}],36:[function(require,module,exports){
+},{"./auth.interceptor":38}],35:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53037,7 +52966,7 @@ var AppConstants = {
 
 exports.default = AppConstants;
 
-},{}],37:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 'use strict';
 
 AppRun.$inject = ["AppConstants", "$rootScope"];
@@ -53066,18 +52995,19 @@ function AppRun(AppConstants, $rootScope) {
 
 exports.default = AppRun;
 
-},{}],38:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 "use strict";
 
 angular.module("templates", []).run(["$templateCache", function ($templateCache) {
+  $templateCache.put("article/article-actions.html", "<article-meta article=\"$ctrl.article\">\n\n  <span ng-show=\"$ctrl.canModify\">\n    <a class=\"btn btn-sm btn-outline-secondary\"\n      ui-sref=\"app.editor({ slug: $ctrl.article.slug })\">\n      <i class=\"ion-edit\"></i> Edit Article\n    </a>\n\n    <button class=\"btn btn-sm btn-outline-danger\"\n      ng-class=\"{disabled: $ctrl.isDeleting}\"\n      ng-click=\"$ctrl.deleteArticle()\">\n      <i class=\"ion-trash-a\"></i> Delete Article\n    </button>\n  </span>\n\n  <span ng-hide=\"$ctrl.canModify\">\n    <follow-btn user=\"$ctrl.article.author\"></follow-btn>\n    <favorite-btn article=\"$ctrl.article\">\n      {{ $ctrl.article.favorited ? \'Unfavorite\' : \'Favorite\' }} Article <span class=\"counter\">({{$ctrl.article.favoritesCount}})</span>\n    </favorite-btn>\n  </span>\n\n</article-meta>\n");
+  $templateCache.put("article/article.html", "<div class=\"article-page\">\n\n  <!-- Banner for article title, action buttons -->\n  <div class=\"banner\">\n    <div class=\"container\">\n\n      <h1 ng-bind=\"::$ctrl.article.title\"></h1>\n\n      <div class=\"article-meta\">\n        <!-- Show author info + favorite & follow buttons -->\n        <article-actions article=\"$ctrl.article\"></article-actions>\n\n      </div>\n\n    </div>\n  </div>\n\n\n\n  <!-- Main view. Contains article html and comments -->\n  <div class=\"container page\">\n\n    <!-- Article\'s HTML & tags rendered here -->\n    <div class=\"row article-content\">\n      <div class=\"col-xs-12\">\n\n        <div ng-bind-html=\"::$ctrl.article.body\"></div>\n\n        <ul class=\"tag-list\">\n          <li class=\"tag-default tag-pill tag-outline\"\n            ng-repeat=\"tag in ::$ctrl.article.tagList\">\n            {{ tag }}\n          </li>\n        </ul>\n\n      </div>\n    </div>\n\n    <hr />\n\n    <div class=\"article-actions\">\n\n      <!-- Show author info + favorite & follow buttons -->\n      <article-actions article=\"$ctrl.article\"></article-actions>\n\n    </div>\n\n</div>\n");
+  $templateCache.put("article/comment.html", "<div class=\"card\">\n  <div class=\"card-block\">\n    <p class=\"card-text\" ng-bind=\"::$ctrl.data.body\"></p>\n  </div>\n  <div class=\"card-footer\">\n    <a class=\"comment-author\" ui-sref=\"app.profile.main({ username: $ctrl.data.author.username })\">\n      <img ng-src=\"{{::$ctrl.data.author.image}}\" class=\"comment-author-img\" />\n    </a>\n    &nbsp;\n    <a class=\"comment-author\" ui-sref=\"app.profile.main({ username: $ctrl.data.author.username })\" ng-bind=\"::$ctrl.data.author.username\">\n    </a>\n    <span class=\"date-posted\"\n      ng-bind=\"::$ctrl.data.createdAt | date: \'longDate\'\">\n    </span>\n    <span class=\"mod-options\" ng-show=\"$ctrl.canModify\">\n      <i class=\"ion-trash-a\" ng-click=\"$ctrl.deleteCb()\"></i>\n    </span>\n  </div>\n</div>\n");
   $templateCache.put("components/list-errors.html", "<ul class=\"error-messages\" ng-show=\"$ctrl.errors\">\n  <div ng-repeat=\"(field, errors) in $ctrl.errors\">\n    <li ng-repeat=\"error in errors\">\n      {{field}} {{error}}\n    </li>\n  </div>\n</ul>\n");
   $templateCache.put("auth/auth.html", "<div class=\"auth-page\">\n  <div class=\"container page\">\n    <div class=\"row\">\n\n      <div class=\"col-md-6 offset-md-3 col-xs-12\">\n        <h1 class=\"text-xs-center\" ng-bind=\"::$ctrl.title\"></h1>\n        <p class=\"text-xs-center\">\n          <a ui-sref=\"app.login\"\n            ng-show=\"$ctrl.authType === \'register\'\">\n            Have an account?\n          </a>\n          <a ui-sref=\"app.register\"\n            ng-show=\"$ctrl.authType === \'login\'\">\n            Need an account?\n          </a>\n        </p>\n\n        <a href=\"http://localhost:3000/api/auth/github\" style=\"font-size: 25px; color:black\">Github</a><br>\n        <a href=\"http://localhost:3000/api/auth/googleplus\" style=\"font-size: 25px; color:black\">Google</a>\n\n        <list-errors errors=\"$ctrl.errors\"></list-errors>\n\n        <form name=\"formData\" ng-submit=\"$ctrl.submitForm()\">\n          <fieldset ng-disabled=\"$ctrl.isSubmitting\">\n\n            <!-- Form -->\n            <fieldset class=\"form-group\" ng-show=\"$ctrl.authType === \'register\'\" ng-disabled=\"$ctrl.authType != \'register\'\">\n              <input class=\"form-control form-control-lg\" type=\"text\" placeholder=\"Username\"\n                ng-model=\"$ctrl.formData.username\" name=\"Username\" ng-minlength=\"3\" ng-maxlength=\"16\" required/>\n              <div ng-messages=\"formData.Username.$error\" style=\"color: red;\">\n                <p ng-message=\"required\" ng-show = \"formData.Username.$dirty\">Username is required</p>\n                <p ng-message=\"minlength\">Enter more than 3 characters</p>\n                <p ng-message=\"maxlength\">Enter less than 16 characters</p>\n              </div>\n            </fieldset>\n            \n\n            <fieldset class=\"form-group\">\n              <input class=\"form-control form-control-lg\" type=\"email\" placeholder=\"Email\"\n                ng-model=\"$ctrl.formData.email\" name=\"Email\" required/>\n              <div ng-messages=\"formData.Email.$error\" style=\"color: red;\">\n                <p ng-message=\"required\" ng-show=\"formData.Email.$dirty\">Email is required</p>\n              </div>\n            </fieldset>\n\n\n            <fieldset class=\"form-group\">\n              <input required class=\"form-control form-control-lg\" type=\"password\" placeholder=\"Password\"\n                 ng-model=\"$ctrl.formData.password\" name=\"Password\" ng-minlength=\"6\" ng-maxlength=\"20\"/>\n              <div ng-messages=\"formData.Password.$error\" style=\"color: red;\">\n                <p ng-message=\"required\" ng-show=\"formData.Password.$dirty\">Password is required</p>\n                <p ng-message=\"minlength\">Enter more than 6 charecters</p>\n                <p ng-message=\"maxlength\">Enter less than 20 characters</p>\n              </div>\n            </fieldset>\n\n\n            <!-- Buttons -->\n            <fieldset ng-show=\"$ctrl.authType === \'register\'\">\n              <button class=\"btn btn-lg btn-primary pull-xs-right\"\n                type=\"submit\" ng-bind=\"::$ctrl.title\"\n                ng-show=\"formData.Username.$valid && formData.Email.$valid && formData.Password.$valid\">\n              </button>\n            </fieldset>\n\n            <fieldset ng-show=\"$ctrl.authType === \'login\'\">\n              <button class=\"btn btn-lg btn-primary pull-xs-right\"\n                type=\"submit\" ng-bind=\"::$ctrl.title\"\n                ng-show=\"formData.Email.$valid && formData.Password.$valid\">\n              </button>\n            </fieldset> \n\n          </fieldset>\n        </form>\n      </div>\n\n    </div>\n  </div>\n</div>\n\n\n\n\n\n       ");
-  $templateCache.put("article/article-actions.html", "<article-meta article=\"$ctrl.article\">\n\n  <span ng-show=\"$ctrl.canModify\">\n    <a class=\"btn btn-sm btn-outline-secondary\"\n      ui-sref=\"app.editor({ slug: $ctrl.article.slug })\">\n      <i class=\"ion-edit\"></i> Edit Article\n    </a>\n\n    <button class=\"btn btn-sm btn-outline-danger\"\n      ng-class=\"{disabled: $ctrl.isDeleting}\"\n      ng-click=\"$ctrl.deleteArticle()\">\n      <i class=\"ion-trash-a\"></i> Delete Article\n    </button>\n  </span>\n\n  <span ng-hide=\"$ctrl.canModify\">\n    <follow-btn user=\"$ctrl.article.author\"></follow-btn>\n    <favorite-btn article=\"$ctrl.article\">\n      {{ $ctrl.article.favorited ? \'Unfavorite\' : \'Favorite\' }} Article <span class=\"counter\">({{$ctrl.article.favoritesCount}})</span>\n    </favorite-btn>\n  </span>\n\n</article-meta>\n");
-  $templateCache.put("article/article.html", "<div class=\"article-page\">\n\n  <!-- Banner for article title, action buttons -->\n  <div class=\"banner\">\n    <div class=\"container\">\n\n      <h1 ng-bind=\"::$ctrl.article.title\"></h1>\n\n      <div class=\"article-meta\">\n        <!-- Show author info + favorite & follow buttons -->\n        <article-actions article=\"$ctrl.article\"></article-actions>\n\n      </div>\n\n    </div>\n  </div>\n\n\n\n  <!-- Main view. Contains article html and comments -->\n  <div class=\"container page\">\n\n    <!-- Article\'s HTML & tags rendered here -->\n    <div class=\"row article-content\">\n      <div class=\"col-xs-12\">\n\n        <div ng-bind-html=\"::$ctrl.article.body\"></div>\n\n        <ul class=\"tag-list\">\n          <li class=\"tag-default tag-pill tag-outline\"\n            ng-repeat=\"tag in ::$ctrl.article.tagList\">\n            {{ tag }}\n          </li>\n        </ul>\n\n      </div>\n    </div>\n\n    <hr />\n\n    <div class=\"article-actions\">\n\n      <!-- Show author info + favorite & follow buttons -->\n      <article-actions article=\"$ctrl.article\"></article-actions>\n\n    </div>\n\n    <!-- Comments section -->\n    <div class=\"row\">\n      <div class=\"col-xs-12 col-md-8 offset-md-2\">\n\n        <div show-authed=\"true\">\n          <list-errors from=\"$crl.commentForm.errors\"></list-errors>\n          <form class=\"card comment-form\" ng-submit=\"$ctrl.addComment()\">\n            <fieldset ng-disabled=\"$ctrl.commentForm.isSubmitting\">\n              <div class=\"card-block\">\n                <textarea class=\"form-control\"\n                  placeholder=\"Write a comment...\"\n                  rows=\"3\"\n                  ng-model=\"$ctrl.commentForm.body\"></textarea>\n              </div>\n              <div class=\"card-footer\">\n                <img ng-src=\"{{::$ctrl.currentUser.image}}\" class=\"comment-author-img\" />\n                <button class=\"btn btn-sm btn-primary\" type=\"submit\">\n                 Post Comment\n                </button>\n              </div>\n            </fieldset>\n          </form>\n        </div>\n\n        <div show-authed=\"false\">\n          <a ui-sref=\"app.login\">Sign in</a> or <a ui-sref=\"app.register\">sign up</a> to add comments on this article.\n        </div>\n\n        <comment ng-repeat=\"cmt in $ctrl.comments\"\n          data=\"cmt\"\n          delete-cb=\"$ctrl.deleteComment(cmt.id, $index)\">\n        </comment>\n\n\n      </div>\n    </div>\n\n  </div>\n\n\n\n</div>\n");
-  $templateCache.put("article/comment.html", "<div class=\"card\">\n  <div class=\"card-block\">\n    <p class=\"card-text\" ng-bind=\"::$ctrl.data.body\"></p>\n  </div>\n  <div class=\"card-footer\">\n    <a class=\"comment-author\" ui-sref=\"app.profile.main({ username: $ctrl.data.author.username })\">\n      <img ng-src=\"{{::$ctrl.data.author.image}}\" class=\"comment-author-img\" />\n    </a>\n    &nbsp;\n    <a class=\"comment-author\" ui-sref=\"app.profile.main({ username: $ctrl.data.author.username })\" ng-bind=\"::$ctrl.data.author.username\">\n    </a>\n    <span class=\"date-posted\"\n      ng-bind=\"::$ctrl.data.createdAt | date: \'longDate\'\">\n    </span>\n    <span class=\"mod-options\" ng-show=\"$ctrl.canModify\">\n      <i class=\"ion-trash-a\" ng-click=\"$ctrl.deleteCb()\"></i>\n    </span>\n  </div>\n</div>\n");
   $templateCache.put("editor/editor.html", "<div class=\"editor-page\">\n  <div class=\"container page\">\n    <div class=\"row\">\n      <div class=\"col-md-10 offset-md-1 col-xs-12\">\n\n        <h1>New Article</h1>\n        <list-errors errors=\"$ctrl.errors\"></list-errors>\n\n        <form>\n          <fieldset ng-disabled=\"$ctrl.isSubmitting\">\n\n            <fieldset class=\"form-group\">\n              <input class=\"form-control form-control-lg\"\n                ng-model=\"$ctrl.article.title\"\n                type=\"text\"\n                placeholder=\"Article Title\" />\n            </fieldset>\n\n            <fieldset class=\"form-group\">\n              <input class=\"form-control\"\n                ng-model=\"$ctrl.article.description\"\n                type=\"text\"\n                placeholder=\"What\'s this article about?\" />\n            </fieldset>\n\n            <fieldset class=\"form-group\">\n              <textarea class=\"form-control\"\n                rows=\"8\"\n                ng-model=\"$ctrl.article.body\"\n                placeholder=\"Write your article (in markdown)\">\n              </textarea>\n            </fieldset>\n\n            <fieldset class=\"form-group\">\n              <input class=\"form-control\"\n                type=\"text\"\n                placeholder=\"Enter tags\"\n                ng-model=\"$ctrl.tagField\"\n                ng-keyup=\"$event.keyCode == 13 && $ctrl.addTag()\" />\n\n              <div class=\"tag-list\">\n                <span ng-repeat=\"tag in $ctrl.article.tagList\"\n                  class=\"tag-default tag-pill\">\n                  <i class=\"ion-close-round\" ng-click=\"$ctrl.removeTag(tag)\"></i>\n                  {{ tag }}\n                </span>\n              </div>\n            </fieldset>\n\n            <button class=\"btn btn-lg pull-xs-right btn-primary\" type=\"button\" ng-click=\"$ctrl.submit()\">\n              Publish Article\n            </button>\n\n          </fieldset>\n        </form>\n\n      </div>\n    </div>\n  </div>\n</div>\n");
-  $templateCache.put("foods/detailsfood.html", "<food-details food=\"$ctrl.food\"></food-details>");
+  $templateCache.put("foods/comment-food.html", "<hr>\n\n<div class=\"card\">\n    <div class=\"card-block\">\n      <p class=\"card-text\" ng-bind=\"$ctrl.data.body\"></p>\n    </div>\n    <div class=\"card-footer\">\n      <a class=\"comment-author\" ui-sref=\"app.profile.main({ username: $ctrl.data.author.username })\">\n        <img ng-src=\"{{$ctrl.data.author.image}}\" class=\"comment-author-img\" />\n      </a>\n      &nbsp;\n      <a class=\"comment-author\" ui-sref=\"app.profile.main({ username: $ctrl.data.author.username })\" ng-bind=\"$ctrl.data.author.username\">\n      </a>\n      <span class=\"date-posted\"\n        ng-bind=\"$ctrl.data.createdAt | date: \'longDate\'\">\n      </span>\n      &nbsp;\n      <span class=\"mod-options\" ng-show=\"$ctrl.canModify\">\n        <i class=\"ion-trash-a\" ng-click=\"$ctrl.deleteCb()\"></i>\n      </span>\n    </div>\n  </div>");
   $templateCache.put("foods/filterfoods.html", "<hr>\n<blockquote>\n  <button class=\"button-deletefilters\" ui-sref=\"app.foods\">DELETE FILTERS</button>\n  <br><br>\n\n  <div ng-repeat=\"food in $ctrl.filteredFoods\">\n      <hr>\n      <label>Author:</label> <a class=\"author\"\n        ui-sref=\"app.profile.main({ username:food.author.username })\"\n        ng-bind=\"food.author.username\">\n      </a>\n\n      <a ui-sref=\"app.detailsFood({ slug:food.slug })\" class=\"preview-link\">\n        <h1 ng-bind=\"food.title\"></h1>\n        <p style=\"font-size: 12px;\">Difficulty: {{food.difficulty}}</p>\n        <p ng-bind=\"food.description\"></p>\n        <button class=\"button-details\">Read recipe...</span>\n      </a>\n  </div>\n  <hr>\n</blockquote>");
+  $templateCache.put("foods/food.html", "<hr>\n<blockquote>\n  <div>\n    <label>Author:</label> <a class=\"author\"\n      ui-sref=\"app.profile.main({ username:$ctrl.food.author.username })\"\n      ng-bind=\"$ctrl.food.author.username\">\n    </a>\n    <food-actions food=\"$ctrl.food\"></food-actions>\n  \n    <h1>{{$ctrl.food.title}}</h1>\n    <p style=\"font-size: 12px;\">Difficulty: {{$ctrl.food.difficulty}}</p>\n    <p>{{$ctrl.food.description}}</p>\n    <p>{{$ctrl.food.body}}</p>\n  </div><br>\n\n  <!-- Comments section -->\n  <div class=\"row\">\n    <div class=\"col-xs-12 col-md-8 offset-md-2\">\n\n      <div show-authed=\"true\">\n        <list-errors from=\"$crl.commentForm.errors\"></list-errors>\n        <form class=\"card comment-form\" ng-submit=\"$ctrl.addComment()\">\n          <fieldset ng-disabled=\"$ctrl.commentForm.isSubmitting\">\n            <div class=\"card-block\">\n              <textarea class=\"form-control\"\n                placeholder=\"Write a comment...\"\n                rows=\"3\"\n                ng-model=\"$ctrl.commentForm.body\"></textarea>\n            </div>\n            <div class=\"card-footer\">\n              <img ng-src=\"{{$ctrl.currentUser.image}}\" class=\"comment-author-img\" />\n              <button class=\"btn btn-sm btn-primary\" type=\"submit\">\n               Post Comment\n              </button>\n            </div>\n          </fieldset>\n        </form>\n      </div>\n\n      <div show-authed=\"false\">\n        <a ui-sref=\"app.login\">Sign in</a> or <a ui-sref=\"app.register\">sign up</a> to add comments on this article.\n      </div>\n\n      <comment-food ng-repeat=\"cmt in $ctrl.comments\"\n        data=\"cmt\"\n        delete-cb=\"$ctrl.deleteComment(cmt.id, $index)\">\n      </comment-food>\n\n    </div>\n  </div>\n</blockquote>");
   $templateCache.put("foods/foods.html", "<foods-list foods=\"$ctrl.foods\"></foods-list>");
   $templateCache.put("foods/recipes.html", "<div class=\"editor-page\">\n    <div class=\"container page\">\n      <div class=\"row\">\n        <div class=\"col-md-10 offset-md-1 col-xs-12\">\n          \n          <h1>New Recipe</h1>\n          <list-errors errors=\"$ctrl.errors\"></list-errors>\n  \n          <form>\n            <fieldset ng-disabled=\"$ctrl.isSubmitting\">\n  \n              <fieldset class=\"form-group\">\n                <input class=\"form-control form-control-lg\"\n                  ng-model=\"$ctrl.food.title\"\n                  type=\"text\"\n                  placeholder=\"Recipe Name\"/>\n              </fieldset>\n  \n              <fieldset class=\"form-group\">\n                <input class=\"form-control\"\n                  ng-model=\"$ctrl.food.description\"\n                  type=\"text\"\n                  placeholder=\"What\'s this recipe about?\" />\n              </fieldset>\n  \n              <fieldset class=\"form-group\">\n                <textarea class=\"form-control\"\n                  rows=\"8\"\n                  ng-model=\"$ctrl.food.body\"\n                  placeholder=\"Write your recipe\">\n                </textarea>\n              </fieldset>\n\n              <fieldset class=\"form-group\">\n                <textarea class=\"form-control\"\n                  ng-model=\"$ctrl.food.difficulty\"\n                  placeholder=\"Describe the difficulty in one or two words: Easy, Medium, Hard, etc\">\n                </textarea>\n              </fieldset>\n  \n              <button class=\"btn btn-lg pull-xs-right btn-primary\" type=\"button\" ng-click=\"$ctrl.submit()\">\n                Publish Recipe\n              </button>\n  \n            </fieldset>\n          </form>\n  \n        </div>\n      </div>\n    </div>\n  </div>\n  ");
   $templateCache.put("home/home-slider.html", "<div style=\"height: 400px\">\n    <div uib-carousel active=\"active\" interval=\"$ctrl.myInterval\" no-wrap=\"$ctrl.noWrapSlides\">\n        <div uib-slide ng-repeat=\"slide in $ctrl.slides track by slide.id\" index=\"slide.id\" style=\"height: 400px\">\n            <img ng-src=\"{{slide.image}}\" class=\"img-fluid\" style=\"filter: blur(2px);\">\n            <div class = \"carousel-caption\" style = \"padding-bottom: 100px;\">\n                <h2>{{slide.text}}</h2>\n            </div>\n        </div>\n    </div>\n</div>");
@@ -53092,16 +53022,15 @@ angular.module("templates", []).run(["$templateCache", function ($templateCache)
   $templateCache.put("components/article-helpers/article-meta.html", "<div class=\"article-meta\">\n  <a ui-sref=\"app.profile.main({ username:$ctrl.article.author.username })\">\n    <img ng-src=\"{{$ctrl.article.author.image}}\" />\n  </a>\n\n  <div class=\"info\">\n    <a class=\"author\"\n      ui-sref=\"app.profile.main({ username:$ctrl.article.author.username })\"\n      ng-bind=\"$ctrl.article.author.username\">\n    </a>\n    <span class=\"date\"\n      ng-bind=\"$ctrl.article.createdAt | date: \'longDate\' \">\n    </span>\n  </div>\n\n  <ng-transclude></ng-transclude>\n</div>\n");
   $templateCache.put("components/article-helpers/article-preview.html", "<div class=\"article-preview\">\n  <article-meta article=\"$ctrl.article\">\n    <favorite-btn\n      article=\"$ctrl.article\"\n      class=\"pull-xs-right\">\n      {{$ctrl.article.favoritesCount}}\n    </favorite-btn>\n  </article-meta>\n\n  <a ui-sref=\"app.article({ slug: $ctrl.article.slug })\" class=\"preview-link\">\n    <h1 ng-bind=\"$ctrl.article.title\"></h1>\n    <p ng-bind=\"$ctrl.article.description\"></p>\n    <span>Read more...</span>\n    <ul class=\"tag-list\">\n      <li class=\"tag-default tag-pill tag-outline\"\n        ng-repeat=\"tag in $ctrl.article.tagList\">\n        {{tag}}\n      </li>\n    </ul>\n  </a>\n</div>\n");
   $templateCache.put("components/article-helpers/list-pagination.html", "<nav>\n  <ul class=\"pagination\">\n\n    <li class=\"page-item\"\n      ng-class=\"{active: pageNumber === $ctrl.currentPage }\"\n      ng-repeat=\"pageNumber in $ctrl.pageRange($ctrl.totalPages)\"\n      ng-click=\"$ctrl.changePage(pageNumber)\">\n\n      <a class=\"page-link\" href=\"\">{{ pageNumber }}</a>\n\n    </li>\n\n  </ul>\n</nav>\n");
+  $templateCache.put("components/foods-helpers/food-actions.html", "<!-- Your article -->\n<span ng-show=\"$ctrl.canModify\">\n    <a class=\"btn btn-sm btn-outline-secondary\"\n    ui-sref=\"app.editRecipe({ slug: $ctrl.article.slug })\">\n    <i class=\"ion-edit\"></i> Edit Recipe\n    </a>\n\n    <button class=\"btn btn-sm btn-outline-danger\"\n    ng-class=\"{disabled: $ctrl.isDeleting}\"\n    ng-click=\"$ctrl.deleteRecipe()\">\n    <i class=\"ion-trash-a\"></i> Delete Recipe\n    </button>\n</span>\n\n<!-- Not your article -->\n<span ng-hide=\"$ctrl.canModify\">\n    <follow-btn user=\"$ctrl.food.author\"></follow-btn>\n    <favorite-food-btn food=\"$ctrl.food\">\n    {{ $ctrl.food.favorited ? \'Unfavorite\' : \'Favorite\' }} Recipe <span class=\"counter\">({{$ctrl.food.favoritesCount}})</span>\n    </favorite-food-btn>\n</span>");
+  $templateCache.put("components/foods-helpers/foods-list.html", "<hr>\n<blockquote>\n  <foods-preview food=\"food\" ng-repeat=\"food in $ctrl.foods\"></foods-preview>\n  <hr>\n\n  <label>Try Toastr:</label> \n  <button class=\"button-toastrexample\" ng-click=\"$ctrl.errToas()\">Error</button>\n  <button class=\"button-toastrexample\" ng-click=\"$ctrl.succToas()\">Success</button>\n  <button class=\"button-toastrexample\" ng-click=\"$ctrl.infoToas()\">Info</button>\n  <button class=\"button-toastrexample\" ng-click=\"$ctrl.warnToas()\">Warning</button>\n</blockquote>");
+  $templateCache.put("components/foods-helpers/foods-preview.html", "<div class=\"food-preview\">\n  <label>Author:</label> <a class=\"author\"\n    ui-sref=\"app.profile.main({ username:$ctrl.food.author.username })\"\n    ng-bind=\"$ctrl.food.author.username\">\n  </a>\n\n  <a ui-sref=\"app.detailsFood({ slug: $ctrl.food.slug })\" class=\"preview-link\">\n    <h1 ng-bind=\"$ctrl.food.title\"></h1>\n    <p style=\"font-size: 12px;\">Difficulty: {{$ctrl.food.difficulty}}</p>\n    <p ng-bind=\"$ctrl.food.description\"></p>\n    <button class=\"button-details\">Read recipe...</span>\n  </a>\n\n</div>  \n<hr>");
   $templateCache.put("components/buttons/favorite-btn.html", "<button class=\"btn btn-sm\"\n  ng-class=\"{ \'disabled\' : $ctrl.isSubmitting,\n              \'btn-outline-primary\': !$ctrl.article.favorited,\n              \'btn-primary\': $ctrl.article.favorited }\"\n  ng-click=\"$ctrl.submit()\">\n  <i class=\"ion-heart\"></i> <ng-transclude></ng-transclude>\n</button>\n");
   $templateCache.put("components/buttons/favorite-food-btn.html", "<button class=\"btn btn-sm\"\n  ng-class=\"{ \'disabled\' : $ctrl.isSubmitting,\n              \'btn-outline-primary\': !$ctrl.food.favorited,\n              \'btn-primary\': $ctrl.food.favorited }\"\n  ng-click=\"$ctrl.submit()\">\n  <i class=\"ion-heart\"></i> <ng-transclude></ng-transclude>\n</button>\n");
   $templateCache.put("components/buttons/follow-btn.html", "<button\n  class=\"btn btn-sm action-btn\"\n  ng-class=\"{ \'disabled\': $ctrl.isSubmitting,\n              \'btn-outline-secondary\': !$ctrl.user.following,\n              \'btn-secondary\': $ctrl.user.following }\"\n  ng-click=\"$ctrl.submit()\">\n  <i class=\"ion-plus-round\"></i>\n  &nbsp;\n  {{ $ctrl.user.following ? \'Unfollow\' : \'Follow\' }} {{ $ctrl.user.username }}\n</button>\n");
-  $templateCache.put("components/foods-helpers/food-actions.html", "<!-- Your article -->\n<span ng-show=\"$ctrl.canModify\">\n    <a class=\"btn btn-sm btn-outline-secondary\"\n    ui-sref=\"app.editRecipe({ slug: $ctrl.article.slug })\">\n    <i class=\"ion-edit\"></i> Edit Recipe\n    </a>\n\n    <button class=\"btn btn-sm btn-outline-danger\"\n    ng-class=\"{disabled: $ctrl.isDeleting}\"\n    ng-click=\"$ctrl.deleteRecipe()\">\n    <i class=\"ion-trash-a\"></i> Delete Recipe\n    </button>\n</span>\n\n<!-- Not your article -->\n<span ng-hide=\"$ctrl.canModify\">\n    <follow-btn user=\"$ctrl.food.author\"></follow-btn>\n    <favorite-food-btn food=\"$ctrl.food\">\n    {{ $ctrl.food.favorited ? \'Unfavorite\' : \'Favorite\' }} Recipe <span class=\"counter\">({{$ctrl.food.favoritesCount}})</span>\n    </favorite-food-btn>\n</span>");
-  $templateCache.put("components/foods-helpers/food-details.html", "<hr>\n<blockquote>\n  <div>\n    <label>Author:</label> <a class=\"author\"\n      ui-sref=\"app.profile.main({ username:$ctrl.food.author.username })\"\n      ng-bind=\"$ctrl.food.author.username\">\n    </a>\n    <food-actions food=\"$ctrl.food\"></food-actions>\n  \n    <h1>{{$ctrl.food.title}}</h1>\n    <p style=\"font-size: 12px;\">Difficulty: {{$ctrl.food.difficulty}}</p>\n    <p>{{$ctrl.food.description}}</p>\n    <p>{{$ctrl.food.body}}</p>\n  </div>\n</blockquote>");
-  $templateCache.put("components/foods-helpers/foods-list.html", "<hr>\n<blockquote>\n  <foods-preview food=\"food\" ng-repeat=\"food in $ctrl.foods\"></foods-preview>\n  <hr>\n\n  <label>Toastr:</label> \n  <button class=\"button-toastrexample\" ng-click=\"$ctrl.errToas()\">Error</button>\n  <button class=\"button-toastrexample\" ng-click=\"$ctrl.succToas()\">Success</button>\n  <button class=\"button-toastrexample\" ng-click=\"$ctrl.infoToas()\">Info</button>\n  <button class=\"button-toastrexample\" ng-click=\"$ctrl.warnToas()\">Warning</button>\n</blockquote>");
-  $templateCache.put("components/foods-helpers/foods-preview.html", "<div class=\"food-preview\">\n  <label>Author:</label> <a class=\"author\"\n    ui-sref=\"app.profile.main({ username:$ctrl.food.author.username })\"\n    ng-bind=\"$ctrl.food.author.username\">\n  </a>\n\n  <a ui-sref=\"app.detailsFood({ slug: $ctrl.food.slug })\" class=\"preview-link\">\n    <h1 ng-bind=\"$ctrl.food.title\"></h1>\n    <p style=\"font-size: 12px;\">Difficulty: {{$ctrl.food.difficulty}}</p>\n    <p ng-bind=\"$ctrl.food.description\"></p>\n    <button class=\"button-details\">Read recipe...</span>\n  </a>\n\n</div>  \n<hr>");
 }]);
 
-},{}],39:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 'use strict';
 
 authInterceptor.$inject = ["JWT", "AppConstants", "$window", "$q"];
@@ -53136,7 +53065,7 @@ function authInterceptor(JWT, AppConstants, $window, $q) {
 
 exports.default = authInterceptor;
 
-},{}],40:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 'use strict';
 
 EditorConfig.$inject = ["$stateProvider"];
@@ -53179,7 +53108,7 @@ function EditorConfig($stateProvider) {
 
 exports.default = EditorConfig;
 
-},{}],41:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53248,7 +53177,7 @@ var EditorCtrl = function () {
 
 exports.default = EditorCtrl;
 
-},{}],42:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53282,7 +53211,7 @@ editorModule.controller('EditorCtrl', _editor4.default);
 
 exports.default = editorModule;
 
-},{"./editor.config":40,"./editor.controller":41,"angular":9}],43:[function(require,module,exports){
+},{"./editor.config":39,"./editor.controller":40,"angular":9}],42:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53291,19 +53220,35 @@ Object.defineProperty(exports, "__esModule", {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var DetailsFoodCtrl = function DetailsFoodCtrl(food) {
+var CommentFoodCtrl = function CommentFoodCtrl(User) {
     'ngInject';
 
-    _classCallCheck(this, DetailsFoodCtrl);
+    var _this = this;
 
-    this.food = food;
-    console.log(this.food);
+    _classCallCheck(this, CommentFoodCtrl);
+
+    this.$onInit = function () {
+        if (User.current) {
+            _this.canModify = User.current.username === _this.data.author.username;
+        } else {
+            _this.canModify = false;
+        }
+    };
 };
-DetailsFoodCtrl.$inject = ["food"];
+CommentFoodCtrl.$inject = ["User"];
 
-exports.default = DetailsFoodCtrl;
+var CommentFood = {
+    bindings: {
+        data: '=',
+        deleteCb: '&'
+    },
+    controller: CommentFoodCtrl,
+    templateUrl: 'foods/comment-food.html'
+};
 
-},{}],44:[function(require,module,exports){
+exports.default = CommentFood;
+
+},{}],43:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -53336,6 +53281,73 @@ var FilterFoodsCtrl = function FilterFoodsCtrl(foods, $state, $scope, $statePara
 FilterFoodsCtrl.$inject = ["foods", "$state", "$scope", "$stateParams"];
 
 exports.default = FilterFoodsCtrl;
+
+},{}],44:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var FoodCtrl = function () {
+  FoodCtrl.$inject = ["food", "comments", "User", "Comments"];
+  function FoodCtrl(food, comments, User, Comments) {
+    'ngInject';
+
+    _classCallCheck(this, FoodCtrl);
+
+    this.food = food;
+    this._Comments = Comments;
+
+    this.currentUser = User.current;
+    this.comments = comments;
+
+    this.resetCommentForm();
+  }
+
+  _createClass(FoodCtrl, [{
+    key: 'resetCommentForm',
+    value: function resetCommentForm() {
+      this.commentForm = {
+        isSubmitting: false,
+        body: '',
+        errors: []
+      };
+    }
+  }, {
+    key: 'addComment',
+    value: function addComment() {
+      var _this = this;
+
+      this.commentForm.isSubmitting = true;
+
+      this._Comments.add(this.food.slug, this.commentForm.body).then(function (comment) {
+        _this.comments.unshift(comment);
+        _this.resetCommentForm();
+      }, function (err) {
+        _this.commentForm.isSubmitting = false;
+        _this.commentForm.errors = err.data.errors;
+      });
+    }
+  }, {
+    key: 'deleteComment',
+    value: function deleteComment(commentId, index) {
+      var _this2 = this;
+
+      this._Comments.destroy(commentId, this.food.slug).then(function (success) {
+        _this2.comments.splice(index, 1);
+      });
+    }
+  }]);
+
+  return FoodCtrl;
+}();
+
+exports.default = FoodCtrl;
 
 },{}],45:[function(require,module,exports){
 'use strict';
@@ -53375,14 +53387,19 @@ function FoodsConfig($stateProvider, $httpProvider) {
     }
   }).state('app.detailsFood', {
     url: '/foods/:slug',
-    controller: 'DetailsFoodCtrl',
+    controller: 'FoodCtrl',
     controllerAs: '$ctrl',
-    templateUrl: 'foods/detailsfood.html',
+    templateUrl: 'foods/food.html',
     title: 'Details Food',
     resolve: {
       food: ["Foods", "$stateParams", function food(Foods, $stateParams) {
         return Foods.getFood($stateParams.slug).then(function (food) {
           return food;
+        });
+      }],
+      comments: ["Comments", "$stateParams", function comments(Comments, $stateParams) {
+        return Comments.getAll($stateParams.slug).then(function (comments) {
+          return comments;
         });
       }]
     }
@@ -53462,13 +53479,17 @@ var _filterfoods = require('./filterfoods.controller');
 
 var _filterfoods2 = _interopRequireDefault(_filterfoods);
 
-var _detailsfood = require('./detailsfood.controller');
+var _food = require('./food.controller');
 
-var _detailsfood2 = _interopRequireDefault(_detailsfood);
+var _food2 = _interopRequireDefault(_food);
 
 var _recipes = require('./recipes.controller');
 
 var _recipes2 = _interopRequireDefault(_recipes);
+
+var _commentFood = require('./comment-food.component');
+
+var _commentFood2 = _interopRequireDefault(_commentFood);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -53485,13 +53506,15 @@ foodsModule.controller('FoodsCtrl', _foods4.default);
 
 foodsModule.controller('FilterFoodsCtrl', _filterfoods2.default);
 
-foodsModule.controller('DetailsFoodCtrl', _detailsfood2.default);
+foodsModule.controller('FoodCtrl', _food2.default);
 
 foodsModule.controller('RecipesCtrl', _recipes2.default);
 
+foodsModule.component('commentFood', _commentFood2.default);
+
 exports.default = foodsModule;
 
-},{"./detailsfood.controller":43,"./filterfoods.controller":44,"./foods.config":45,"./foods.controller":46,"./recipes.controller":48,"angular":9}],48:[function(require,module,exports){
+},{"./comment-food.component":42,"./filterfoods.controller":43,"./food.controller":44,"./foods.config":45,"./foods.controller":46,"./recipes.controller":48,"angular":9}],48:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54067,35 +54090,41 @@ var Comments = function () {
     this._$http = $http;
   }
 
-  // Add a comment to an article
+  // Add a comment to a recipe
 
 
   _createClass(Comments, [{
     key: 'add',
     value: function add(slug, payload) {
       return this._$http({
-        url: this._AppConstants.api + '/articles/' + slug + '/comments',
+        url: this._AppConstants.api + '/foods/' + slug + '/comments',
         method: 'POST',
         data: { comment: { body: payload } }
       }).then(function (res) {
         return res.data.comment;
       });
     }
+
+    // Get all recipe's comments
+
   }, {
     key: 'getAll',
     value: function getAll(slug) {
       return this._$http({
-        url: this._AppConstants.api + '/articles/' + slug + '/comments',
+        url: this._AppConstants.api + '/foods/' + slug + '/comments',
         method: 'GET'
       }).then(function (res) {
         return res.data.comments;
       });
     }
+
+    // Delete recipe's comment
+
   }, {
     key: 'destroy',
-    value: function destroy(commentId, articleSlug) {
+    value: function destroy(commentId, foodSlug) {
       return this._$http({
-        url: this._AppConstants.api + '/articles/' + articleSlug + '/comments/' + commentId,
+        url: this._AppConstants.api + '/foods/' + foodSlug + '/comments/' + commentId,
         method: 'DELETE'
       });
     }

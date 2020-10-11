@@ -1,0 +1,51 @@
+<hr>
+<blockquote>
+  <div>
+    <label>Author:</label> <a class="author"
+      ui-sref="app.profile.main({ username:$ctrl.food.author.username })"
+      ng-bind="$ctrl.food.author.username">
+    </a>
+    <food-actions food="$ctrl.food"></food-actions>
+  
+    <h1>{{$ctrl.food.title}}</h1>
+    <p style="font-size: 12px;">Difficulty: {{$ctrl.food.difficulty}}</p>
+    <p>{{$ctrl.food.description}}</p>
+    <p>{{$ctrl.food.body}}</p>
+  </div><br>
+
+  <!-- Comments section -->
+  <div class="row">
+    <div class="col-xs-12 col-md-8 offset-md-2">
+
+      <div show-authed="true">
+        <list-errors from="$crl.commentForm.errors"></list-errors>
+        <form class="card comment-form" ng-submit="$ctrl.addComment()">
+          <fieldset ng-disabled="$ctrl.commentForm.isSubmitting">
+            <div class="card-block">
+              <textarea class="form-control"
+                placeholder="Write a comment..."
+                rows="3"
+                ng-model="$ctrl.commentForm.body"></textarea>
+            </div>
+            <div class="card-footer">
+              <img ng-src="{{$ctrl.currentUser.image}}" class="comment-author-img" />
+              <button class="btn btn-sm btn-primary" type="submit">
+               Post Comment
+              </button>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+
+      <div show-authed="false">
+        <a ui-sref="app.login">Sign in</a> or <a ui-sref="app.register">sign up</a> to add comments on this article.
+      </div>
+
+      <comment-food ng-repeat="cmt in $ctrl.comments"
+        data="cmt"
+        delete-cb="$ctrl.deleteComment(cmt.id, $index)">
+      </comment-food>
+
+    </div>
+  </div>
+</blockquote>

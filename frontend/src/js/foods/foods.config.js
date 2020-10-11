@@ -31,13 +31,16 @@ function FoodsConfig($stateProvider, $httpProvider) {
 
     .state('app.detailsFood', {
         url: '/foods/:slug',
-        controller: 'DetailsFoodCtrl',
+        controller: 'FoodCtrl',
         controllerAs: '$ctrl',
-        templateUrl: 'foods/detailsfood.html',
+        templateUrl: 'foods/food.html',
         title: 'Details Food',
         resolve: {
           food: function(Foods, $stateParams) {
             return Foods.getFood($stateParams.slug).then(food => food);
+          },
+          comments: function(Comments, $stateParams) {
+            return Comments.getAll($stateParams.slug).then(comments => comments);
           }
         }
       })

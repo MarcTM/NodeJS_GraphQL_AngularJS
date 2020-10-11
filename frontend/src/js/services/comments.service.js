@@ -7,27 +7,29 @@ export default class Comments {
   }
 
 
-  // Add a comment to an article
-  add(slug, payload) {
+   // Add a comment to a recipe
+   add(slug, payload) {
     return this._$http({
-      url: `${this._AppConstants.api}/articles/${slug}/comments`,
+      url: `${this._AppConstants.api}/foods/${slug}/comments`,
       method: 'POST',
       data: { comment: { body: payload } }
     }).then((res) => res.data.comment);
 
   }
 
+  // Get all recipe's comments
   getAll(slug) {
     return this._$http({
-      url: `${this._AppConstants.api}/articles/${slug}/comments`,
+      url: `${this._AppConstants.api}/foods/${slug}/comments`,
       method: 'GET',
     }).then((res) => res.data.comments);
 
   }
 
-  destroy(commentId, articleSlug) {
+  // Delete recipe's comment
+  destroy(commentId, foodSlug) {
     return this._$http({
-      url: `${this._AppConstants.api}/articles/${articleSlug}/comments/${commentId}`,
+      url: `${this._AppConstants.api}/foods/${foodSlug}/comments/${commentId}`,
       method: 'DELETE',
     });
   }

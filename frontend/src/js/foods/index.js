@@ -15,11 +15,15 @@ foodsModule.controller('FoodsCtrl', FoodsCtrl);
 import FilterFoodsCtrl from './filterfoods.controller';
 foodsModule.controller('FilterFoodsCtrl', FilterFoodsCtrl);
 
-import DetailsFoodCtrl from './detailsfood.controller';
-foodsModule.controller('DetailsFoodCtrl', DetailsFoodCtrl);
+import FoodCtrl from './food.controller';
+foodsModule.controller('FoodCtrl', FoodCtrl);
 
 import RecipesCtrl from './recipes.controller';
 foodsModule.controller('RecipesCtrl', RecipesCtrl);
+
+import CommentFood from './comment-food.component';
+foodsModule.component('commentFood', CommentFood);
+
 
 
 export default foodsModule;
