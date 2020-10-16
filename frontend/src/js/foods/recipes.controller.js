@@ -10,13 +10,28 @@ class RecipesCtrl {
         title: '',
         description: '',
         body: '',
-        difficulty: ''
+        difficulty: '',
+        tagList: []
       }
     } else {
       this.food = food;
     }
 
   }
+
+
+  addTag() {
+    if (!this.food.tagList.includes(this.tagField)) {
+      this.food.tagList.push(this.tagField);
+      this.tagField = '';
+    }
+    console.log(this.food.tagList);
+  }
+
+  removeTag(tagName) {
+    this.food.tagList = this.food.tagList.filter((slug) => slug != tagName);
+  }
+
 
 
   submit() {
@@ -34,8 +49,6 @@ class RecipesCtrl {
 
     )
   }
-
-
 
 }
 

@@ -7,9 +7,7 @@ class HomeCtrl {
     this.difficulty = difficulty;
 
     // Get list of all tags
-    Tags
-      .getAll()
-      .then(
+    Tags.getAll().then(
         (tags) => {
           this.tagsLoaded = true;
           this.tags = tags

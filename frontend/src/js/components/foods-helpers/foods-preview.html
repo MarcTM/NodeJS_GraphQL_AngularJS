@@ -6,9 +6,15 @@
 
   <a ui-sref="app.detailsFood({ slug: $ctrl.food.slug })" class="preview-link">
     <h1 ng-bind="$ctrl.food.title"></h1>
-    <p style="font-size: 12px;">Difficulty: {{$ctrl.food.difficulty}}</p>
+    <p class="difficulty-food">Difficulty: {{$ctrl.food.difficulty}}</p>
     <p ng-bind="$ctrl.food.description"></p>
-    <button class="button-details">Read recipe...</span>
+    <button class="button-details">Read more...</button>
+    <ul class="tag-list">
+      <li class="tag-default tag-pill tag-outline"
+        ng-repeat="tag in $ctrl.food.tagList">
+        {{tag}}
+      </li>
+    </ul>
   </a>
 
 </div>  

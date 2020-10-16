@@ -58,6 +58,33 @@
 
     </div>
 
+
+    <!-- Tags -->
+    <div class="col-md-3">
+      <div class="sidebar">
+
+        <p>Popular Tags</p>
+        <div class="tag-list" ng-show="$ctrl.tags">
+          <a href="" class="tag-default tag-pill"
+            ng-click="$ctrl.changeList({ type: 'all', filters: { tag: tagName } })"
+            ng-repeat="tagName in $ctrl.tags"
+            ng-bind="tagName">
+          </a>
+        </div>
+
+        <div ng-show="!$ctrl.tagsLoaded">
+          Loading tags...
+        </div>
+
+        <div class="post-preview"
+          ng-show="$ctrl.tagsLoaded && !$ctrl.tags.length">
+          No tags are here... yet.
+        </div>
+
+      </div>
+    </div>
+
+
     <!-- End the row & container divs -->
   </div>
 </div>

@@ -11,6 +11,13 @@
     <p style="font-size: 12px;">Difficulty: {{$ctrl.food.difficulty}}</p>
     <p>{{$ctrl.food.description}}</p>
     <p>{{$ctrl.food.body}}</p>
+
+    <ul class="tag-list">
+      <li class="tag-default tag-pill tag-outline"
+        ng-repeat="tag in $ctrl.food.tagList">
+        {{tag}}
+      </li>
+    </ul>
   </div><br>
 
   <!-- Comments section -->

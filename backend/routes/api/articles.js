@@ -126,6 +126,7 @@ router.post('/', auth.required, function(req, res, next) {
     if (!user) { return res.sendStatus(401); }
 
     var article = new Article(req.body.article);
+    console.log(req.body.article);
 
     article.author = user;
 

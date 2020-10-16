@@ -39,4 +39,7 @@ componentsModule.component('foodActions', FoodActions);
 import ListPagination from './article-helpers/list-pagination.component';
 componentsModule.component('listPagination', ListPagination);
 
+import ListPaginationFoods from './foods-helpers/list-pagination-foods.component';
+componentsModule.component('listPaginationFoods', ListPaginationFoods);
+
 export default componentsModule;

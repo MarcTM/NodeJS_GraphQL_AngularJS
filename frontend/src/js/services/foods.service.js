@@ -9,15 +9,15 @@ export default class Foods {
   
     }
   
-    // query(config) {
-    //   // Create the $http object for this request
-    //   let request = {
-    //     url: this._AppConstants.api + '/articles' + ((config.type === 'feed') ? '/feed' : ''),
-    //     method: 'GET',
-    //     params: config.filters ? config.filters : null
-    //   };
-    //   return this._$http(request).then((res) => res.data);
-    // }
+    query(config) {
+      // Create the $http object for this request
+      let request = {
+        url: this._AppConstants.api + '/foods' + ((config.type === 'feed') ? '/feed' : ''),
+        method: 'GET',
+        params: config.filters ? config.filters : null
+      };
+      return this._$http(request).then((res) => res.data);
+    }
 
 
 

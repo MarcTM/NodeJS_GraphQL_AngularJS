@@ -92,7 +92,52 @@ router.get('/', auth.optional, function(req, res, next) {
 });
 
 
-// create a food
+
+
+// return your feed
+router.get('/feed', auth.required, function(req, res, next) {
+  var limit = 20;
+  var offset = 0;
+
+  if(typeof req.query.limit !== 'undefined'){
+    limit = req.query.limit;
+  }
+
+  if(typeof req.query.offset !== 'undefined'){
+    offset = req.query.offset;
+  }
+
+  User.findById(req.payload.id).then(function(user){
+    console.log(user);
+    if (!user) { return res.sendStatus(401); }
+
+    Promise.all([
+      Food.find({ author: {$in: user.following}})
+        .limit(Number(limit))
+        .skip(Number(offset))
+        .populate('author')
+        .exec(),
+      Food.count({ author: {$in: user.following}})
+    ]).then(function(results){
+      var foods = results[0];
+      var foodsCount = results[1];
+
+      return res.json({
+        foods: foods.map(function(food){
+          return food.toJSONFor(user);
+        }),
+        foodsCount: foodsCount
+      });
+    }).catch(next);
+  });
+});
+
+
+
+
+
+
+// create a recipe/food
 router.post('/', auth.required, function(req, res, next) {
   User.findById(req.payload.id).then(function(user){
     if (!user) { return res.sendStatus(401); }
@@ -110,6 +155,7 @@ router.post('/', auth.required, function(req, res, next) {
 
 
 
+
 // return a food
 router.get('/:food', auth.optional, function(req, res, next) {
   Promise.all([
@@ -124,13 +170,13 @@ router.get('/:food', auth.optional, function(req, res, next) {
 
 
 
+
 // obtain categories
 router.get('/food/difficulty', function(req, res, next) {
   Food.find().distinct('difficulty').then(function(difficulty){
     return res.json({difficulty: difficulty});
   }).catch(next);
  });
-
 
 
 
@@ -150,6 +196,7 @@ router.post('/:food/favorite', auth.required, function(req, res, next) {
     });
   }).catch(next);
 });
+
 
 
 
@@ -212,6 +259,7 @@ router.get('/:food/comments', auth.optional, function(req, res, next){
 });
 
 
+
 // create a new recipe's comment
 router.post('/:food/comments', auth.required, function(req, res, next) {
   User.findById(req.payload.id).then(function(user){
@@ -230,6 +278,7 @@ router.post('/:food/comments', auth.required, function(req, res, next) {
     });
   }).catch(next);
 });
+
 
 
 // delete recipe's comment

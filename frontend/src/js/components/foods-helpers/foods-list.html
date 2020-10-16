@@ -1,11 +1,20 @@
 <hr>
 <blockquote>
-  <foods-preview food="food" ng-repeat="food in $ctrl.foods"></foods-preview>
-  <hr>
 
-  <label>Try Toastr:</label> 
-  <button class="button-toastrexample" ng-click="$ctrl.errToas()">Error</button>
-  <button class="button-toastrexample" ng-click="$ctrl.succToas()">Success</button>
-  <button class="button-toastrexample" ng-click="$ctrl.infoToas()">Info</button>
-  <button class="button-toastrexample" ng-click="$ctrl.warnToas()">Warning</button>
+  <foods-preview food="food" ng-repeat="food in $ctrl.list"></foods-preview>
+  
+  <div ng-hide="!$ctrl.loading">
+    Loading recipes...
+  </div>
+
+  <div ng-show="!$ctrl.loading && !$ctrl.list.length">
+    No recipes are here... yet.
+  </div>
+
+  <list-pagination-foods
+    total-pages="$ctrl.listConfig.totalPages"
+    current-page="$ctrl.listConfig.currentPage"
+    ng-hide="$ctrl.listConfig.totalPages <= 1">
+  </list-pagination-foods>
+
 </blockquote>
