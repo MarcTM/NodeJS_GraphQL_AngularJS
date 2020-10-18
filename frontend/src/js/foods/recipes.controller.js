@@ -2,6 +2,7 @@ class RecipesCtrl {
   constructor(Foods, food, $state) {
     'ngInject';
 
+    console.log(food);
     this._Foods = Foods;
     this._$state = $state;
 

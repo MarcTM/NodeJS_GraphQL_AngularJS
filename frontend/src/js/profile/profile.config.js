@@ -19,18 +19,21 @@ function ProfileConfig($stateProvider) {
 
   })
 
+  
   .state('app.profile.main', {
     url:'',
-    controller: 'ProfileArticlesCtrl',
+    controller: 'ProfileFoodsCtrl',
     controllerAs: '$ctrl',
-    templateUrl: 'profile/profile-articles.html',
+    templateUrl: 'profile/profile-foods.html',
     title: 'Profile'
   })
+
+
   .state('app.profile.favorites', {
     url:'/favorites',
-    controller: 'ProfileArticlesCtrl',
+    controller: 'ProfileFoodsCtrl',
     controllerAs: '$ctrl',
-    templateUrl: 'profile/profile-articles.html',
+    templateUrl: 'profile/profile-foods.html',
     title: 'Favorites'
   });
 

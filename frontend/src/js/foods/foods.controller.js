@@ -1,10 +1,8 @@
 class FoodsCtrl {
-    constructor(foods, Tags, User, $state, $scope) {
+    constructor(Tags, User, $state, $scope) {
       'ngInject';
 
-      this.foods = foods;
       this._$scope = $scope;
-      console.log(this.foods);
 
       // Get list of all tags
       Tags.getAll().then(

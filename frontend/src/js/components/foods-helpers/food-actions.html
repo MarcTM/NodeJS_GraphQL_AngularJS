@@ -1,7 +1,7 @@
-<!-- Your article -->
+<!-- Your food -->
 <span ng-show="$ctrl.canModify">
     <a class="btn btn-sm btn-outline-secondary"
-    ui-sref="app.editRecipe({ slug: $ctrl.article.slug })">
+    ui-sref="app.recipes({ slug:$ctrl.food.slug })">
     <i class="ion-edit"></i> Edit Recipe
     </a>
 
@@ -12,7 +12,7 @@
     </button>
 </span>
 
-<!-- Not your article -->
+<!-- Not your food -->
 <span ng-hide="$ctrl.canModify">
     <follow-btn user="$ctrl.food.author"></follow-btn>
     <favorite-food-btn food="$ctrl.food">
