@@ -16,9 +16,6 @@ servicesModule.service('JWT', JwtService);
 import ProfileService from './profile.service';
 servicesModule.service('Profile', ProfileService);
 
-import ArticlesService from './articles.service';
-servicesModule.service('Articles', ArticlesService);
-
 import FoodsService from './foods.service';
 servicesModule.service('Foods', FoodsService);
 

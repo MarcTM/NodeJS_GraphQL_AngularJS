@@ -50430,1398 +50430,6 @@ require('./angular');
 module.exports = angular;
 
 },{"./angular":8}],10:[function(require,module,exports){
-(function (global){
-/**
- * marked - a markdown parser
- * Copyright (c) 2011-2014, Christopher Jeffrey. (MIT Licensed)
- * https://github.com/markedjs/marked
- */
-
-;(function(root) {
-'use strict';
-
-/**
- * Block-Level Grammar
- */
-
-var block = {
-  newline: /^\n+/,
-  code: /^( {4}[^\n]+\n*)+/,
-  fences: noop,
-  hr: /^ {0,3}((?:- *){3,}|(?:_ *){3,}|(?:\* *){3,})(?:\n+|$)/,
-  heading: /^ *(#{1,6}) *([^\n]+?) *#* *(?:\n+|$)/,
-  nptable: noop,
-  blockquote: /^( {0,3}> ?(paragraph|[^\n]*)(?:\n|$))+/,
-  list: /^( *)(bull) [\s\S]+?(?:hr|def|\n{2,}(?! )(?!\1bull )\n*|\s*$)/,
-  html: /^ *(?:comment *(?:\n|\s*$)|closed *(?:\n{2,}|\s*$)|closing *(?:\n{2,}|\s*$))/,
-  def: /^ {0,3}\[(label)\]: *\n? *<?([^\s>]+)>?(?:(?: +\n? *| *\n *)(title))? *(?:\n+|$)/,
-  table: noop,
-  lheading: /^([^\n]+)\n *(=|-){2,} *(?:\n+|$)/,
-  paragraph: /^([^\n]+(?:\n?(?!hr|heading|lheading| {0,3}>|tag)[^\n]+)+)/,
-  text: /^[^\n]+/
-};
-
-block._label = /(?:\\[\[\]]|[^\[\]])+/;
-block._title = /(?:"(?:\\"|[^"]|"[^"\n]*")*"|'\n?(?:[^'\n]+\n?)*'|\([^()]*\))/;
-block.def = edit(block.def)
-  .replace('label', block._label)
-  .replace('title', block._title)
-  .getRegex();
-
-block.bullet = /(?:[*+-]|\d+\.)/;
-block.item = /^( *)(bull) [^\n]*(?:\n(?!\1bull )[^\n]*)*/;
-block.item = edit(block.item, 'gm')
-  .replace(/bull/g, block.bullet)
-  .getRegex();
-
-block.list = edit(block.list)
-  .replace(/bull/g, block.bullet)
-  .replace('hr', '\\n+(?=\\1?(?:(?:- *){3,}|(?:_ *){3,}|(?:\\* *){3,})(?:\\n+|$))')
-  .replace('def', '\\n+(?=' + block.def.source + ')')
-  .getRegex();
-
-block._tag = '(?!(?:'
-  + 'a|em|strong|small|s|cite|q|dfn|abbr|data|time|code'
-  + '|var|samp|kbd|sub|sup|i|b|u|mark|ruby|rt|rp|bdi|bdo'
-  + '|span|br|wbr|ins|del|img)\\b)\\w+(?!:|[^\\w\\s@]*@)\\b';
-
-block.html = edit(block.html)
-  .replace('comment', /<!--[\s\S]*?-->/)
-  .replace('closed', /<(tag)[\s\S]+?<\/\1>/)
-  .replace('closing', /<tag(?:"[^"]*"|'[^']*'|\s[^'"\/>\s]*)*?\/?>/)
-  .replace(/tag/g, block._tag)
-  .getRegex();
-
-block.paragraph = edit(block.paragraph)
-  .replace('hr', block.hr)
-  .replace('heading', block.heading)
-  .replace('lheading', block.lheading)
-  .replace('tag', '<' + block._tag)
-  .getRegex();
-
-block.blockquote = edit(block.blockquote)
-  .replace('paragraph', block.paragraph)
-  .getRegex();
-
-/**
- * Normal Block Grammar
- */
-
-block.normal = merge({}, block);
-
-/**
- * GFM Block Grammar
- */
-
-block.gfm = merge({}, block.normal, {
-  fences: /^ *(`{3,}|~{3,})[ \.]*(\S+)? *\n([\s\S]*?)\n? *\1 *(?:\n+|$)/,
-  paragraph: /^/,
-  heading: /^ *(#{1,6}) +([^\n]+?) *#* *(?:\n+|$)/
-});
-
-block.gfm.paragraph = edit(block.paragraph)
-  .replace('(?!', '(?!'
-    + block.gfm.fences.source.replace('\\1', '\\2') + '|'
-    + block.list.source.replace('\\1', '\\3') + '|')
-  .getRegex();
-
-/**
- * GFM + Tables Block Grammar
- */
-
-block.tables = merge({}, block.gfm, {
-  nptable: /^ *(\S.*\|.*)\n *([-:]+ *\|[-| :]*)\n((?:.*\|.*(?:\n|$))*)\n*/,
-  table: /^ *\|(.+)\n *\|( *[-:]+[-| :]*)\n((?: *\|.*(?:\n|$))*)\n*/
-});
-
-/**
- * Block Lexer
- */
-
-function Lexer(options) {
-  this.tokens = [];
-  this.tokens.links = {};
-  this.options = options || marked.defaults;
-  this.rules = block.normal;
-
-  if (this.options.gfm) {
-    if (this.options.tables) {
-      this.rules = block.tables;
-    } else {
-      this.rules = block.gfm;
-    }
-  }
-}
-
-/**
- * Expose Block Rules
- */
-
-Lexer.rules = block;
-
-/**
- * Static Lex Method
- */
-
-Lexer.lex = function(src, options) {
-  var lexer = new Lexer(options);
-  return lexer.lex(src);
-};
-
-/**
- * Preprocessing
- */
-
-Lexer.prototype.lex = function(src) {
-  src = src
-    .replace(/\r\n|\r/g, '\n')
-    .replace(/\t/g, '    ')
-    .replace(/\u00a0/g, ' ')
-    .replace(/\u2424/g, '\n');
-
-  return this.token(src, true);
-};
-
-/**
- * Lexing
- */
-
-Lexer.prototype.token = function(src, top) {
-  src = src.replace(/^ +$/gm, '');
-  var next,
-      loose,
-      cap,
-      bull,
-      b,
-      item,
-      space,
-      i,
-      tag,
-      l,
-      isordered;
-
-  while (src) {
-    // newline
-    if (cap = this.rules.newline.exec(src)) {
-      src = src.substring(cap[0].length);
-      if (cap[0].length > 1) {
-        this.tokens.push({
-          type: 'space'
-        });
-      }
-    }
-
-    // code
-    if (cap = this.rules.code.exec(src)) {
-      src = src.substring(cap[0].length);
-      cap = cap[0].replace(/^ {4}/gm, '');
-      this.tokens.push({
-        type: 'code',
-        text: !this.options.pedantic
-          ? cap.replace(/\n+$/, '')
-          : cap
-      });
-      continue;
-    }
-
-    // fences (gfm)
-    if (cap = this.rules.fences.exec(src)) {
-      src = src.substring(cap[0].length);
-      this.tokens.push({
-        type: 'code',
-        lang: cap[2],
-        text: cap[3] || ''
-      });
-      continue;
-    }
-
-    // heading
-    if (cap = this.rules.heading.exec(src)) {
-      src = src.substring(cap[0].length);
-      this.tokens.push({
-        type: 'heading',
-        depth: cap[1].length,
-        text: cap[2]
-      });
-      continue;
-    }
-
-    // table no leading pipe (gfm)
-    if (top && (cap = this.rules.nptable.exec(src))) {
-      src = src.substring(cap[0].length);
-
-      item = {
-        type: 'table',
-        header: cap[1].replace(/^ *| *\| *$/g, '').split(/ *\| */),
-        align: cap[2].replace(/^ *|\| *$/g, '').split(/ *\| */),
-        cells: cap[3].replace(/\n$/, '').split('\n')
-      };
-
-      for (i = 0; i < item.align.length; i++) {
-        if (/^ *-+: *$/.test(item.align[i])) {
-          item.align[i] = 'right';
-        } else if (/^ *:-+: *$/.test(item.align[i])) {
-          item.align[i] = 'center';
-        } else if (/^ *:-+ *$/.test(item.align[i])) {
-          item.align[i] = 'left';
-        } else {
-          item.align[i] = null;
-        }
-      }
-
-      for (i = 0; i < item.cells.length; i++) {
-        item.cells[i] = item.cells[i].split(/ *\| */);
-      }
-
-      this.tokens.push(item);
-
-      continue;
-    }
-
-    // hr
-    if (cap = this.rules.hr.exec(src)) {
-      src = src.substring(cap[0].length);
-      this.tokens.push({
-        type: 'hr'
-      });
-      continue;
-    }
-
-    // blockquote
-    if (cap = this.rules.blockquote.exec(src)) {
-      src = src.substring(cap[0].length);
-
-      this.tokens.push({
-        type: 'blockquote_start'
-      });
-
-      cap = cap[0].replace(/^ *> ?/gm, '');
-
-      // Pass `top` to keep the current
-      // "toplevel" state. This is exactly
-      // how markdown.pl works.
-      this.token(cap, top);
-
-      this.tokens.push({
-        type: 'blockquote_end'
-      });
-
-      continue;
-    }
-
-    // list
-    if (cap = this.rules.list.exec(src)) {
-      src = src.substring(cap[0].length);
-      bull = cap[2];
-      isordered = bull.length > 1;
-
-      this.tokens.push({
-        type: 'list_start',
-        ordered: isordered,
-        start: isordered ? +bull : ''
-      });
-
-      // Get each top-level item.
-      cap = cap[0].match(this.rules.item);
-
-      next = false;
-      l = cap.length;
-      i = 0;
-
-      for (; i < l; i++) {
-        item = cap[i];
-
-        // Remove the list item's bullet
-        // so it is seen as the next token.
-        space = item.length;
-        item = item.replace(/^ *([*+-]|\d+\.) +/, '');
-
-        // Outdent whatever the
-        // list item contains. Hacky.
-        if (~item.indexOf('\n ')) {
-          space -= item.length;
-          item = !this.options.pedantic
-            ? item.replace(new RegExp('^ {1,' + space + '}', 'gm'), '')
-            : item.replace(/^ {1,4}/gm, '');
-        }
-
-        // Determine whether the next list item belongs here.
-        // Backpedal if it does not belong in this list.
-        if (this.options.smartLists && i !== l - 1) {
-          b = block.bullet.exec(cap[i + 1])[0];
-          if (bull !== b && !(bull.length > 1 && b.length > 1)) {
-            src = cap.slice(i + 1).join('\n') + src;
-            i = l - 1;
-          }
-        }
-
-        // Determine whether item is loose or not.
-        // Use: /(^|\n)(?! )[^\n]+\n\n(?!\s*$)/
-        // for discount behavior.
-        loose = next || /\n\n(?!\s*$)/.test(item);
-        if (i !== l - 1) {
-          next = item.charAt(item.length - 1) === '\n';
-          if (!loose) loose = next;
-        }
-
-        this.tokens.push({
-          type: loose
-            ? 'loose_item_start'
-            : 'list_item_start'
-        });
-
-        // Recurse.
-        this.token(item, false);
-
-        this.tokens.push({
-          type: 'list_item_end'
-        });
-      }
-
-      this.tokens.push({
-        type: 'list_end'
-      });
-
-      continue;
-    }
-
-    // html
-    if (cap = this.rules.html.exec(src)) {
-      src = src.substring(cap[0].length);
-      this.tokens.push({
-        type: this.options.sanitize
-          ? 'paragraph'
-          : 'html',
-        pre: !this.options.sanitizer
-          && (cap[1] === 'pre' || cap[1] === 'script' || cap[1] === 'style'),
-        text: cap[0]
-      });
-      continue;
-    }
-
-    // def
-    if (top && (cap = this.rules.def.exec(src))) {
-      src = src.substring(cap[0].length);
-      if (cap[3]) cap[3] = cap[3].substring(1, cap[3].length - 1);
-      tag = cap[1].toLowerCase();
-      if (!this.tokens.links[tag]) {
-        this.tokens.links[tag] = {
-          href: cap[2],
-          title: cap[3]
-        };
-      }
-      continue;
-    }
-
-    // table (gfm)
-    if (top && (cap = this.rules.table.exec(src))) {
-      src = src.substring(cap[0].length);
-
-      item = {
-        type: 'table',
-        header: cap[1].replace(/^ *| *\| *$/g, '').split(/ *\| */),
-        align: cap[2].replace(/^ *|\| *$/g, '').split(/ *\| */),
-        cells: cap[3].replace(/(?: *\| *)?\n$/, '').split('\n')
-      };
-
-      for (i = 0; i < item.align.length; i++) {
-        if (/^ *-+: *$/.test(item.align[i])) {
-          item.align[i] = 'right';
-        } else if (/^ *:-+: *$/.test(item.align[i])) {
-          item.align[i] = 'center';
-        } else if (/^ *:-+ *$/.test(item.align[i])) {
-          item.align[i] = 'left';
-        } else {
-          item.align[i] = null;
-        }
-      }
-
-      for (i = 0; i < item.cells.length; i++) {
-        item.cells[i] = item.cells[i]
-          .replace(/^ *\| *| *\| *$/g, '')
-          .split(/ *\| */);
-      }
-
-      this.tokens.push(item);
-
-      continue;
-    }
-
-    // lheading
-    if (cap = this.rules.lheading.exec(src)) {
-      src = src.substring(cap[0].length);
-      this.tokens.push({
-        type: 'heading',
-        depth: cap[2] === '=' ? 1 : 2,
-        text: cap[1]
-      });
-      continue;
-    }
-
-    // top-level paragraph
-    if (top && (cap = this.rules.paragraph.exec(src))) {
-      src = src.substring(cap[0].length);
-      this.tokens.push({
-        type: 'paragraph',
-        text: cap[1].charAt(cap[1].length - 1) === '\n'
-          ? cap[1].slice(0, -1)
-          : cap[1]
-      });
-      continue;
-    }
-
-    // text
-    if (cap = this.rules.text.exec(src)) {
-      // Top-level should never reach here.
-      src = src.substring(cap[0].length);
-      this.tokens.push({
-        type: 'text',
-        text: cap[0]
-      });
-      continue;
-    }
-
-    if (src) {
-      throw new Error('Infinite loop on byte: ' + src.charCodeAt(0));
-    }
-  }
-
-  return this.tokens;
-};
-
-/**
- * Inline-Level Grammar
- */
-
-var inline = {
-  escape: /^\\([\\`*{}\[\]()#+\-.!_>])/,
-  autolink: /^<(scheme:[^\s\x00-\x1f<>]*|email)>/,
-  url: noop,
-  tag: /^<!--[\s\S]*?-->|^<\/?[a-zA-Z0-9\-]+(?:"[^"]*"|'[^']*'|\s[^<'">\/\s]*)*?\/?>/,
-  link: /^!?\[(inside)\]\(href\)/,
-  reflink: /^!?\[(inside)\]\s*\[([^\]]*)\]/,
-  nolink: /^!?\[((?:\[[^\[\]]*\]|\\[\[\]]|[^\[\]])*)\]/,
-  strong: /^__([\s\S]+?)__(?!_)|^\*\*([\s\S]+?)\*\*(?!\*)/,
-  em: /^_([^\s_](?:[^_]|__)+?[^\s_])_\b|^\*((?:\*\*|[^*])+?)\*(?!\*)/,
-  code: /^(`+)\s*([\s\S]*?[^`]?)\s*\1(?!`)/,
-  br: /^ {2,}\n(?!\s*$)/,
-  del: noop,
-  text: /^[\s\S]+?(?=[\\<!\[`*]|\b_| {2,}\n|$)/
-};
-
-inline._scheme = /[a-zA-Z][a-zA-Z0-9+.-]{1,31}/;
-inline._email = /[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+(@)[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(?![-_])/;
-
-inline.autolink = edit(inline.autolink)
-  .replace('scheme', inline._scheme)
-  .replace('email', inline._email)
-  .getRegex()
-
-inline._inside = /(?:\[[^\[\]]*\]|\\[\[\]]|[^\[\]]|\](?=[^\[]*\]))*/;
-inline._href = /\s*<?([\s\S]*?)>?(?:\s+['"]([\s\S]*?)['"])?\s*/;
-
-inline.link = edit(inline.link)
-  .replace('inside', inline._inside)
-  .replace('href', inline._href)
-  .getRegex();
-
-inline.reflink = edit(inline.reflink)
-  .replace('inside', inline._inside)
-  .getRegex();
-
-/**
- * Normal Inline Grammar
- */
-
-inline.normal = merge({}, inline);
-
-/**
- * Pedantic Inline Grammar
- */
-
-inline.pedantic = merge({}, inline.normal, {
-  strong: /^__(?=\S)([\s\S]*?\S)__(?!_)|^\*\*(?=\S)([\s\S]*?\S)\*\*(?!\*)/,
-  em: /^_(?=\S)([\s\S]*?\S)_(?!_)|^\*(?=\S)([\s\S]*?\S)\*(?!\*)/
-});
-
-/**
- * GFM Inline Grammar
- */
-
-inline.gfm = merge({}, inline.normal, {
-  escape: edit(inline.escape).replace('])', '~|])').getRegex(),
-  url: edit(/^((?:ftp|https?):\/\/|www\.)(?:[a-zA-Z0-9\-]+\.?)+[^\s<]*|^email/)
-    .replace('email', inline._email)
-    .getRegex(),
-  _backpedal: /(?:[^?!.,:;*_~()&]+|\([^)]*\)|&(?![a-zA-Z0-9]+;$)|[?!.,:;*_~)]+(?!$))+/,
-  del: /^~~(?=\S)([\s\S]*?\S)~~/,
-  text: edit(inline.text)
-    .replace(']|', '~]|')
-    .replace('|', '|https?://|ftp://|www\\.|[a-zA-Z0-9.!#$%&\'*+/=?^_`{\\|}~-]+@|')
-    .getRegex()
-});
-
-/**
- * GFM + Line Breaks Inline Grammar
- */
-
-inline.breaks = merge({}, inline.gfm, {
-  br: edit(inline.br).replace('{2,}', '*').getRegex(),
-  text: edit(inline.gfm.text).replace('{2,}', '*').getRegex()
-});
-
-/**
- * Inline Lexer & Compiler
- */
-
-function InlineLexer(links, options) {
-  this.options = options || marked.defaults;
-  this.links = links;
-  this.rules = inline.normal;
-  this.renderer = this.options.renderer || new Renderer();
-  this.renderer.options = this.options;
-
-  if (!this.links) {
-    throw new Error('Tokens array requires a `links` property.');
-  }
-
-  if (this.options.gfm) {
-    if (this.options.breaks) {
-      this.rules = inline.breaks;
-    } else {
-      this.rules = inline.gfm;
-    }
-  } else if (this.options.pedantic) {
-    this.rules = inline.pedantic;
-  }
-}
-
-/**
- * Expose Inline Rules
- */
-
-InlineLexer.rules = inline;
-
-/**
- * Static Lexing/Compiling Method
- */
-
-InlineLexer.output = function(src, links, options) {
-  var inline = new InlineLexer(links, options);
-  return inline.output(src);
-};
-
-/**
- * Lexing/Compiling
- */
-
-InlineLexer.prototype.output = function(src) {
-  var out = '',
-      link,
-      text,
-      href,
-      cap;
-
-  while (src) {
-    // escape
-    if (cap = this.rules.escape.exec(src)) {
-      src = src.substring(cap[0].length);
-      out += cap[1];
-      continue;
-    }
-
-    // autolink
-    if (cap = this.rules.autolink.exec(src)) {
-      src = src.substring(cap[0].length);
-      if (cap[2] === '@') {
-        text = escape(this.mangle(cap[1]));
-        href = 'mailto:' + text;
-      } else {
-        text = escape(cap[1]);
-        href = text;
-      }
-      out += this.renderer.link(href, null, text);
-      continue;
-    }
-
-    // url (gfm)
-    if (!this.inLink && (cap = this.rules.url.exec(src))) {
-      cap[0] = this.rules._backpedal.exec(cap[0])[0];
-      src = src.substring(cap[0].length);
-      if (cap[2] === '@') {
-        text = escape(cap[0]);
-        href = 'mailto:' + text;
-      } else {
-        text = escape(cap[0]);
-        if (cap[1] === 'www.') {
-          href = 'http://' + text;
-        } else {
-          href = text;
-        }
-      }
-      out += this.renderer.link(href, null, text);
-      continue;
-    }
-
-    // tag
-    if (cap = this.rules.tag.exec(src)) {
-      if (!this.inLink && /^<a /i.test(cap[0])) {
-        this.inLink = true;
-      } else if (this.inLink && /^<\/a>/i.test(cap[0])) {
-        this.inLink = false;
-      }
-      src = src.substring(cap[0].length);
-      out += this.options.sanitize
-        ? this.options.sanitizer
-          ? this.options.sanitizer(cap[0])
-          : escape(cap[0])
-        : cap[0]
-      continue;
-    }
-
-    // link
-    if (cap = this.rules.link.exec(src)) {
-      src = src.substring(cap[0].length);
-      this.inLink = true;
-      out += this.outputLink(cap, {
-        href: cap[2],
-        title: cap[3]
-      });
-      this.inLink = false;
-      continue;
-    }
-
-    // reflink, nolink
-    if ((cap = this.rules.reflink.exec(src))
-        || (cap = this.rules.nolink.exec(src))) {
-      src = src.substring(cap[0].length);
-      link = (cap[2] || cap[1]).replace(/\s+/g, ' ');
-      link = this.links[link.toLowerCase()];
-      if (!link || !link.href) {
-        out += cap[0].charAt(0);
-        src = cap[0].substring(1) + src;
-        continue;
-      }
-      this.inLink = true;
-      out += this.outputLink(cap, link);
-      this.inLink = false;
-      continue;
-    }
-
-    // strong
-    if (cap = this.rules.strong.exec(src)) {
-      src = src.substring(cap[0].length);
-      out += this.renderer.strong(this.output(cap[2] || cap[1]));
-      continue;
-    }
-
-    // em
-    if (cap = this.rules.em.exec(src)) {
-      src = src.substring(cap[0].length);
-      out += this.renderer.em(this.output(cap[2] || cap[1]));
-      continue;
-    }
-
-    // code
-    if (cap = this.rules.code.exec(src)) {
-      src = src.substring(cap[0].length);
-      out += this.renderer.codespan(escape(cap[2].trim(), true));
-      continue;
-    }
-
-    // br
-    if (cap = this.rules.br.exec(src)) {
-      src = src.substring(cap[0].length);
-      out += this.renderer.br();
-      continue;
-    }
-
-    // del (gfm)
-    if (cap = this.rules.del.exec(src)) {
-      src = src.substring(cap[0].length);
-      out += this.renderer.del(this.output(cap[1]));
-      continue;
-    }
-
-    // text
-    if (cap = this.rules.text.exec(src)) {
-      src = src.substring(cap[0].length);
-      out += this.renderer.text(escape(this.smartypants(cap[0])));
-      continue;
-    }
-
-    if (src) {
-      throw new Error('Infinite loop on byte: ' + src.charCodeAt(0));
-    }
-  }
-
-  return out;
-};
-
-/**
- * Compile Link
- */
-
-InlineLexer.prototype.outputLink = function(cap, link) {
-  var href = escape(link.href),
-      title = link.title ? escape(link.title) : null;
-
-  return cap[0].charAt(0) !== '!'
-    ? this.renderer.link(href, title, this.output(cap[1]))
-    : this.renderer.image(href, title, escape(cap[1]));
-};
-
-/**
- * Smartypants Transformations
- */
-
-InlineLexer.prototype.smartypants = function(text) {
-  if (!this.options.smartypants) return text;
-  return text
-    // em-dashes
-    .replace(/---/g, '\u2014')
-    // en-dashes
-    .replace(/--/g, '\u2013')
-    // opening singles
-    .replace(/(^|[-\u2014/(\[{"\s])'/g, '$1\u2018')
-    // closing singles & apostrophes
-    .replace(/'/g, '\u2019')
-    // opening doubles
-    .replace(/(^|[-\u2014/(\[{\u2018\s])"/g, '$1\u201c')
-    // closing doubles
-    .replace(/"/g, '\u201d')
-    // ellipses
-    .replace(/\.{3}/g, '\u2026');
-};
-
-/**
- * Mangle Links
- */
-
-InlineLexer.prototype.mangle = function(text) {
-  if (!this.options.mangle) return text;
-  var out = '',
-      l = text.length,
-      i = 0,
-      ch;
-
-  for (; i < l; i++) {
-    ch = text.charCodeAt(i);
-    if (Math.random() > 0.5) {
-      ch = 'x' + ch.toString(16);
-    }
-    out += '&#' + ch + ';';
-  }
-
-  return out;
-};
-
-/**
- * Renderer
- */
-
-function Renderer(options) {
-  this.options = options || {};
-}
-
-Renderer.prototype.code = function(code, lang, escaped) {
-  if (this.options.highlight) {
-    var out = this.options.highlight(code, lang);
-    if (out != null && out !== code) {
-      escaped = true;
-      code = out;
-    }
-  }
-
-  if (!lang) {
-    return '<pre><code>'
-      + (escaped ? code : escape(code, true))
-      + '\n</code></pre>';
-  }
-
-  return '<pre><code class="'
-    + this.options.langPrefix
-    + escape(lang, true)
-    + '">'
-    + (escaped ? code : escape(code, true))
-    + '\n</code></pre>\n';
-};
-
-Renderer.prototype.blockquote = function(quote) {
-  return '<blockquote>\n' + quote + '</blockquote>\n';
-};
-
-Renderer.prototype.html = function(html) {
-  return html;
-};
-
-Renderer.prototype.heading = function(text, level, raw) {
-  return '<h'
-    + level
-    + ' id="'
-    + this.options.headerPrefix
-    + raw.toLowerCase().replace(/[^\w]+/g, '-')
-    + '">'
-    + text
-    + '</h'
-    + level
-    + '>\n';
-};
-
-Renderer.prototype.hr = function() {
-  return this.options.xhtml ? '<hr/>\n' : '<hr>\n';
-};
-
-Renderer.prototype.list = function(body, ordered, start) {
-  var type = ordered ? 'ol' : 'ul',
-      startatt = (ordered && start !== 1) ? (' start="' + start + '"') : '';
-  return '<' + type + startatt + '>\n' + body + '</' + type + '>\n';
-};
-
-Renderer.prototype.listitem = function(text) {
-  return '<li>' + text + '</li>\n';
-};
-
-Renderer.prototype.paragraph = function(text) {
-  return '<p>' + text + '</p>\n';
-};
-
-Renderer.prototype.table = function(header, body) {
-  return '<table>\n'
-    + '<thead>\n'
-    + header
-    + '</thead>\n'
-    + '<tbody>\n'
-    + body
-    + '</tbody>\n'
-    + '</table>\n';
-};
-
-Renderer.prototype.tablerow = function(content) {
-  return '<tr>\n' + content + '</tr>\n';
-};
-
-Renderer.prototype.tablecell = function(content, flags) {
-  var type = flags.header ? 'th' : 'td';
-  var tag = flags.align
-    ? '<' + type + ' style="text-align:' + flags.align + '">'
-    : '<' + type + '>';
-  return tag + content + '</' + type + '>\n';
-};
-
-// span level renderer
-Renderer.prototype.strong = function(text) {
-  return '<strong>' + text + '</strong>';
-};
-
-Renderer.prototype.em = function(text) {
-  return '<em>' + text + '</em>';
-};
-
-Renderer.prototype.codespan = function(text) {
-  return '<code>' + text + '</code>';
-};
-
-Renderer.prototype.br = function() {
-  return this.options.xhtml ? '<br/>' : '<br>';
-};
-
-Renderer.prototype.del = function(text) {
-  return '<del>' + text + '</del>';
-};
-
-Renderer.prototype.link = function(href, title, text) {
-  if (this.options.sanitize) {
-    try {
-      var prot = decodeURIComponent(unescape(href))
-        .replace(/[^\w:]/g, '')
-        .toLowerCase();
-    } catch (e) {
-      return text;
-    }
-    if (prot.indexOf('javascript:') === 0 || prot.indexOf('vbscript:') === 0 || prot.indexOf('data:') === 0) {
-      return text;
-    }
-  }
-  if (this.options.baseUrl && !originIndependentUrl.test(href)) {
-    href = resolveUrl(this.options.baseUrl, href);
-  }
-  var out = '<a href="' + href + '"';
-  if (title) {
-    out += ' title="' + title + '"';
-  }
-  out += '>' + text + '</a>';
-  return out;
-};
-
-Renderer.prototype.image = function(href, title, text) {
-  if (this.options.baseUrl && !originIndependentUrl.test(href)) {
-    href = resolveUrl(this.options.baseUrl, href);
-  }
-  var out = '<img src="' + href + '" alt="' + text + '"';
-  if (title) {
-    out += ' title="' + title + '"';
-  }
-  out += this.options.xhtml ? '/>' : '>';
-  return out;
-};
-
-Renderer.prototype.text = function(text) {
-  return text;
-};
-
-/**
- * TextRenderer
- * returns only the textual part of the token
- */
-
-function TextRenderer() {}
-
-// no need for block level renderers
-
-TextRenderer.prototype.strong =
-TextRenderer.prototype.em =
-TextRenderer.prototype.codespan =
-TextRenderer.prototype.del =
-TextRenderer.prototype.text = function (text) {
-  return text;
-}
-
-TextRenderer.prototype.link =
-TextRenderer.prototype.image = function(href, title, text) {
-  return '' + text;
-}
-
-TextRenderer.prototype.br = function() {
-  return '';
-}
-
-/**
- * Parsing & Compiling
- */
-
-function Parser(options) {
-  this.tokens = [];
-  this.token = null;
-  this.options = options || marked.defaults;
-  this.options.renderer = this.options.renderer || new Renderer();
-  this.renderer = this.options.renderer;
-  this.renderer.options = this.options;
-}
-
-/**
- * Static Parse Method
- */
-
-Parser.parse = function(src, options) {
-  var parser = new Parser(options);
-  return parser.parse(src);
-};
-
-/**
- * Parse Loop
- */
-
-Parser.prototype.parse = function(src) {
-  this.inline = new InlineLexer(src.links, this.options);
-  // use an InlineLexer with a TextRenderer to extract pure text
-  this.inlineText = new InlineLexer(
-    src.links,
-    merge({}, this.options, {renderer: new TextRenderer()})
-  );
-  this.tokens = src.reverse();
-
-  var out = '';
-  while (this.next()) {
-    out += this.tok();
-  }
-
-  return out;
-};
-
-/**
- * Next Token
- */
-
-Parser.prototype.next = function() {
-  return this.token = this.tokens.pop();
-};
-
-/**
- * Preview Next Token
- */
-
-Parser.prototype.peek = function() {
-  return this.tokens[this.tokens.length - 1] || 0;
-};
-
-/**
- * Parse Text Tokens
- */
-
-Parser.prototype.parseText = function() {
-  var body = this.token.text;
-
-  while (this.peek().type === 'text') {
-    body += '\n' + this.next().text;
-  }
-
-  return this.inline.output(body);
-};
-
-/**
- * Parse Current Token
- */
-
-Parser.prototype.tok = function() {
-  switch (this.token.type) {
-    case 'space': {
-      return '';
-    }
-    case 'hr': {
-      return this.renderer.hr();
-    }
-    case 'heading': {
-      return this.renderer.heading(
-        this.inline.output(this.token.text),
-        this.token.depth,
-        unescape(this.inlineText.output(this.token.text)));
-    }
-    case 'code': {
-      return this.renderer.code(this.token.text,
-        this.token.lang,
-        this.token.escaped);
-    }
-    case 'table': {
-      var header = '',
-          body = '',
-          i,
-          row,
-          cell,
-          j;
-
-      // header
-      cell = '';
-      for (i = 0; i < this.token.header.length; i++) {
-        cell += this.renderer.tablecell(
-          this.inline.output(this.token.header[i]),
-          { header: true, align: this.token.align[i] }
-        );
-      }
-      header += this.renderer.tablerow(cell);
-
-      for (i = 0; i < this.token.cells.length; i++) {
-        row = this.token.cells[i];
-
-        cell = '';
-        for (j = 0; j < row.length; j++) {
-          cell += this.renderer.tablecell(
-            this.inline.output(row[j]),
-            { header: false, align: this.token.align[j] }
-          );
-        }
-
-        body += this.renderer.tablerow(cell);
-      }
-      return this.renderer.table(header, body);
-    }
-    case 'blockquote_start': {
-      body = '';
-
-      while (this.next().type !== 'blockquote_end') {
-        body += this.tok();
-      }
-
-      return this.renderer.blockquote(body);
-    }
-    case 'list_start': {
-      body = '';
-      var ordered = this.token.ordered,
-          start = this.token.start;
-
-      while (this.next().type !== 'list_end') {
-        body += this.tok();
-      }
-
-      return this.renderer.list(body, ordered, start);
-    }
-    case 'list_item_start': {
-      body = '';
-
-      while (this.next().type !== 'list_item_end') {
-        body += this.token.type === 'text'
-          ? this.parseText()
-          : this.tok();
-      }
-
-      return this.renderer.listitem(body);
-    }
-    case 'loose_item_start': {
-      body = '';
-
-      while (this.next().type !== 'list_item_end') {
-        body += this.tok();
-      }
-
-      return this.renderer.listitem(body);
-    }
-    case 'html': {
-      var html = !this.token.pre && !this.options.pedantic
-        ? this.inline.output(this.token.text)
-        : this.token.text;
-      return this.renderer.html(html);
-    }
-    case 'paragraph': {
-      return this.renderer.paragraph(this.inline.output(this.token.text));
-    }
-    case 'text': {
-      return this.renderer.paragraph(this.parseText());
-    }
-  }
-};
-
-/**
- * Helpers
- */
-
-function escape(html, encode) {
-  return html
-    .replace(!encode ? /&(?!#?\w+;)/g : /&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-function unescape(html) {
-  // explicitly match decimal, hex, and named HTML entities
-  return html.replace(/&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/ig, function(_, n) {
-    n = n.toLowerCase();
-    if (n === 'colon') return ':';
-    if (n.charAt(0) === '#') {
-      return n.charAt(1) === 'x'
-        ? String.fromCharCode(parseInt(n.substring(2), 16))
-        : String.fromCharCode(+n.substring(1));
-    }
-    return '';
-  });
-}
-
-function edit(regex, opt) {
-  regex = regex.source;
-  opt = opt || '';
-  return {
-    replace: function(name, val) {
-      val = val.source || val;
-      val = val.replace(/(^|[^\[])\^/g, '$1');
-      regex = regex.replace(name, val);
-      return this;
-    },
-    getRegex: function() {
-      return new RegExp(regex, opt);
-    }
-  };
-}
-
-function resolveUrl(base, href) {
-  if (!baseUrls[' ' + base]) {
-    // we can ignore everything in base after the last slash of its path component,
-    // but we might need to add _that_
-    // https://tools.ietf.org/html/rfc3986#section-3
-    if (/^[^:]+:\/*[^/]*$/.test(base)) {
-      baseUrls[' ' + base] = base + '/';
-    } else {
-      baseUrls[' ' + base] = base.replace(/[^/]*$/, '');
-    }
-  }
-  base = baseUrls[' ' + base];
-
-  if (href.slice(0, 2) === '//') {
-    return base.replace(/:[\s\S]*/, ':') + href;
-  } else if (href.charAt(0) === '/') {
-    return base.replace(/(:\/*[^/]*)[\s\S]*/, '$1') + href;
-  } else {
-    return base + href;
-  }
-}
-var baseUrls = {};
-var originIndependentUrl = /^$|^[a-z][a-z0-9+.-]*:|^[?#]/i;
-
-function noop() {}
-noop.exec = noop;
-
-function merge(obj) {
-  var i = 1,
-      target,
-      key;
-
-  for (; i < arguments.length; i++) {
-    target = arguments[i];
-    for (key in target) {
-      if (Object.prototype.hasOwnProperty.call(target, key)) {
-        obj[key] = target[key];
-      }
-    }
-  }
-
-  return obj;
-}
-
-/**
- * Marked
- */
-
-function marked(src, opt, callback) {
-  // throw error in case of non string input
-  if (typeof src === 'undefined' || src === null) {
-    throw new Error('marked(): input parameter is undefined or null');
-  }
-  if (typeof src !== 'string') {
-    throw new Error('marked(): input parameter is of type '
-      + Object.prototype.toString.call(src) + ', string expected');
-  }
-
-  if (callback || typeof opt === 'function') {
-    if (!callback) {
-      callback = opt;
-      opt = null;
-    }
-
-    opt = merge({}, marked.defaults, opt || {});
-
-    var highlight = opt.highlight,
-        tokens,
-        pending,
-        i = 0;
-
-    try {
-      tokens = Lexer.lex(src, opt)
-    } catch (e) {
-      return callback(e);
-    }
-
-    pending = tokens.length;
-
-    var done = function(err) {
-      if (err) {
-        opt.highlight = highlight;
-        return callback(err);
-      }
-
-      var out;
-
-      try {
-        out = Parser.parse(tokens, opt);
-      } catch (e) {
-        err = e;
-      }
-
-      opt.highlight = highlight;
-
-      return err
-        ? callback(err)
-        : callback(null, out);
-    };
-
-    if (!highlight || highlight.length < 3) {
-      return done();
-    }
-
-    delete opt.highlight;
-
-    if (!pending) return done();
-
-    for (; i < tokens.length; i++) {
-      (function(token) {
-        if (token.type !== 'code') {
-          return --pending || done();
-        }
-        return highlight(token.text, token.lang, function(err, code) {
-          if (err) return done(err);
-          if (code == null || code === token.text) {
-            return --pending || done();
-          }
-          token.text = code;
-          token.escaped = true;
-          --pending || done();
-        });
-      })(tokens[i]);
-    }
-
-    return;
-  }
-  try {
-    if (opt) opt = merge({}, marked.defaults, opt);
-    return Parser.parse(Lexer.lex(src, opt), opt);
-  } catch (e) {
-    e.message += '\nPlease report this to https://github.com/markedjs/marked.';
-    if ((opt || marked.defaults).silent) {
-      return '<p>An error occurred:</p><pre>'
-        + escape(e.message + '', true)
-        + '</pre>';
-    }
-    throw e;
-  }
-}
-
-/**
- * Options
- */
-
-marked.options =
-marked.setOptions = function(opt) {
-  merge(marked.defaults, opt);
-  return marked;
-};
-
-marked.defaults = {
-  gfm: true,
-  tables: true,
-  breaks: false,
-  pedantic: false,
-  sanitize: false,
-  sanitizer: null,
-  mangle: true,
-  smartLists: false,
-  silent: false,
-  highlight: null,
-  langPrefix: 'lang-',
-  smartypants: false,
-  headerPrefix: '',
-  renderer: new Renderer(),
-  xhtml: false,
-  baseUrl: null
-};
-
-/**
- * Expose
- */
-
-marked.Parser = Parser;
-marked.parser = Parser.parse;
-
-marked.Renderer = Renderer;
-marked.TextRenderer = TextRenderer;
-
-marked.Lexer = Lexer;
-marked.lexer = Lexer.lex;
-
-marked.InlineLexer = InlineLexer;
-marked.inlineLexer = InlineLexer.output;
-
-marked.parse = marked;
-
-if (typeof module !== 'undefined' && typeof exports === 'object') {
-  module.exports = marked;
-} else if (typeof define === 'function' && define.amd) {
-  define(function() { return marked; });
-} else {
-  root.marked = marked;
-}
-})(this || (typeof window !== 'undefined' ? window : global));
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],11:[function(require,module,exports){
 'use strict';
 
 var _angular = require('angular');
@@ -51860,8 +50468,6 @@ require('./home');
 
 require('./profile');
 
-require('./article');
-
 require('./foods');
 
 require('./services');
@@ -51869,8 +50475,6 @@ require('./services');
 require('./auth');
 
 require('./settings');
-
-require('./editor');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -51881,7 +50485,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 
 // Import our app config files
-var requires = ['ui.router', 'ui.bootstrap', 'templates', 'app.layout', 'app.components', 'app.home', 'app.profile', 'app.article', 'app.foods', 'app.services', 'app.auth', 'app.settings', 'app.editor', 'ngMessages', _angularToastr2.default];
+var requires = ['ui.router', 'ui.bootstrap', 'templates', 'app.layout', 'app.components', 'app.home', 'app.profile', 'app.foods', 'app.services', 'app.auth', 'app.settings', 'ngMessages', _angularToastr2.default];
 
 // Mount on window for testing
 
@@ -51899,203 +50503,7 @@ _angular2.default.bootstrap(document, ['app'], {
   strictDi: true
 });
 
-},{"./article":16,"./auth":19,"./components":32,"./config/app.config":35,"./config/app.constants":36,"./config/app.run":37,"./config/app.templates":38,"./editor":42,"./foods":48,"./home":53,"./layout":56,"./profile":57,"./services":64,"./settings":70,"angular":9,"angular-messages":2,"angular-toastr":4,"angular-ui-bootstrap":6,"angular-ui-router":7}],12:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var ArticleActionsCtrl = function () {
-  ArticleActionsCtrl.$inject = ["Articles", "User", "$state"];
-  function ArticleActionsCtrl(Articles, User, $state) {
-    'ngInject';
-
-    _classCallCheck(this, ArticleActionsCtrl);
-
-    this._Articles = Articles;
-    this._$state = $state;
-
-    if (User.current) {
-      this.canModify = User.current.username === this.article.author.username;
-    } else {
-      this.canModify = false;
-    }
-  }
-
-  _createClass(ArticleActionsCtrl, [{
-    key: 'deleteArticle',
-    value: function deleteArticle() {
-      var _this = this;
-
-      this.isDeleting = true;
-      this._Articles.destroy(this.article.slug).then(function (success) {
-        return _this._$state.go('app.home');
-      }, function (err) {
-        return _this._$state.go('app.home');
-      });
-    }
-  }]);
-
-  return ArticleActionsCtrl;
-}();
-
-var ArticleActions = {
-  bindings: {
-    article: '='
-  },
-  controller: ArticleActionsCtrl,
-  templateUrl: 'article/article-actions.html'
-};
-
-exports.default = ArticleActions;
-
-},{}],13:[function(require,module,exports){
-'use strict';
-
-ArticleConfig.$inject = ["$stateProvider"];
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-function ArticleConfig($stateProvider) {
-  'ngInject';
-
-  $stateProvider.state('app.article', {
-    url: '/article/:slug',
-    controller: 'ArticleCtrl',
-    controllerAs: '$ctrl',
-    templateUrl: 'article/article.html',
-    title: 'Article',
-    resolve: {
-      article: ["Articles", "$state", "$stateParams", function article(Articles, $state, $stateParams) {
-        return Articles.get($stateParams.slug).then(function (article) {
-          return article;
-        }, function (err) {
-          return $state.go('app.home');
-        });
-      }]
-    }
-  });
-};
-
-exports.default = ArticleConfig;
-
-},{}],14:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _marked = require('marked');
-
-var _marked2 = _interopRequireDefault(_marked);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var ArticleCtrl = function ArticleCtrl(article, User, $sce, $rootScope) {
-  'ngInject';
-
-  _classCallCheck(this, ArticleCtrl);
-
-  this.article = article;
-
-  this.currentUser = User.current;
-
-  $rootScope.setPageTitle(this.article.title);
-
-  this.article.body = $sce.trustAsHtml((0, _marked2.default)(this.article.body, { sanitize: true }));
-};
-ArticleCtrl.$inject = ["article", "User", "$sce", "$rootScope"];
-
-exports.default = ArticleCtrl;
-
-},{"marked":10}],15:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var CommentCtrl = function CommentCtrl(User) {
-  'ngInject';
-
-  _classCallCheck(this, CommentCtrl);
-
-  if (User.current) {
-    this.canModify = User.current.username === this.data.author.username;
-  } else {
-    this.canModify = false;
-  }
-};
-CommentCtrl.$inject = ["User"];
-
-var Comment = {
-  bindings: {
-    data: '=',
-    deleteCb: '&'
-  },
-  controller: CommentCtrl,
-  templateUrl: 'article/comment.html'
-};
-
-exports.default = Comment;
-
-},{}],16:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _angular = require('angular');
-
-var _angular2 = _interopRequireDefault(_angular);
-
-var _article = require('./article.config');
-
-var _article2 = _interopRequireDefault(_article);
-
-var _article3 = require('./article.controller');
-
-var _article4 = _interopRequireDefault(_article3);
-
-var _articleActions = require('./article-actions.component');
-
-var _articleActions2 = _interopRequireDefault(_articleActions);
-
-var _comment = require('./comment.component');
-
-var _comment2 = _interopRequireDefault(_comment);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// Create the module where our functionality can attach to
-var articleModule = _angular2.default.module('app.article', []);
-
-// Include our UI-Router config settings
-
-articleModule.config(_article2.default);
-
-// Controllers
-
-articleModule.controller('ArticleCtrl', _article4.default);
-
-articleModule.component('articleActions', _articleActions2.default);
-
-articleModule.component('comment', _comment2.default);
-
-exports.default = articleModule;
-
-},{"./article-actions.component":12,"./article.config":13,"./article.controller":14,"./comment.component":15,"angular":9}],17:[function(require,module,exports){
+},{"./auth":13,"./components":21,"./config/app.config":24,"./config/app.constants":25,"./config/app.run":26,"./config/app.templates":27,"./foods":34,"./home":39,"./layout":42,"./profile":43,"./services":49,"./settings":55,"angular":9,"angular-messages":2,"angular-toastr":4,"angular-ui-bootstrap":6,"angular-ui-router":7}],11:[function(require,module,exports){
 'use strict';
 
 AuthConfig.$inject = ["$stateProvider", "$httpProvider"];
@@ -52139,7 +50547,7 @@ function AuthConfig($stateProvider, $httpProvider) {
 
 exports.default = AuthConfig;
 
-},{}],18:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52189,7 +50597,7 @@ var AuthCtrl = function () {
 
 exports.default = AuthCtrl;
 
-},{}],19:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52229,7 +50637,7 @@ authModule.controller('SocialCtrl', _social2.default);
 
 exports.default = authModule;
 
-},{"./auth.config":17,"./auth.controller":18,"./social.controller":20,"angular":9}],20:[function(require,module,exports){
+},{"./auth.config":11,"./auth.controller":12,"./social.controller":14,"angular":9}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52268,259 +50676,7 @@ SocialCtrl.$inject = ["User", "$state", "$scope"];
 
 exports.default = SocialCtrl;
 
-},{}],21:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var ArticleListCtrl = function () {
-  ArticleListCtrl.$inject = ["Articles", "$scope"];
-  function ArticleListCtrl(Articles, $scope) {
-    'ngInject';
-
-    var _this = this;
-
-    _classCallCheck(this, ArticleListCtrl);
-
-    this._Articles = Articles;
-
-    this.setListTo(this.listConfig);
-
-    $scope.$on('setListTo', function (ev, newList) {
-      _this.setListTo(newList);
-    });
-
-    $scope.$on('setPageTo', function (ev, pageNumber) {
-      _this.setPageTo(pageNumber);
-    });
-  }
-
-  _createClass(ArticleListCtrl, [{
-    key: 'setListTo',
-    value: function setListTo(newList) {
-      // Set the current list to an empty array
-      this.list = [];
-
-      // Set listConfig to the new list's config
-      this.listConfig = newList;
-
-      this.runQuery();
-    }
-  }, {
-    key: 'setPageTo',
-    value: function setPageTo(pageNumber) {
-      this.listConfig.currentPage = pageNumber;
-
-      this.runQuery();
-    }
-  }, {
-    key: 'runQuery',
-    value: function runQuery() {
-      var _this2 = this;
-
-      // Show the loading indicator
-      this.loading = true;
-      this.listConfig = this.listConfig || {};
-
-      // Create an object for this query
-      var queryConfig = {
-        type: this.listConfig.type || undefined,
-        filters: this.listConfig.filters || {}
-      };
-
-      // Set the limit filter from the component's attribute
-      queryConfig.filters.limit = this.limit;
-
-      // If there is no page set, set page as 1
-      if (!this.listConfig.currentPage) {
-        this.listConfig.currentPage = 1;
-      }
-
-      // Add the offset filter
-      queryConfig.filters.offset = this.limit * (this.listConfig.currentPage - 1);
-
-      // Run the query
-      this._Articles.query(queryConfig).then(function (res) {
-        _this2.loading = false;
-
-        // Update list and total pages
-        _this2.list = res.articles;
-
-        _this2.listConfig.totalPages = Math.ceil(res.articlesCount / _this2.limit);
-      });
-    }
-  }]);
-
-  return ArticleListCtrl;
-}();
-
-var ArticleList = {
-  bindings: {
-    limit: '=',
-    listConfig: '='
-  },
-  controller: ArticleListCtrl,
-  templateUrl: 'components/article-helpers/article-list.html'
-};
-
-exports.default = ArticleList;
-
-},{}],22:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-var ArticleMeta = {
-  bindings: {
-    article: '='
-  },
-  transclude: true,
-  templateUrl: 'components/article-helpers/article-meta.html'
-};
-
-exports.default = ArticleMeta;
-
-},{}],23:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-var ArticlePreview = {
-  bindings: {
-    article: '='
-  },
-  templateUrl: 'components/article-helpers/article-preview.html'
-};
-
-exports.default = ArticlePreview;
-
-},{}],24:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var ListPaginationCtrl = function () {
-  ListPaginationCtrl.$inject = ["$scope"];
-  function ListPaginationCtrl($scope) {
-    'ngInject';
-
-    _classCallCheck(this, ListPaginationCtrl);
-
-    this._$scope = $scope;
-  }
-
-  _createClass(ListPaginationCtrl, [{
-    key: 'pageRange',
-    value: function pageRange(total) {
-      var pages = [];
-
-      for (var i = 0; i < total; i++) {
-        pages.push(i + 1);
-      }
-
-      return pages;
-    }
-  }, {
-    key: 'changePage',
-    value: function changePage(number) {
-      this._$scope.$emit('setPageTo', number);
-    }
-  }]);
-
-  return ListPaginationCtrl;
-}();
-
-var ListPagination = {
-  bindings: {
-    totalPages: '=',
-    currentPage: '='
-  },
-  controller: ListPaginationCtrl,
-  templateUrl: 'components/article-helpers/list-pagination.html'
-};
-
-exports.default = ListPagination;
-
-},{}],25:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var FavoriteBtnCtrl = function () {
-  FavoriteBtnCtrl.$inject = ["User", "Articles", "$state"];
-  function FavoriteBtnCtrl(User, Articles, $state) {
-    'ngInject';
-
-    _classCallCheck(this, FavoriteBtnCtrl);
-
-    this._User = User;
-    this._Articles = Articles;
-    this._$state = $state;
-  }
-
-  _createClass(FavoriteBtnCtrl, [{
-    key: 'submit',
-    value: function submit() {
-      var _this = this;
-
-      this.isSubmitting = true;
-
-      if (!this._User.current) {
-        this._$state.go('app.register');
-        return;
-      }
-
-      if (this.article.favorited) {
-        this._Articles.unfavorite(this.article.slug).then(function () {
-          _this.isSubmitting = false;
-          _this.article.favorited = false;
-          _this.article.favoritesCount--;
-        });
-      } else {
-        this._Articles.favorite(this.article.slug).then(function () {
-          _this.isSubmitting = false;
-          _this.article.favorited = true;
-          _this.article.favoritesCount++;
-        });
-      }
-    }
-  }]);
-
-  return FavoriteBtnCtrl;
-}();
-
-var FavoriteBtn = {
-  bindings: {
-    article: '='
-  },
-  transclude: true,
-  controller: FavoriteBtnCtrl,
-  templateUrl: 'components/buttons/favorite-btn.html'
-};
-
-exports.default = FavoriteBtn;
-
-},{}],26:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52585,7 +50741,7 @@ var FavoriteFoodBtn = {
 
 exports.default = FavoriteFoodBtn;
 
-},{}],27:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52651,7 +50807,7 @@ var FollowBtn = {
 
 exports.default = FollowBtn;
 
-},{}],28:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52710,7 +50866,7 @@ var FoodActions = {
 
 exports.default = FoodActions;
 
-},{}],29:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52824,7 +50980,7 @@ var FoodsList = {
 
 exports.default = FoodsList;
 
-},{}],30:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52839,7 +50995,7 @@ var FoodsPreview = {
 
 exports.default = FoodsPreview;
 
-},{}],31:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52892,7 +51048,7 @@ var ListPaginationFoods = {
 
 exports.default = ListPaginationFoods;
 
-},{}],32:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -52915,25 +51071,9 @@ var _followBtn = require('./buttons/follow-btn.component');
 
 var _followBtn2 = _interopRequireDefault(_followBtn);
 
-var _articleMeta = require('./article-helpers/article-meta.component');
-
-var _articleMeta2 = _interopRequireDefault(_articleMeta);
-
-var _favoriteBtn = require('./buttons/favorite-btn.component');
-
-var _favoriteBtn2 = _interopRequireDefault(_favoriteBtn);
-
 var _favoriteFoodBtn = require('./buttons/favorite-food-btn.component');
 
 var _favoriteFoodBtn2 = _interopRequireDefault(_favoriteFoodBtn);
-
-var _articlePreview = require('./article-helpers/article-preview.component');
-
-var _articlePreview2 = _interopRequireDefault(_articlePreview);
-
-var _articleList = require('./article-helpers/article-list.component');
-
-var _articleList2 = _interopRequireDefault(_articleList);
 
 var _foodsList = require('./foods-helpers/foods-list.component');
 
@@ -52946,10 +51086,6 @@ var _foodsPreview2 = _interopRequireDefault(_foodsPreview);
 var _foodActions = require('./foods-helpers/food-actions.component');
 
 var _foodActions2 = _interopRequireDefault(_foodActions);
-
-var _listPagination = require('./article-helpers/list-pagination.component');
-
-var _listPagination2 = _interopRequireDefault(_listPagination);
 
 var _listPaginationFoods = require('./foods-helpers/list-pagination-foods.component');
 
@@ -52965,15 +51101,7 @@ componentsModule.directive('showAuthed', _showAuthed2.default);
 
 componentsModule.component('followBtn', _followBtn2.default);
 
-componentsModule.component('articleMeta', _articleMeta2.default);
-
-componentsModule.component('favoriteBtn', _favoriteBtn2.default);
-
 componentsModule.component('favoriteFoodBtn', _favoriteFoodBtn2.default);
-
-componentsModule.component('articlePreview', _articlePreview2.default);
-
-componentsModule.component('articleList', _articleList2.default);
 
 componentsModule.component('foodsList', _foodsList2.default);
 
@@ -52981,13 +51109,11 @@ componentsModule.component('foodsPreview', _foodsPreview2.default);
 
 componentsModule.component('foodActions', _foodActions2.default);
 
-componentsModule.component('listPagination', _listPagination2.default);
-
 componentsModule.component('listPaginationFoods', _listPaginationFoods2.default);
 
 exports.default = componentsModule;
 
-},{"./article-helpers/article-list.component":21,"./article-helpers/article-meta.component":22,"./article-helpers/article-preview.component":23,"./article-helpers/list-pagination.component":24,"./buttons/favorite-btn.component":25,"./buttons/favorite-food-btn.component":26,"./buttons/follow-btn.component":27,"./foods-helpers/food-actions.component":28,"./foods-helpers/foods-list.component":29,"./foods-helpers/foods-preview.component":30,"./foods-helpers/list-pagination-foods.component":31,"./list-errors.component":33,"./show-authed.directive":34,"angular":9}],33:[function(require,module,exports){
+},{"./buttons/favorite-food-btn.component":15,"./buttons/follow-btn.component":16,"./foods-helpers/food-actions.component":17,"./foods-helpers/foods-list.component":18,"./foods-helpers/foods-preview.component":19,"./foods-helpers/list-pagination-foods.component":20,"./list-errors.component":22,"./show-authed.directive":23,"angular":9}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53002,7 +51128,7 @@ var ListErrors = {
 
 exports.default = ListErrors;
 
-},{}],34:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 'use strict';
 
 ShowAuthed.$inject = ["User"];
@@ -53041,7 +51167,7 @@ function ShowAuthed(User) {
 
 exports.default = ShowAuthed;
 
-},{}],35:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 'use strict';
 
 AppConfig.$inject = ["$httpProvider", "$stateProvider", "$locationProvider", "$urlRouterProvider"];
@@ -53081,7 +51207,7 @@ function AppConfig($httpProvider, $stateProvider, $locationProvider, $urlRouterP
 
 exports.default = AppConfig;
 
-},{"./auth.interceptor":39}],36:[function(require,module,exports){
+},{"./auth.interceptor":28}],25:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53096,7 +51222,7 @@ var AppConstants = {
 
 exports.default = AppConstants;
 
-},{}],37:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 'use strict';
 
 AppRun.$inject = ["AppConstants", "$rootScope"];
@@ -53125,43 +51251,35 @@ function AppRun(AppConstants, $rootScope) {
 
 exports.default = AppRun;
 
-},{}],38:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 
 angular.module("templates", []).run(["$templateCache", function ($templateCache) {
-  $templateCache.put("auth/auth.html", "<div class=\"auth-page\">\n  <div class=\"container page\">\n    <div class=\"row\">\n\n      <div class=\"col-md-6 offset-md-3 col-xs-12\">\n        <h1 class=\"text-xs-center\" ng-bind=\"::$ctrl.title\"></h1>\n        <p class=\"text-xs-center\">\n          <a ui-sref=\"app.login\"\n            ng-show=\"$ctrl.authType === \'register\'\">\n            Have an account?\n          </a>\n          <a ui-sref=\"app.register\"\n            ng-show=\"$ctrl.authType === \'login\'\">\n            Need an account?\n          </a>\n        </p>\n\n        <a href=\"http://localhost:3000/api/auth/github\" style=\"font-size: 25px; color:black\">Github</a><br>\n        <a href=\"http://localhost:3000/api/auth/googleplus\" style=\"font-size: 25px; color:black\">Google</a>\n\n        <list-errors errors=\"$ctrl.errors\"></list-errors>\n\n        <form name=\"formData\" ng-submit=\"$ctrl.submitForm()\">\n          <fieldset ng-disabled=\"$ctrl.isSubmitting\">\n\n            <!-- Form -->\n            <fieldset class=\"form-group\" ng-show=\"$ctrl.authType === \'register\'\" ng-disabled=\"$ctrl.authType != \'register\'\">\n              <input class=\"form-control form-control-lg\" type=\"text\" placeholder=\"Username\"\n                ng-model=\"$ctrl.formData.username\" name=\"Username\" ng-minlength=\"3\" ng-maxlength=\"16\" required/>\n              <div ng-messages=\"formData.Username.$error\" style=\"color: red;\">\n                <p ng-message=\"required\" ng-show = \"formData.Username.$dirty\">Username is required</p>\n                <p ng-message=\"minlength\">Enter more than 3 characters</p>\n                <p ng-message=\"maxlength\">Enter less than 16 characters</p>\n              </div>\n            </fieldset>\n            \n\n            <fieldset class=\"form-group\">\n              <input class=\"form-control form-control-lg\" type=\"email\" placeholder=\"Email\"\n                ng-model=\"$ctrl.formData.email\" name=\"Email\" required/>\n              <div ng-messages=\"formData.Email.$error\" style=\"color: red;\">\n                <p ng-message=\"required\" ng-show=\"formData.Email.$dirty\">Email is required</p>\n              </div>\n            </fieldset>\n\n\n            <fieldset class=\"form-group\">\n              <input required class=\"form-control form-control-lg\" type=\"password\" placeholder=\"Password\"\n                 ng-model=\"$ctrl.formData.password\" name=\"Password\" ng-minlength=\"6\" ng-maxlength=\"20\"/>\n              <div ng-messages=\"formData.Password.$error\" style=\"color: red;\">\n                <p ng-message=\"required\" ng-show=\"formData.Password.$dirty\">Password is required</p>\n                <p ng-message=\"minlength\">Enter more than 6 charecters</p>\n                <p ng-message=\"maxlength\">Enter less than 20 characters</p>\n              </div>\n            </fieldset>\n\n\n            <!-- Buttons -->\n            <fieldset ng-show=\"$ctrl.authType === \'register\'\">\n              <button class=\"btn btn-lg btn-primary pull-xs-right\"\n                type=\"submit\" ng-bind=\"::$ctrl.title\"\n                ng-show=\"formData.Username.$valid && formData.Email.$valid && formData.Password.$valid\">\n              </button>\n            </fieldset>\n\n            <fieldset ng-show=\"$ctrl.authType === \'login\'\">\n              <button class=\"btn btn-lg btn-primary pull-xs-right\"\n                type=\"submit\" ng-bind=\"::$ctrl.title\"\n                ng-show=\"formData.Email.$valid && formData.Password.$valid\">\n              </button>\n            </fieldset> \n\n          </fieldset>\n        </form>\n      </div>\n\n    </div>\n  </div>\n</div>\n\n\n\n\n\n       ");
-  $templateCache.put("article/article-actions.html", "<article-meta article=\"$ctrl.article\">\n\n  <span ng-show=\"$ctrl.canModify\">\n    <a class=\"btn btn-sm btn-outline-secondary\"\n      ui-sref=\"app.editor({ slug: $ctrl.article.slug })\">\n      <i class=\"ion-edit\"></i> Edit Article\n    </a>\n\n    <button class=\"btn btn-sm btn-outline-danger\"\n      ng-class=\"{disabled: $ctrl.isDeleting}\"\n      ng-click=\"$ctrl.deleteArticle()\">\n      <i class=\"ion-trash-a\"></i> Delete Article\n    </button>\n  </span>\n\n  <span ng-hide=\"$ctrl.canModify\">\n    <follow-btn user=\"$ctrl.article.author\"></follow-btn>\n    <favorite-btn article=\"$ctrl.article\">\n      {{ $ctrl.article.favorited ? \'Unfavorite\' : \'Favorite\' }} Article <span class=\"counter\">({{$ctrl.article.favoritesCount}})</span>\n    </favorite-btn>\n  </span>\n\n</article-meta>\n");
-  $templateCache.put("article/article.html", "<div class=\"article-page\">\n\n  <!-- Banner for article title, action buttons -->\n  <div class=\"banner\">\n    <div class=\"container\">\n\n      <h1 ng-bind=\"::$ctrl.article.title\"></h1>\n\n      <div class=\"article-meta\">\n        <!-- Show author info + favorite & follow buttons -->\n        <article-actions article=\"$ctrl.article\"></article-actions>\n\n      </div>\n\n    </div>\n  </div>\n\n\n\n  <!-- Main view. Contains article html and comments -->\n  <div class=\"container page\">\n\n    <!-- Article\'s HTML & tags rendered here -->\n    <div class=\"row article-content\">\n      <div class=\"col-xs-12\">\n\n        <div ng-bind-html=\"::$ctrl.article.body\"></div>\n\n        <ul class=\"tag-list\">\n          <li class=\"tag-default tag-pill tag-outline\"\n            ng-repeat=\"tag in ::$ctrl.article.tagList\">\n            {{ tag }}\n          </li>\n        </ul>\n\n      </div>\n    </div>\n\n    <hr />\n\n    <div class=\"article-actions\">\n\n      <!-- Show author info + favorite & follow buttons -->\n      <article-actions article=\"$ctrl.article\"></article-actions>\n\n    </div>\n\n</div>\n");
-  $templateCache.put("article/comment.html", "<div class=\"card\">\n  <div class=\"card-block\">\n    <p class=\"card-text\" ng-bind=\"::$ctrl.data.body\"></p>\n  </div>\n  <div class=\"card-footer\">\n    <a class=\"comment-author\" ui-sref=\"app.profile.main({ username: $ctrl.data.author.username })\">\n      <img ng-src=\"{{::$ctrl.data.author.image}}\" class=\"comment-author-img\" />\n    </a>\n    &nbsp;\n    <a class=\"comment-author\" ui-sref=\"app.profile.main({ username: $ctrl.data.author.username })\" ng-bind=\"::$ctrl.data.author.username\">\n    </a>\n    <span class=\"date-posted\"\n      ng-bind=\"::$ctrl.data.createdAt | date: \'longDate\'\">\n    </span>\n    <span class=\"mod-options\" ng-show=\"$ctrl.canModify\">\n      <i class=\"ion-trash-a\" ng-click=\"$ctrl.deleteCb()\"></i>\n    </span>\n  </div>\n</div>\n");
   $templateCache.put("components/list-errors.html", "<ul class=\"error-messages\" ng-show=\"$ctrl.errors\">\n  <div ng-repeat=\"(field, errors) in $ctrl.errors\">\n    <li ng-repeat=\"error in errors\">\n      {{field}} {{error}}\n    </li>\n  </div>\n</ul>\n");
-  $templateCache.put("editor/editor.html", "<div class=\"editor-page\">\n  <div class=\"container page\">\n    <div class=\"row\">\n      <div class=\"col-md-10 offset-md-1 col-xs-12\">\n\n        <h1>New Article</h1>\n        <list-errors errors=\"$ctrl.errors\"></list-errors>\n\n        <form>\n          <fieldset ng-disabled=\"$ctrl.isSubmitting\">\n\n            <fieldset class=\"form-group\">\n              <input class=\"form-control form-control-lg\"\n                ng-model=\"$ctrl.article.title\"\n                type=\"text\"\n                placeholder=\"Article Title\" />\n            </fieldset>\n\n            <fieldset class=\"form-group\">\n              <input class=\"form-control\"\n                ng-model=\"$ctrl.article.description\"\n                type=\"text\"\n                placeholder=\"What\'s this article about?\" />\n            </fieldset>\n\n            <fieldset class=\"form-group\">\n              <textarea class=\"form-control\"\n                rows=\"8\"\n                ng-model=\"$ctrl.article.body\"\n                placeholder=\"Write your article (in markdown)\">\n              </textarea>\n            </fieldset>\n\n            <fieldset class=\"form-group\">\n              <input class=\"form-control\"\n                type=\"text\"\n                placeholder=\"Enter tags\"\n                ng-model=\"$ctrl.tagField\"\n                ng-keyup=\"$event.keyCode == 13 && $ctrl.addTag()\" />\n\n              <div class=\"tag-list\">\n                <span ng-repeat=\"tag in $ctrl.article.tagList\"\n                  class=\"tag-default tag-pill\">\n                  <i class=\"ion-close-round\" ng-click=\"$ctrl.removeTag(tag)\"></i>\n                  {{ tag }}\n                </span>\n              </div>\n            </fieldset>\n\n            <button class=\"btn btn-lg pull-xs-right btn-primary\" type=\"button\" ng-click=\"$ctrl.submit()\">\n              Publish Article\n            </button>\n\n          </fieldset>\n        </form>\n\n      </div>\n    </div>\n  </div>\n</div>\n");
+  $templateCache.put("auth/auth.html", "<div class=\"auth-page\">\n  <div class=\"container page\">\n    <div class=\"row\">\n\n      <div class=\"col-md-6 offset-md-3 col-xs-12\">\n        <h1 class=\"text-xs-center\" ng-bind=\"::$ctrl.title\"></h1>\n        <p class=\"text-xs-center\">\n          <a ui-sref=\"app.login\"\n            ng-show=\"$ctrl.authType === \'register\'\">\n            Have an account?\n          </a>\n          <a ui-sref=\"app.register\"\n            ng-show=\"$ctrl.authType === \'login\'\">\n            Need an account?\n          </a>\n        </p>\n\n        <a href=\"http://localhost:3000/api/auth/github\" style=\"font-size: 25px; color:black\">Github</a><br>\n        <a href=\"http://localhost:3000/api/auth/googleplus\" style=\"font-size: 25px; color:black\">Google</a>\n\n        <list-errors errors=\"$ctrl.errors\"></list-errors>\n\n        <form name=\"formData\" ng-submit=\"$ctrl.submitForm()\">\n          <fieldset ng-disabled=\"$ctrl.isSubmitting\">\n\n            <!-- Form -->\n            <fieldset class=\"form-group\" ng-show=\"$ctrl.authType === \'register\'\" ng-disabled=\"$ctrl.authType != \'register\'\">\n              <input class=\"form-control form-control-lg\" type=\"text\" placeholder=\"Username\"\n                ng-model=\"$ctrl.formData.username\" name=\"Username\" ng-minlength=\"3\" ng-maxlength=\"16\" required/>\n              <div ng-messages=\"formData.Username.$error\" style=\"color: red;\">\n                <p ng-message=\"required\" ng-show = \"formData.Username.$dirty\">Username is required</p>\n                <p ng-message=\"minlength\">Enter more than 3 characters</p>\n                <p ng-message=\"maxlength\">Enter less than 16 characters</p>\n              </div>\n            </fieldset>\n            \n\n            <fieldset class=\"form-group\">\n              <input class=\"form-control form-control-lg\" type=\"email\" placeholder=\"Email\"\n                ng-model=\"$ctrl.formData.email\" name=\"Email\" required/>\n              <div ng-messages=\"formData.Email.$error\" style=\"color: red;\">\n                <p ng-message=\"required\" ng-show=\"formData.Email.$dirty\">Email is required</p>\n              </div>\n            </fieldset>\n\n\n            <fieldset class=\"form-group\">\n              <input required class=\"form-control form-control-lg\" type=\"password\" placeholder=\"Password\"\n                 ng-model=\"$ctrl.formData.password\" name=\"Password\" ng-minlength=\"6\" ng-maxlength=\"20\"/>\n              <div ng-messages=\"formData.Password.$error\" style=\"color: red;\">\n                <p ng-message=\"required\" ng-show=\"formData.Password.$dirty\">Password is required</p>\n                <p ng-message=\"minlength\">Enter more than 6 charecters</p>\n                <p ng-message=\"maxlength\">Enter less than 20 characters</p>\n              </div>\n            </fieldset>\n\n\n            <!-- Buttons -->\n            <fieldset ng-show=\"$ctrl.authType === \'register\'\">\n              <button class=\"btn btn-lg btn-primary pull-xs-right\"\n                type=\"submit\" ng-bind=\"::$ctrl.title\"\n                ng-show=\"formData.Username.$valid && formData.Email.$valid && formData.Password.$valid\">\n              </button>\n            </fieldset>\n\n            <fieldset ng-show=\"$ctrl.authType === \'login\'\">\n              <button class=\"btn btn-lg btn-primary pull-xs-right\"\n                type=\"submit\" ng-bind=\"::$ctrl.title\"\n                ng-show=\"formData.Email.$valid && formData.Password.$valid\">\n              </button>\n            </fieldset> \n\n          </fieldset>\n        </form>\n      </div>\n\n    </div>\n  </div>\n</div>\n\n\n\n\n\n       ");
   $templateCache.put("foods/comment-food.html", "<hr>\n\n<div class=\"card\">\n    <div class=\"card-block\">\n      <p class=\"card-text\" ng-bind=\"$ctrl.data.body\"></p>\n    </div>\n    <div class=\"card-footer\">\n      <a class=\"comment-author\" ui-sref=\"app.profile.main({ username: $ctrl.data.author.username })\">\n        <img ng-src=\"{{$ctrl.data.author.image}}\" class=\"comment-author-img\" />\n      </a>\n      &nbsp;\n      <a class=\"comment-author\" ui-sref=\"app.profile.main({ username: $ctrl.data.author.username })\" ng-bind=\"$ctrl.data.author.username\">\n      </a>\n      <span class=\"date-posted\"\n        ng-bind=\"$ctrl.data.createdAt | date: \'longDate\'\">\n      </span>\n      &nbsp;\n      <span class=\"mod-options\" ng-show=\"$ctrl.canModify\">\n        <i class=\"ion-trash-a\" ng-click=\"$ctrl.deleteCb()\"></i>\n      </span>\n    </div>\n  </div>");
   $templateCache.put("foods/filterfoods.html", "<hr>\n<blockquote>\n  <button class=\"button-deletefilters\" ui-sref=\"app.foods\">DELETE FILTERS</button>\n  <br><br>\n\n  <div ng-repeat=\"food in $ctrl.filteredFoods\">\n      <hr>\n      <label>Author:</label> <a class=\"author\"\n        ui-sref=\"app.profile.main({ username:food.author.username })\"\n        ng-bind=\"food.author.username\">\n      </a>\n\n      <a ui-sref=\"app.detailsFood({ slug:food.slug })\" class=\"preview-link\">\n        <h1 ng-bind=\"food.title\"></h1>\n        <p style=\"font-size: 12px;\">Difficulty: {{food.difficulty}}</p>\n        <p ng-bind=\"food.description\"></p>\n        <button class=\"button-details\">Read recipe...</span>\n      </a>\n  </div>\n  <hr>\n</blockquote>");
   $templateCache.put("foods/food.html", "<hr>\n<blockquote>\n  <div>\n    <label>Author:</label> <a class=\"author\"\n      ui-sref=\"app.profile.main({ username:$ctrl.food.author.username })\"\n      ng-bind=\"$ctrl.food.author.username\">\n    </a>\n    <food-actions food=\"$ctrl.food\"></food-actions>\n  \n    <h1>{{$ctrl.food.title}}</h1>\n    <p style=\"font-size: 12px;\">Difficulty: {{$ctrl.food.difficulty}}</p>\n    <p>{{$ctrl.food.description}}</p>\n    <p>{{$ctrl.food.body}}</p>\n\n    <ul class=\"tag-list\">\n      <li class=\"tag-default tag-pill tag-outline\"\n        ng-repeat=\"tag in $ctrl.food.tagList\">\n        {{tag}}\n      </li>\n    </ul>\n  </div><br>\n\n  <!-- Comments section -->\n  <div class=\"row\">\n    <div class=\"col-xs-12 col-md-8 offset-md-2\">\n\n      <div show-authed=\"true\">\n        <list-errors from=\"$crl.commentForm.errors\"></list-errors>\n        <form class=\"card comment-form\" ng-submit=\"$ctrl.addComment()\">\n          <fieldset ng-disabled=\"$ctrl.commentForm.isSubmitting\">\n            <div class=\"card-block\">\n              <textarea class=\"form-control\"\n                placeholder=\"Write a comment...\"\n                rows=\"3\"\n                ng-model=\"$ctrl.commentForm.body\"></textarea>\n            </div>\n            <div class=\"card-footer\">\n              <img ng-src=\"{{$ctrl.currentUser.image}}\" class=\"comment-author-img\" />\n              <button class=\"btn btn-sm btn-primary\" type=\"submit\">\n               Post Comment\n              </button>\n            </div>\n          </fieldset>\n        </form>\n      </div>\n\n      <div show-authed=\"false\">\n        <a ui-sref=\"app.login\">Sign in</a> or <a ui-sref=\"app.register\">sign up</a> to add comments on this article.\n      </div>\n\n      <comment-food ng-repeat=\"cmt in $ctrl.comments\"\n        data=\"cmt\"\n        delete-cb=\"$ctrl.deleteComment(cmt.id, $index)\">\n      </comment-food>\n\n    </div>\n  </div>\n</blockquote>");
   $templateCache.put("foods/foods.html", "<div class=\"col-md-9\">\n    <!-- Tabs for toggling between feed, article lists -->\n    <div class=\"feed-toggle\">\n      <ul class=\"nav nav-pills outline-active\">\n\n        <li class=\"nav-item\">\n          <a href=\"\" class=\"nav-link\"\n            ng-class=\"{ active: $ctrl.listConfig.type === \'all\' && !$ctrl.listConfig.filters }\"\n            ng-click=\"$ctrl.changeList({ type: \'all\' })\">\n            Global Feed\n          </a>\n        </li>\n\n        <li class=\"nav-item\" show-authed=\"true\">\n            <a href=\"\" class=\"nav-link\"\n              ng-class=\"{ active: $ctrl.listConfig.type === \'feed\' }\"\n              ng-click=\"$ctrl.changeList({ type: \'feed\' })\">\n              Your Feed\n            </a>\n        </li>\n\n        <li class=\"nav-item\" ng-show=\"$ctrl.listConfig.filters.tag\">\n          <a href=\"\" class=\"nav-link active\">\n            <i class=\"ion-pound\"></i> {{$ctrl.listConfig.filters.tag}}\n          </a>\n        </li>\n\n      </ul>\n    </div>\n\n    <!-- List the current foods -->\n    <foods-list limit=\"5\" list-config=\"$ctrl.listConfig\"></foods-list>\n    \n  </div>\n\n\n  <!-- Tags -->\n  <div class=\"col-md-3\">\n    <div class=\"sidebar\">\n\n      <p>Popular Tags</p>\n      <div class=\"tag-list\" ng-show=\"$ctrl.tags\">\n        <a href=\"\" class=\"tag-default tag-pill\"\n          ng-click=\"$ctrl.changeList({ type: \'all\', filters: { tag: tagName } })\"\n          ng-repeat=\"tagName in $ctrl.tags\"\n          ng-bind=\"tagName\">\n        </a>\n      </div>\n\n      <div ng-show=\"!$ctrl.tagsLoaded\">\n        Loading tags...\n      </div>\n\n      <div class=\"post-preview\"\n        ng-show=\"$ctrl.tagsLoaded && !$ctrl.tags.length\">\n        No tags are here... yet.\n      </div>\n\n    </div>\n  </div>\n\n\n\n");
   $templateCache.put("foods/recipes.html", "<div class=\"editor-page\">\n    <div class=\"container page\">\n      <div class=\"row\">\n        <div class=\"col-md-10 offset-md-1 col-xs-12\">\n          \n          <h1>New Recipe</h1>\n          <list-errors errors=\"$ctrl.errors\"></list-errors>\n  \n          <form>\n            <fieldset ng-disabled=\"$ctrl.isSubmitting\">\n  \n              <fieldset class=\"form-group\">\n                <input class=\"form-control form-control-lg\"\n                  ng-model=\"$ctrl.food.title\"\n                  type=\"text\"\n                  placeholder=\"Recipe Name\"/>\n              </fieldset>\n  \n              <fieldset class=\"form-group\">\n                <input class=\"form-control\"\n                  ng-model=\"$ctrl.food.description\"\n                  type=\"text\"\n                  placeholder=\"What\'s this recipe about?\" />\n              </fieldset>\n  \n              <fieldset class=\"form-group\">\n                <textarea class=\"form-control\"\n                  rows=\"8\"\n                  ng-model=\"$ctrl.food.body\"\n                  placeholder=\"Write your recipe\">\n                </textarea>\n              </fieldset>\n\n              <fieldset class=\"form-group\">\n                <textarea class=\"form-control\"\n                  ng-model=\"$ctrl.food.difficulty\"\n                  placeholder=\"Describe the difficulty in one or two words: Easy, Medium, Hard, etc\">\n                </textarea>\n              </fieldset>\n\n              <fieldset class=\"form-group\">\n                <input class=\"form-control\"\n                  type=\"text\"\n                  placeholder=\"Enter tags\"\n                  ng-model=\"$ctrl.tagField\"\n                  ng-keyup=\"$event.keyCode == 13 && $ctrl.addTag()\" />\n\n                <div class=\"tag-list\">\n                  <span ng-repeat=\"tag in $ctrl.food.tagList\"\n                    class=\"tag-default tag-pill\">\n                    <i class=\"ion-close-round\" ng-click=\"$ctrl.removeTag(tag)\"></i>\n                    {{ tag }}\n                  </span>\n                </div>\n              </fieldset>\n  \n              <button class=\"btn btn-lg pull-xs-right btn-primary\" type=\"button\" ng-click=\"$ctrl.submit()\">\n                Publish Recipe\n              </button>\n  \n            </fieldset>\n          </form>\n  \n        </div>\n      </div>\n    </div>\n  </div>\n  ");
   $templateCache.put("home/home-slider.html", "<div style=\"height: 400px\">\n    <div uib-carousel active=\"active\" interval=\"$ctrl.myInterval\" no-wrap=\"$ctrl.noWrapSlides\">\n        <div uib-slide ng-repeat=\"slide in $ctrl.slides track by slide.id\" index=\"slide.id\" style=\"height: 400px\">\n            <img ng-src=\"{{slide.image}}\" class=\"img-fluid\" style=\"filter: blur(2px);\">\n            <div class = \"carousel-caption\" style = \"padding-bottom: 100px;\">\n                <h2>{{slide.text}}</h2>\n            </div>\n        </div>\n    </div>\n</div>");
-  $templateCache.put("home/home.html", " <div class=\"home-page\">\n\n  <!-- Splash banner that only shows when not logged in -->\n  <div class=\"banner\" show-authed=\"false\">\n    <div class=\"container\">\n      <h1 class=\"logo-font\" ng-bind=\"::$ctrl.appName | lowercase\"></h1>\n      <p>A place to share your knowledge.</p>\n    </div>\n  </div>\n\n<home-slider></home-slider><br><br>\n\n<blockquote>\n  <h1><u>RECIPES</u></h1>\n  <h2>Difficulty</h2>\n  <div class=\"cats\" ng-repeat=\"d in $ctrl.difficulty\">\n    <button class=\"button-categories\" ui-sref=\"app.filterFoods({filter:d})\">{{ d }}</button>\n  </div><br><br>\n</blockquote>\n\n<div class=\"container page\">\n  <div class=\"row\">\n\n\n    <!-- Main view - contains tabs & article list -->\n    <div class=\"col-md-9\">\n      <!-- Tabs for toggling between feed, article lists -->\n      <div class=\"feed-toggle\">\n        <ul class=\"nav nav-pills outline-active\">\n\n          <li class=\"nav-item\" show-authed=\"true\">\n            <a href=\"\" class=\"nav-link\"\n              ng-class=\"{ active: $ctrl.listConfig.type === \'feed\' }\"\n              ng-click=\"$ctrl.changeList({ type: \'feed\' })\">\n              Your Feed\n            </a>\n          </li>\n\n          <li class=\"nav-item\">\n            <a href=\"\" class=\"nav-link\"\n              ng-class=\"{ active: $ctrl.listConfig.type === \'all\' && !$ctrl.listConfig.filters }\"\n              ng-click=\"$ctrl.changeList({ type: \'all\' })\">\n              Global Feed\n            </a>\n          </li>\n\n          <li class=\"nav-item\" ng-show=\"$ctrl.listConfig.filters.tag\">\n            <a href=\"\" class=\"nav-link active\">\n              <i class=\"ion-pound\"></i> {{$ctrl.listConfig.filters.tag}}\n            </a>\n          </li>\n\n        </ul>\n      </div>\n\n      <!-- List the current articles -->\n      <article-list limit=\"10\" list-config=\"$ctrl.listConfig\"></article-list>\n\n    </div>\n\n\n    <!-- Tags -->\n    <div class=\"col-md-3\">\n      <div class=\"sidebar\">\n\n        <p>Popular Tags</p>\n        <div class=\"tag-list\" ng-show=\"$ctrl.tags\">\n          <a href=\"\" class=\"tag-default tag-pill\"\n            ng-click=\"$ctrl.changeList({ type: \'all\', filters: { tag: tagName } })\"\n            ng-repeat=\"tagName in $ctrl.tags\"\n            ng-bind=\"tagName\">\n          </a>\n        </div>\n\n        <div ng-show=\"!$ctrl.tagsLoaded\">\n          Loading tags...\n        </div>\n\n        <div class=\"post-preview\"\n          ng-show=\"$ctrl.tagsLoaded && !$ctrl.tags.length\">\n          No tags are here... yet.\n        </div>\n\n      </div>\n    </div>\n\n\n    <!-- End the row & container divs -->\n  </div>\n</div>\n\n</div>\n");
+  $templateCache.put("home/home.html", " <div class=\"home-page\">\n\n  <!-- Splash banner that only shows when not logged in -->\n  <div class=\"banner\" show-authed=\"false\">\n    <div class=\"container\">\n      <h1 class=\"logo-font\" ng-bind=\"::$ctrl.appName | lowercase\"></h1>\n      <p>A place to share your knowledge.</p>\n    </div>\n  </div>\n\n<home-slider></home-slider><br><br>\n\n<blockquote>\n  <h1><u>RECIPES</u></h1>\n  <h2>Difficulty</h2>\n  <div class=\"cats\" ng-repeat=\"d in $ctrl.difficulty\">\n    <button class=\"button-categories\" ui-sref=\"app.filterFoods({filter:d})\">{{ d }}</button>\n  </div><br><br>\n</blockquote>\n\n</div>\n");
   $templateCache.put("layout/app-view.html", "<app-header></app-header>\n\n<div ui-view></div>\n\n<app-footer></app-footer>\n");
   $templateCache.put("layout/footer.html", "<footer>\n  <div class=\"container\">\n    <a class=\"logo-font\" ui-sref=\"app.home\" ng-bind=\"::$ctrl.appName | lowercase\"></a>\n    <span class=\"attribution\">\n      &copy; {{::$ctrl.date | date:\'yyyy\'}}.\n      An interactive learning project from <a href=\"https://thinkster.io\">Thinkster</a>.\n      Code licensed under MIT.\n    </span>\n  </div>\n</footer>\n");
-  $templateCache.put("layout/header.html", "<nav class=\"navbar navbar-light\">\n  <div class=\"container\">\n\n    <a class=\"navbar-brand\"\n      ui-sref=\"app.home\"\n      ng-bind=\"::$ctrl.appName | lowercase\">\n    </a>\n\n<!--  -->\n    <!-- Show this for logged out users -->\n    <ul show-authed=\"false\"\n      class=\"nav navbar-nav pull-xs-right\">\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.home\">\n          Home\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.login\">\n          Sign in\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.register\">\n          Sign up\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.foods\">\n          Foods\n        </a>\n      </li>\n\n    </ul>\n\n<!--  -->\n    <!-- Show this for logged in users -->\n    <ul show-authed=\"true\"\n      class=\"nav navbar-nav pull-xs-right\">\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.home\">\n          Home\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.recipes\">\n          <i class=\"ion-compose\"></i>&nbsp;New Recipe\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.editor\">\n          <i class=\"ion-compose\"></i>&nbsp;New Article\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.settings\">\n          <i class=\"ion-gear-a\"></i>&nbsp;Settings\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.profile.main({ username: $ctrl.currentUser.username})\">\n          <img ng-src=\"{{$ctrl.currentUser.image}}\" class=\"user-pic\" />\n          {{ $ctrl.currentUser.username }}\n        </a>\n      </li>\n\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.foods\">\n          Foods\n        </a>\n      </li>\n\n    </ul>\n\n\n  </div>\n</nav>\n");
+  $templateCache.put("layout/header.html", "<nav class=\"navbar navbar-light\">\n  <div class=\"container\">\n\n    <a class=\"navbar-brand\"\n      ui-sref=\"app.home\"\n      ng-bind=\"::$ctrl.appName | lowercase\">\n    </a>\n\n<!--  -->\n    <!-- Show this for logged out users -->\n    <ul show-authed=\"false\"\n      class=\"nav navbar-nav pull-xs-right\">\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.home\">\n          Home\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.login\">\n          Sign in\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.register\">\n          Sign up\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.foods\">\n          Foods\n        </a>\n      </li>\n\n    </ul>\n\n<!--  -->\n    <!-- Show this for logged in users -->\n    <ul show-authed=\"true\"\n      class=\"nav navbar-nav pull-xs-right\">\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.home\">\n          Home\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.recipes\">\n          <i class=\"ion-compose\"></i>&nbsp;New Recipe\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.settings\">\n          <i class=\"ion-gear-a\"></i>&nbsp;Settings\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.profile.main({ username: $ctrl.currentUser.username})\">\n          <img ng-src=\"{{$ctrl.currentUser.image}}\" class=\"user-pic\" />\n          {{ $ctrl.currentUser.username }}\n        </a>\n      </li>\n\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.foods\">\n          Foods\n        </a>\n      </li>\n\n    </ul>\n\n\n  </div>\n</nav>\n");
   $templateCache.put("profile/profile-foods.html", "<foods-list limit=\"5\" list-config=\"$ctrl.listConfig\"></foods-list>");
   $templateCache.put("profile/profile.html", "<div class=\"profile-page\">\n\n  <!-- User\'s basic info & action buttons -->\n  <div class=\"user-info\">\n    <div class=\"container\">\n      <div class=\"row\">\n        <div class=\"col-xs-12 col-md-10 offset-md-1\">\n\n          <img ng-src=\"{{::$ctrl.profile.image}}\" class=\"user-img\" />\n          <h4 ng-bind=\"::$ctrl.profile.username\"></h4>\n          <p ng-bind=\"::$ctrl.profile.bio\"></p>\n\n          <a ui-sref=\"app.settings\"\n            class=\"btn btn-sm btn-outline-secondary action-btn\"\n            ng-show=\"$ctrl.isUser\">\n            <i class=\"ion-gear-a\"></i> Edit Profile Settings\n          </a>\n\n          <follow-btn user=\"$ctrl.profile\" ng-hide=\"$ctrl.isUser\"></follow-btn>\n\n        </div>\n      </div>\n    </div>\n  </div>\n\n  <!-- Container where User\'s posts & favs are list w/ toggle tabs -->\n  <div class=\"container\">\n    <div class=\"row\">\n\n      <div class=\"col-xs-12 col-md-10 offset-md-1\">\n\n        <!-- Tabs for switching between author recipes & favorites -->\n        <div class=\"articles-toggle\">\n          <ul class=\"nav nav-pills outline-active\">\n\n            <li class=\"nav-item\">\n              <a class=\"nav-link active\"\n                ui-sref-active=\"active\"\n                ui-sref=\"app.profile.main({username: $ctrl.profile.username})\">\n                My Recipes\n              </a>\n            </li>\n\n            <li class=\"nav-item\">\n              <a class=\"nav-link\"\n                ui-sref-active=\"active\"\n                ui-sref=\"app.profile.favorites({username: $ctrl.profile.username})\">\n                Favorited Recipes\n              </a>\n            </li>\n\n          </ul>\n        </div>\n\n        <!-- List of recipes -->\n        <div ui-view></div>\n\n\n      </div>\n\n    <!-- End row & container divs -->\n    </div>\n  </div>\n\n</div>\n");
   $templateCache.put("settings/settings.html", "<div class=\"settings-page\">\n  <div class=\"container page\">\n    <div class=\"row\">\n      <div class=\"col-md-6 offset-md-3 col-xs-12\">\n\n        <h1 class=\"text-xs-center\">Your Settings</h1>\n\n        <list-errors errors=\"$ctrl.errors\"></list-errors>\n\n        <form ng-submit=\"$ctrl.submitForm()\">\n          <fieldset ng-disabled=\"$ctrl.isSubmitting\">\n\n            <fieldset class=\"form-group\">\n              <input class=\"form-control\"\n                type=\"text\"\n                placeholder=\"URL of profile picture\"\n                ng-model=\"$ctrl.formData.image\" />\n            </fieldset>\n\n            <fieldset class=\"form-group\">\n              <input class=\"form-control form-control-lg\"\n                type=\"text\"\n                placeholder=\"Username\"\n                ng-model=\"$ctrl.formData.username\" />\n            </fieldset>\n\n            <fieldset class=\"form-group\">\n              <textarea class=\"form-control form-control-lg\"\n                rows=\"8\"\n                placeholder=\"Short bio about you\"\n                ng-model=\"$ctrl.formData.bio\">\n              </textarea>\n            </fieldset>\n\n            <fieldset class=\"form-group\">\n              <input class=\"form-control form-control-lg\"\n                type=\"email\"\n                placeholder=\"Email\"\n                ng-model=\"$ctrl.formData.email\" />\n            </fieldset>\n\n            <fieldset class=\"form-group\">\n              <input class=\"form-control form-control-lg\"\n                type=\"password\"\n                placeholder=\"New Password\"\n                ng-model=\"$ctrl.formData.password\" />\n            </fieldset>\n\n            <button class=\"btn btn-lg btn-primary pull-xs-right\"\n              type=\"submit\">\n              Update Settings\n            </button>\n\n          </fieldset>\n        </form>\n\n        <!-- Line break for logout button -->\n        <hr />\n\n        <button class=\"btn btn-outline-danger\"\n          ng-click=\"$ctrl.logout()\">\n          Or click here to logout.\n        </button>\n\n      </div>\n    </div>\n  </div>\n</div>\n");
-  $templateCache.put("components/article-helpers/article-list.html", "<article-preview\n  article=\"article\"\n  ng-repeat=\"article in $ctrl.list\">\n</article-preview>\n\n<div class=\"article-preview\"\n  ng-hide=\"!$ctrl.loading\">\n  Loading articles...\n</div>\n\n<div class=\"article-preview\"\n  ng-show=\"!$ctrl.loading && !$ctrl.list.length\">\n  No articles are here... yet.\n</div>\n\n<list-pagination\n total-pages=\"$ctrl.listConfig.totalPages\"\n current-page=\"$ctrl.listConfig.currentPage\"\n ng-hide=\"$ctrl.listConfig.totalPages <= 1\">\n</list-pagination>\n");
-  $templateCache.put("components/article-helpers/article-meta.html", "<div class=\"article-meta\">\n  <a ui-sref=\"app.profile.main({ username:$ctrl.article.author.username })\">\n    <img ng-src=\"{{$ctrl.article.author.image}}\" />\n  </a>\n\n  <div class=\"info\">\n    <a class=\"author\"\n      ui-sref=\"app.profile.main({ username:$ctrl.article.author.username })\"\n      ng-bind=\"$ctrl.article.author.username\">\n    </a>\n    <span class=\"date\"\n      ng-bind=\"$ctrl.article.createdAt | date: \'longDate\' \">\n    </span>\n  </div>\n\n  <ng-transclude></ng-transclude>\n</div>\n");
-  $templateCache.put("components/article-helpers/article-preview.html", "<div class=\"article-preview\">\n  <article-meta article=\"$ctrl.article\">\n    <favorite-btn\n      article=\"$ctrl.article\"\n      class=\"pull-xs-right\">\n      {{$ctrl.article.favoritesCount}}\n    </favorite-btn>\n  </article-meta>\n\n  <a ui-sref=\"app.article({ slug: $ctrl.article.slug })\" class=\"preview-link\">\n    <h1 ng-bind=\"$ctrl.article.title\"></h1>\n    <p ng-bind=\"$ctrl.article.description\"></p>\n    <span>Read more...</span>\n    <ul class=\"tag-list\">\n      <li class=\"tag-default tag-pill tag-outline\"\n        ng-repeat=\"tag in $ctrl.article.tagList\">\n        {{tag}}\n      </li>\n    </ul>\n  </a>\n</div>\n");
-  $templateCache.put("components/article-helpers/list-pagination.html", "<nav>\n  <ul class=\"pagination\">\n\n    <li class=\"page-item\"\n      ng-class=\"{active: pageNumber === $ctrl.currentPage }\"\n      ng-repeat=\"pageNumber in $ctrl.pageRange($ctrl.totalPages)\"\n      ng-click=\"$ctrl.changePage(pageNumber)\">\n\n      <a class=\"page-link\" href=\"\">{{ pageNumber }}</a>\n\n    </li>\n\n  </ul>\n</nav>\n");
-  $templateCache.put("components/foods-helpers/food-actions.html", "<!-- Your food -->\n<span ng-show=\"$ctrl.canModify\">\n    <a class=\"btn btn-sm btn-outline-secondary\"\n    ui-sref=\"app.recipes({ slug:$ctrl.food.slug })\">\n    <i class=\"ion-edit\"></i> Edit Recipe\n    </a>\n\n    <button class=\"btn btn-sm btn-outline-danger\"\n    ng-class=\"{disabled: $ctrl.isDeleting}\"\n    ng-click=\"$ctrl.deleteRecipe()\">\n    <i class=\"ion-trash-a\"></i> Delete Recipe\n    </button>\n</span>\n\n<!-- Not your food -->\n<span ng-hide=\"$ctrl.canModify\">\n    <follow-btn user=\"$ctrl.food.author\"></follow-btn>\n    <favorite-food-btn food=\"$ctrl.food\">\n    {{ $ctrl.food.favorited ? \'Unfavorite\' : \'Favorite\' }} Recipe <span class=\"counter\">({{$ctrl.food.favoritesCount}})</span>\n    </favorite-food-btn>\n</span>");
-  $templateCache.put("components/foods-helpers/foods-list.html", "<hr>\n<blockquote>\n\n  <foods-preview food=\"food\" ng-repeat=\"food in $ctrl.list\"></foods-preview>\n  \n  <div ng-hide=\"!$ctrl.loading\">\n    Loading recipes...\n  </div>\n\n  <div ng-show=\"!$ctrl.loading && !$ctrl.list.length\">\n    No recipes are here... yet.\n  </div>\n\n  <list-pagination-foods\n    total-pages=\"$ctrl.listConfig.totalPages\"\n    current-page=\"$ctrl.listConfig.currentPage\"\n    ng-hide=\"$ctrl.listConfig.totalPages <= 1\">\n  </list-pagination-foods>\n\n</blockquote>");
-  $templateCache.put("components/foods-helpers/foods-preview.html", "<div class=\"food-preview\">\n  <label>Author:</label> <a class=\"author\"\n    ui-sref=\"app.profile.main({ username:$ctrl.food.author.username })\"\n    ng-bind=\"$ctrl.food.author.username\">\n  </a>\n\n  <a ui-sref=\"app.detailsFood({ slug: $ctrl.food.slug })\" class=\"preview-link\">\n    <h1 ng-bind=\"$ctrl.food.title\"></h1>\n    <p class=\"difficulty-food\">Difficulty: {{$ctrl.food.difficulty}}</p>\n    <p ng-bind=\"$ctrl.food.description\"></p>\n    <button class=\"button-details\">Read more...</button>\n    <ul class=\"tag-list\">\n      <li class=\"tag-default tag-pill tag-outline\"\n        ng-repeat=\"tag in $ctrl.food.tagList\">\n        {{tag}}\n      </li>\n    </ul>\n  </a>\n\n</div>  \n<hr>");
-  $templateCache.put("components/foods-helpers/list-pagination-foods.html", "<nav>\n    <ul class=\"pagination\">\n  \n      <li class=\"page-item\"\n        ng-class=\"{active: pageNumber === $ctrl.currentPage }\"\n        ng-repeat=\"pageNumber in $ctrl.pageRange($ctrl.totalPages)\"\n        ng-click=\"$ctrl.changePage(pageNumber)\">\n  \n        <a class=\"page-link\" href=\"\">{{ pageNumber }}</a>\n  \n      </li>\n  \n    </ul>\n  </nav>\n  ");
   $templateCache.put("components/buttons/favorite-btn.html", "<button class=\"btn btn-sm\"\n  ng-class=\"{ \'disabled\' : $ctrl.isSubmitting,\n              \'btn-outline-primary\': !$ctrl.article.favorited,\n              \'btn-primary\': $ctrl.article.favorited }\"\n  ng-click=\"$ctrl.submit()\">\n  <i class=\"ion-heart\"></i> <ng-transclude></ng-transclude>\n</button>\n");
   $templateCache.put("components/buttons/favorite-food-btn.html", "<button class=\"btn btn-sm\"\n  ng-class=\"{ \'disabled\' : $ctrl.isSubmitting,\n              \'btn-outline-primary\': !$ctrl.food.favorited,\n              \'btn-primary\': $ctrl.food.favorited }\"\n  ng-click=\"$ctrl.submit()\">\n  <i class=\"ion-heart\"></i> <ng-transclude></ng-transclude>\n</button>\n");
   $templateCache.put("components/buttons/follow-btn.html", "<button\n  class=\"btn btn-sm action-btn\"\n  ng-class=\"{ \'disabled\': $ctrl.isSubmitting,\n              \'btn-outline-secondary\': !$ctrl.user.following,\n              \'btn-secondary\': $ctrl.user.following }\"\n  ng-click=\"$ctrl.submit()\">\n  <i class=\"ion-plus-round\"></i>\n  &nbsp;\n  {{ $ctrl.user.following ? \'Unfollow\' : \'Follow\' }} {{ $ctrl.user.username }}\n</button>\n");
+  $templateCache.put("components/foods-helpers/food-actions.html", "<!-- Your food -->\n<span ng-show=\"$ctrl.canModify\">\n    <a class=\"btn btn-sm btn-outline-secondary\"\n    ui-sref=\"app.recipes({ slug:$ctrl.food.slug })\">\n    <i class=\"ion-edit\"></i> Edit Recipe\n    </a>\n\n    <button class=\"btn btn-sm btn-outline-danger\"\n    ng-class=\"{disabled: $ctrl.isDeleting}\"\n    ng-click=\"$ctrl.deleteRecipe()\">\n    <i class=\"ion-trash-a\"></i> Delete Recipe\n    </button>\n</span>\n\n<!-- Not your food -->\n<span ng-hide=\"$ctrl.canModify\">\n    <follow-btn user=\"$ctrl.food.author\"></follow-btn>\n    <favorite-food-btn food=\"$ctrl.food\">\n    {{ $ctrl.food.favorited ? \'Unfavorite\' : \'Favorite\' }} Recipe <span class=\"counter\">({{$ctrl.food.favoritesCount}})</span>\n    </favorite-food-btn>\n</span>");
+  $templateCache.put("components/foods-helpers/foods-list.html", "<hr>\n<blockquote>\n\n  <foods-preview food=\"food\" ng-repeat=\"food in $ctrl.list\"></foods-preview>\n  \n  <div ng-hide=\"!$ctrl.loading\">\n    Loading recipes...\n  </div>\n\n  <div ng-show=\"!$ctrl.loading && !$ctrl.list.length\">\n    No recipes are here... yet.\n  </div>\n\n  <list-pagination-foods\n    total-pages=\"$ctrl.listConfig.totalPages\"\n    current-page=\"$ctrl.listConfig.currentPage\"\n    ng-hide=\"$ctrl.listConfig.totalPages <= 1\">\n  </list-pagination-foods>\n\n</blockquote>");
+  $templateCache.put("components/foods-helpers/foods-preview.html", "<div class=\"article-preview\">\n  <label>Author:</label> <a class=\"author\"\n    ui-sref=\"app.profile.main({ username:$ctrl.food.author.username })\"\n    ng-bind=\"$ctrl.food.author.username\">\n  </a>\n  <favorite-food-btn\n      food=\"$ctrl.food\"\n      class=\"pull-xs-right\">\n      {{$ctrl.food.favoritesCount}}\n  </favorite-food-btn>\n\n  <a ui-sref=\"app.detailsFood({ slug: $ctrl.food.slug })\" class=\"preview-link\">\n    <h1 ng-bind=\"$ctrl.food.title\"></h1>\n    <p class=\"difficulty-food\">Difficulty: {{$ctrl.food.difficulty}}</p>\n    <p ng-bind=\"$ctrl.food.description\"></p>\n    <button class=\"button-details\">Read more...</button>\n    <ul class=\"tag-list\">\n      <li class=\"tag-default tag-pill tag-outline\"\n        ng-repeat=\"tag in $ctrl.food.tagList\">\n        {{tag}}\n      </li>\n    </ul>\n  </a>\n\n</div>  ");
+  $templateCache.put("components/foods-helpers/list-pagination-foods.html", "<nav>\n    <ul class=\"pagination\">\n  \n      <li class=\"page-item\"\n        ng-class=\"{active: pageNumber === $ctrl.currentPage }\"\n        ng-repeat=\"pageNumber in $ctrl.pageRange($ctrl.totalPages)\"\n        ng-click=\"$ctrl.changePage(pageNumber)\">\n  \n        <a class=\"page-link\" href=\"\">{{ pageNumber }}</a>\n  \n      </li>\n  \n    </ul>\n  </nav>\n  ");
 }]);
 
-},{}],39:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 'use strict';
 
 authInterceptor.$inject = ["JWT", "AppConstants", "$window", "$q"];
@@ -53196,153 +51314,7 @@ function authInterceptor(JWT, AppConstants, $window, $q) {
 
 exports.default = authInterceptor;
 
-},{}],40:[function(require,module,exports){
-'use strict';
-
-EditorConfig.$inject = ["$stateProvider"];
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-function EditorConfig($stateProvider) {
-  'ngInject';
-
-  $stateProvider.state('app.editor', {
-    url: '/editor/:slug',
-    controller: 'EditorCtrl',
-    controllerAs: '$ctrl',
-    templateUrl: 'editor/editor.html',
-    title: 'Editor',
-    resolve: {
-      auth: ["User", function auth(User) {
-        return User.ensureAuthIs(true);
-      }],
-      article: ["Articles", "User", "$state", "$stateParams", function article(Articles, User, $state, $stateParams) {
-
-        if ($stateParams.slug) {
-
-          return Articles.get($stateParams.slug).then(function (article) {
-            if (User.current.username === article.author.username) {
-              return article;
-            } else {
-              $state.go('app.home');
-            }
-          }, function (err) {
-            return $state.go('app.home');
-          });
-        } else {
-          return null;
-        }
-      }]
-    }
-  });
-};
-
-exports.default = EditorConfig;
-
-},{}],41:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var EditorCtrl = function () {
-  EditorCtrl.$inject = ["Articles", "article", "$state"];
-  function EditorCtrl(Articles, article, $state) {
-    'ngInject';
-
-    _classCallCheck(this, EditorCtrl);
-
-    this._Articles = Articles;
-    this._$state = $state;
-
-    if (!article) {
-      this.article = {
-        title: '',
-        description: '',
-        body: '',
-        tagList: []
-      };
-    } else {
-      this.article = article;
-    }
-  }
-
-  _createClass(EditorCtrl, [{
-    key: 'addTag',
-    value: function addTag() {
-      if (!this.article.tagList.includes(this.tagField)) {
-        this.article.tagList.push(this.tagField);
-        this.tagField = '';
-      }
-    }
-  }, {
-    key: 'removeTag',
-    value: function removeTag(tagName) {
-      this.article.tagList = this.article.tagList.filter(function (slug) {
-        return slug != tagName;
-      });
-    }
-  }, {
-    key: 'submit',
-    value: function submit() {
-      var _this = this;
-
-      this.isSubmitting = true;
-
-      this._Articles.save(this.article).then(function (newArticle) {
-        _this._$state.go('app.article', { slug: newArticle.slug });
-      }, function (err) {
-        _this.isSubmitting = false;
-        _this.errors = err.data.errors;
-      });
-    }
-  }]);
-
-  return EditorCtrl;
-}();
-
-exports.default = EditorCtrl;
-
-},{}],42:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _angular = require('angular');
-
-var _angular2 = _interopRequireDefault(_angular);
-
-var _editor = require('./editor.config');
-
-var _editor2 = _interopRequireDefault(_editor);
-
-var _editor3 = require('./editor.controller');
-
-var _editor4 = _interopRequireDefault(_editor3);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// Create the module where our functionality can attach to
-var editorModule = _angular2.default.module('app.editor', []);
-
-// Include our UI-Router config settings
-
-editorModule.config(_editor2.default);
-
-// Controllers
-
-editorModule.controller('EditorCtrl', _editor4.default);
-
-exports.default = editorModule;
-
-},{"./editor.config":40,"./editor.controller":41,"angular":9}],43:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53379,7 +51351,7 @@ var CommentFood = {
 
 exports.default = CommentFood;
 
-},{}],44:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -53413,7 +51385,7 @@ FilterFoodsCtrl.$inject = ["foods", "$state", "$scope", "$stateParams"];
 
 exports.default = FilterFoodsCtrl;
 
-},{}],45:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53480,7 +51452,7 @@ var FoodCtrl = function () {
 
 exports.default = FoodCtrl;
 
-},{}],46:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 'use strict';
 
 FoodsConfig.$inject = ["$stateProvider", "$httpProvider"];
@@ -53566,7 +51538,7 @@ function FoodsConfig($stateProvider, $httpProvider) {
 
 exports.default = FoodsConfig;
 
-},{}],47:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53613,7 +51585,7 @@ var FoodsCtrl = function () {
 
 exports.default = FoodsCtrl;
 
-},{}],48:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53671,7 +51643,7 @@ foodsModule.component('commentFood', _commentFood2.default);
 
 exports.default = foodsModule;
 
-},{"./comment-food.component":43,"./filterfoods.controller":44,"./food.controller":45,"./foods.config":46,"./foods.controller":47,"./recipes.controller":49,"angular":9}],49:[function(require,module,exports){
+},{"./comment-food.component":29,"./filterfoods.controller":30,"./food.controller":31,"./foods.config":32,"./foods.controller":33,"./recipes.controller":35,"angular":9}],35:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53743,7 +51715,7 @@ var RecipesCtrl = function () {
 
 exports.default = RecipesCtrl;
 
-},{}],50:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53768,7 +51740,7 @@ var HomeSlider = {
 
 exports.default = HomeSlider;
 
-},{}],51:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 'use strict';
 
 HomeConfig.$inject = ["$stateProvider"];
@@ -53796,7 +51768,7 @@ function HomeConfig($stateProvider) {
 
 exports.default = HomeConfig;
 
-},{}],52:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53844,7 +51816,7 @@ var HomeCtrl = function () {
 
 exports.default = HomeCtrl;
 
-},{}],53:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53886,7 +51858,7 @@ homeModule.component('homeSlider', _homeSlider2.default);
 
 exports.default = homeModule;
 
-},{"./home-slider.component":50,"./home.config":51,"./home.controller":52,"angular":9}],54:[function(require,module,exports){
+},{"./home-slider.component":36,"./home.config":37,"./home.controller":38,"angular":9}],40:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53914,7 +51886,7 @@ var AppFooter = {
 
 exports.default = AppFooter;
 
-},{}],55:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53946,7 +51918,7 @@ var AppHeader = {
 
 exports.default = AppHeader;
 
-},{}],56:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -53978,7 +51950,7 @@ layoutModule.component('appFooter', _footer2.default);
 
 exports.default = layoutModule;
 
-},{"./footer.component":54,"./header.component":55,"angular":9}],57:[function(require,module,exports){
+},{"./footer.component":40,"./header.component":41,"angular":9}],43:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54018,7 +51990,7 @@ profileModule.controller('ProfileFoodsCtrl', _profileFoods2.default);
 
 exports.default = profileModule;
 
-},{"./profile-foods.controller":58,"./profile.config":59,"./profile.controller":60,"angular":9}],58:[function(require,module,exports){
+},{"./profile-foods.controller":44,"./profile.config":45,"./profile.controller":46,"angular":9}],44:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54056,7 +52028,7 @@ ProfileFoodsCtrl.$inject = ["profile", "$state", "$rootScope"];
 
 exports.default = ProfileFoodsCtrl;
 
-},{}],59:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 'use strict';
 
 ProfileConfig.$inject = ["$stateProvider"];
@@ -54099,7 +52071,7 @@ function ProfileConfig($stateProvider) {
 
 exports.default = ProfileConfig;
 
-},{}],60:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54126,124 +52098,7 @@ ProfileCtrl.$inject = ["profile", "User"];
 
 exports.default = ProfileCtrl;
 
-},{}],61:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Articles = function () {
-  Articles.$inject = ["AppConstants", "$http", "$q"];
-  function Articles(AppConstants, $http, $q) {
-    'ngInject';
-
-    _classCallCheck(this, Articles);
-
-    this._AppConstants = AppConstants;
-    this._$http = $http;
-    this._$q = $q;
-  }
-
-  /*
-    Config object spec:
-     {
-      type: String [REQUIRED] - Accepts "all", "feed"
-      filters: Object that serves as a key => value of URL params (i.e. {author:"ericsimons"} )
-    }
-  */
-
-
-  _createClass(Articles, [{
-    key: 'query',
-    value: function query(config) {
-      // Create the $http object for this request
-      var request = {
-        url: this._AppConstants.api + '/articles' + (config.type === 'feed' ? '/feed' : ''),
-        method: 'GET',
-        params: config.filters ? config.filters : null
-      };
-      return this._$http(request).then(function (res) {
-        return res.data;
-      });
-    }
-  }, {
-    key: 'get',
-    value: function get(slug) {
-      var deferred = this._$q.defer();
-
-      if (!slug.replace(" ", "")) {
-        deferred.reject("Article slug is empty");
-        return deferred.promise;
-      }
-
-      this._$http({
-        url: this._AppConstants.api + '/articles/' + slug,
-        method: 'GET'
-      }).then(function (res) {
-        return deferred.resolve(res.data.article);
-      }, function (err) {
-        return deferred.reject(err);
-      });
-
-      return deferred.promise;
-    }
-  }, {
-    key: 'destroy',
-    value: function destroy(slug) {
-      return this._$http({
-        url: this._AppConstants.api + '/articles/' + slug,
-        method: 'DELETE'
-      });
-    }
-  }, {
-    key: 'save',
-    value: function save(article) {
-      var request = {};
-
-      if (article.slug) {
-        request.url = this._AppConstants.api + '/articles/' + article.slug;
-        request.method = 'PUT';
-        delete article.slug;
-      } else {
-        request.url = this._AppConstants.api + '/articles';
-        request.method = 'POST';
-      }
-
-      request.data = { article: article };
-
-      return this._$http(request).then(function (res) {
-        return res.data.article;
-      });
-    }
-  }, {
-    key: 'favorite',
-    value: function favorite(slug) {
-      return this._$http({
-        url: this._AppConstants.api + '/articles/' + slug + '/favorite',
-        method: 'POST'
-      });
-    }
-  }, {
-    key: 'unfavorite',
-    value: function unfavorite(slug) {
-      return this._$http({
-        url: this._AppConstants.api + '/articles/' + slug + '/favorite',
-        method: 'DELETE'
-      });
-    }
-  }]);
-
-  return Articles;
-}();
-
-exports.default = Articles;
-
-},{}],62:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54310,7 +52165,7 @@ var Comments = function () {
 
 exports.default = Comments;
 
-},{}],63:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54465,7 +52320,7 @@ var Foods = function () {
 
 exports.default = Foods;
 
-},{}],64:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54492,10 +52347,6 @@ var _profile = require('./profile.service');
 
 var _profile2 = _interopRequireDefault(_profile);
 
-var _articles = require('./articles.service');
-
-var _articles2 = _interopRequireDefault(_articles);
-
 var _foods = require('./foods.service');
 
 var _foods2 = _interopRequireDefault(_foods);
@@ -54521,8 +52372,6 @@ servicesModule.service('JWT', _jwt2.default);
 
 servicesModule.service('Profile', _profile2.default);
 
-servicesModule.service('Articles', _articles2.default);
-
 servicesModule.service('Foods', _foods2.default);
 
 servicesModule.service('Comments', _comments2.default);
@@ -54531,7 +52380,7 @@ servicesModule.service('Tags', _tags2.default);
 
 exports.default = servicesModule;
 
-},{"./articles.service":61,"./comments.service":62,"./foods.service":63,"./jwt.service":65,"./profile.service":66,"./tags.service":67,"./toastr.service":68,"./user.service":69,"angular":9}],65:[function(require,module,exports){
+},{"./comments.service":47,"./foods.service":48,"./jwt.service":50,"./profile.service":51,"./tags.service":52,"./toastr.service":53,"./user.service":54,"angular":9}],50:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54575,7 +52424,7 @@ var JWT = function () {
 
 exports.default = JWT;
 
-},{}],66:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54634,7 +52483,7 @@ var Profile = function () {
 
 exports.default = Profile;
 
-},{}],67:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54673,7 +52522,7 @@ var Tags = function () {
 
 exports.default = Tags;
 
-},{}],68:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54720,7 +52569,7 @@ var Toastr = function () {
 
 exports.default = Toastr;
 
-},{}],69:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -54851,7 +52700,7 @@ var User = function () {
 
 exports.default = User;
 
-},{}],70:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54884,7 +52733,7 @@ settingsModule.controller('SettingsCtrl', _settings4.default);
 
 exports.default = settingsModule;
 
-},{"./settings.config":71,"./settings.controller":72,"angular":9}],71:[function(require,module,exports){
+},{"./settings.config":56,"./settings.controller":57,"angular":9}],56:[function(require,module,exports){
 'use strict';
 
 SettingsConfig.$inject = ["$stateProvider"];
@@ -54910,7 +52759,7 @@ function SettingsConfig($stateProvider) {
 
 exports.default = SettingsConfig;
 
-},{}],72:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -54961,4 +52810,4 @@ var SettingsCtrl = function () {
 
 exports.default = SettingsCtrl;
 
-},{}]},{},[11]);
+},{}]},{},[10]);

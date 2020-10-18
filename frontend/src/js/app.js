@@ -18,12 +18,10 @@ import './layout';
 import './components';
 import './home';
 import './profile';
-import './article';
 import './foods';
 import './services';
 import './auth';
 import './settings';
-import './editor';
 
 
 // Create and bootstrap application
@@ -35,12 +33,10 @@ const requires = [
   'app.components',
   'app.home',
   'app.profile',
-  'app.article',
   'app.foods',
   'app.services',
   'app.auth',
   'app.settings',
-  'app.editor',
   'ngMessages',
   toastr
 ];

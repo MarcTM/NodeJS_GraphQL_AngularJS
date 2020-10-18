@@ -1,8 +1,13 @@
-<div class="food-preview">
+<div class="article-preview">
   <label>Author:</label> <a class="author"
     ui-sref="app.profile.main({ username:$ctrl.food.author.username })"
     ng-bind="$ctrl.food.author.username">
   </a>
+  <favorite-food-btn
+      food="$ctrl.food"
+      class="pull-xs-right">
+      {{$ctrl.food.favoritesCount}}
+  </favorite-food-btn>
 
   <a ui-sref="app.detailsFood({ slug: $ctrl.food.slug })" class="preview-link">
     <h1 ng-bind="$ctrl.food.title"></h1>
@@ -18,4 +23,3 @@
   </a>
 
 </div>  
-<hr>
