@@ -18,9 +18,6 @@ foodsModule.controller('FilterFoodsCtrl', FilterFoodsCtrl);
 import FoodCtrl from './food.controller';
 foodsModule.controller('FoodCtrl', FoodCtrl);
 
-import RecipesCtrl from './recipes.controller';
-foodsModule.controller('RecipesCtrl', RecipesCtrl);
-
 import CommentFood from './comment-food.component';
 foodsModule.component('commentFood', CommentFood);
 

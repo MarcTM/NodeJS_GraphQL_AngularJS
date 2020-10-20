@@ -12,6 +12,8 @@ class FoodActionsCtrl {
             this.canModify = false;
           }
         }
+
+        console.log(this.food);
     }
   
     deleteRecipe() {
@@ -21,6 +23,11 @@ class FoodActionsCtrl {
         (err) => this._$state.go('app.home')
       )
     }
+
+
+
+
+
   }
   
   let FoodActions = {

@@ -155,6 +155,38 @@ router.post('/', auth.required, function(req, res, next) {
 
 
 
+// update recipe/food
+router.put('/:food', auth.required, function(req, res, next) {
+  console.log("estic aci");
+  User.findById(req.payload.id).then(function(user){
+    if(req.food.author._id.toString() === req.payload.id.toString()){
+      if(typeof req.body.food.title !== 'undefined'){
+        req.food.title = req.body.food.title;
+      }
+
+      if(typeof req.body.food.description !== 'undefined'){
+        req.food.description = req.body.food.description;
+      }
+
+      if(typeof req.body.food.body !== 'undefined'){
+        req.food.body = req.body.food.body;
+      }
+
+      if(typeof req.body.food.tagList !== 'undefined'){
+        req.food.tagList = req.body.food.tagList
+      }
+
+      req.food.save().then(function(food){
+        return res.json({food: food.toJSONFor(user)});
+      }).catch(next);
+    } else {
+      return res.sendStatus(403);
+    }
+  });
+});
+
+
+
 
 // return a food
 router.get('/:food', auth.optional, function(req, res, next) {

@@ -18,6 +18,7 @@ import './layout';
 import './components';
 import './home';
 import './profile';
+import './editor';
 import './foods';
 import './services';
 import './auth';
@@ -33,6 +34,7 @@ const requires = [
   'app.components',
   'app.home',
   'app.profile',
+  'app.editor',
   'app.foods',
   'app.services',
   'app.auth',

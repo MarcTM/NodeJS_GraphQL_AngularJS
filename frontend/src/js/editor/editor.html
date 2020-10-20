@@ -54,8 +54,12 @@
                 </div>
               </fieldset>
   
-              <button class="btn btn-lg pull-xs-right btn-primary" type="button" ng-click="$ctrl.submit()">
+              <button class="btn btn-lg pull-xs-right btn-primary" type="button" ng-hide="$ctrl.toUpdate" ng-click="$ctrl.submit()">
                 Publish Recipe
+              </button>
+
+              <button class="btn btn-lg pull-xs-right btn-primary" type="button" ng-show="$ctrl.toUpdate" ng-click="$ctrl.submit()">
+                Update Recipe
               </button>
   
             </fieldset>

@@ -45,38 +45,6 @@ function FoodsConfig($stateProvider, $httpProvider) {
         }
       })
 
-      .state('app.recipes', {
-        url: '/recipes/:slug',
-        controller: 'RecipesCtrl',
-        controllerAs: '$ctrl',
-        templateUrl: 'foods/recipes.html',
-        title: 'Recipes Food',
-        resolve:{
-          auth: function(User) {
-            return User.ensureAuthIs(true);
-          },
-          food: function(Foods, User, $state, $stateParams) {
-            if ($stateParams.slug) {
-    
-              return Foods.get($stateParams.slug).then(
-                (food) => {
-                  if (User.current.username === food.author.username) {
-                    return food;
-                  } else {
-                    $state.go('app.home');
-                  }
-                },
-                (err) => $state.go('app.home')
-              )
-    
-            } else {
-              return null;
-            }
-    
-          }
-        }
-      })
-
   };
   
   export default FoodsConfig;
