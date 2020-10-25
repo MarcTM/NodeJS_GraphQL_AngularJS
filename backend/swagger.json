@@ -293,24 +293,24 @@
           }
         }
       },
-      "/articles/feed": {
+      "/foods/feed": {
         "get": {
-          "summary": "Get recent articles from users you follow",
-          "description": "Get most recent articles from users you follow. Use query parameters to limit. Auth is required",
+          "summary": "Get recent recipes from users you follow",
+          "description": "Get most recent recipes from users you follow. Use query parameters to limit. Auth is required",
           "tags": [
-            "Articles"
+            "Recipes"
           ],
           "security": [
             {
               "Token": []
             }
           ],
-          "operationId": "GetArticlesFeed",
+          "operationId": "GetRecipesFeed",
           "parameters": [
             {
               "name": "limit",
               "in": "query",
-              "description": "Limit number of articles returned (default is 20)",
+              "description": "Limit number of recipes returned (default is 20)",
               "required": false,
               "default": 20,
               "type": "integer"
@@ -318,7 +318,7 @@
             {
               "name": "offset",
               "in": "query",
-              "description": "Offset/skip number of articles (default is 0)",
+              "description": "Offset/skip number of recipes (default is 0)",
               "required": false,
               "default": 0,
               "type": "integer"
@@ -328,7 +328,7 @@
             "200": {
               "description": "OK",
               "schema": {
-                "$ref": "#/definitions/MultipleArticlesResponse"
+                "$ref": "#/definitions/MultipleFoodsResponse"
               }
             },
             "401": {
@@ -343,14 +343,14 @@
           }
         }
       },
-      "/articles": {
+      "/foods": {
         "get": {
-          "summary": "Get recent articles globally",
-          "description": "Get most recent articles globally. Use query parameters to filter results. Auth is optional",
+          "summary": "Get recent recipes globally",
+          "description": "Get most recent recipes globally. Use query parameters to filter results. Auth is optional",
           "tags": [
-            "Articles"
+            "Recipes"
           ],
-          "operationId": "GetArticles",
+          "operationId": "GetRecipes",
           "parameters": [
             {
               "name": "tag",
@@ -376,7 +376,7 @@
             {
               "name": "limit",
               "in": "query",
-              "description": "Limit number of articles returned (default is 20)",
+              "description": "Limit number of recipes returned (default is 20)",
               "required": false,
               "default": 20,
               "type": "integer"
@@ -384,7 +384,7 @@
             {
               "name": "offset",
               "in": "query",
-              "description": "Offset/skip number of articles (default is 0)",
+              "description": "Offset/skip number of recipes (default is 0)",
               "required": false,
               "default": 0,
               "type": "integer"
@@ -394,7 +394,7 @@
             "200": {
               "description": "OK",
               "schema": {
-                "$ref": "#/definitions/MultipleArticlesResponse"
+                "$ref": "#/definitions/MultipleFoodsResponse"
               }
             },
             "401": {
@@ -409,25 +409,25 @@
           }
         },
         "post": {
-          "summary": "Create an article",
-          "description": "Create an article. Auth is required",
+          "summary": "Create a recipe",
+          "description": "Create an recipe. Auth is required",
           "tags": [
-            "Articles"
+            "Recipes"
           ],
           "security": [
             {
               "Token": []
             }
           ],
-          "operationId": "CreateArticle",
+          "operationId": "CreateRecipe",
           "parameters": [
             {
-              "name": "article",
+              "name": "food",
               "in": "body",
               "required": true,
-              "description": "Article to create",
+              "description": "Food to create",
               "schema": {
-                "$ref": "#/definitions/NewArticleRequest"
+                "$ref": "#/definitions/NewFoodRequest"
               }
             }
           ],
@@ -435,7 +435,7 @@
             "201": {
               "description": "OK",
               "schema": {
-                "$ref": "#/definitions/SingleArticleResponse"
+                "$ref": "#/definitions/SingleFoodResponse"
               }
             },
             "401": {
@@ -450,20 +450,20 @@
           }
         }
       },
-      "/articles/{slug}": {
+      "/foods/{slug}": {
         "get": {
-          "summary": "Get an article",
-          "description": "Get an article. Auth not required",
+          "summary": "Get a recipe",
+          "description": "Get a recipe. Auth not required",
           "tags": [
-            "Articles"
+            "Recipes"
           ],
-          "operationId": "GetArticle",
+          "operationId": "GetFood",
           "parameters": [
             {
               "name": "slug",
               "in": "path",
               "required": true,
-              "description": "Slug of the article to get",
+              "description": "Slug of the recipe to get",
               "type": "string"
             }
           ],
@@ -471,7 +471,7 @@
             "200": {
               "description": "OK",
               "schema": {
-                "$ref": "#/definitions/SingleArticleResponse"
+                "$ref": "#/definitions/SingleFoodResponse"
               }
             },
             "422": {
@@ -483,32 +483,32 @@
           }
         },
         "put": {
-          "summary": "Update an article",
-          "description": "Update an article. Auth is required",
+          "summary": "Update a recipe",
+          "description": "Update a recipe. Auth is required",
           "tags": [
-            "Articles"
+            "Recipes"
           ],
           "security": [
             {
               "Token": []
             }
           ],
-          "operationId": "UpdateArticle",
+          "operationId": "UpdateFood",
           "parameters": [
             {
               "name": "slug",
               "in": "path",
               "required": true,
-              "description": "Slug of the article to update",
+              "description": "Slug of the recipe to update",
               "type": "string"
             },
             {
-              "name": "article",
+              "name": "food",
               "in": "body",
               "required": true,
-              "description": "Article to update",
+              "description": "Recipe to update",
               "schema": {
-                "$ref": "#/definitions/UpdateArticleRequest"
+                "$ref": "#/definitions/UpdateFoodRequest"
               }
             }
           ],
@@ -516,7 +516,7 @@
             "200": {
               "description": "OK",
               "schema": {
-                "$ref": "#/definitions/SingleArticleResponse"
+                "$ref": "#/definitions/SingleFoodResponse"
               }
             },
             "401": {
@@ -531,23 +531,23 @@
           }
         },
         "delete": {
-          "summary": "Delete an article",
-          "description": "Delete an article. Auth is required",
+          "summary": "Delete a recipe",
+          "description": "Delete a recipe. Auth is required",
           "tags": [
-            "Articles"
+            "Recipes"
           ],
           "security": [
             {
               "Token": []
             }
           ],
-          "operationId": "DeleteArticle",
+          "operationId": "DeleteFood",
           "parameters": [
             {
               "name": "slug",
               "in": "path",
               "required": true,
-              "description": "Slug of the article to delete",
+              "description": "Slug of the recipe to delete",
               "type": "string"
             }
           ],
@@ -567,20 +567,20 @@
           }
         }
       },
-      "/articles/{slug}/comments": {
+      "/foods/{slug}/comments": {
         "get": {
-          "summary": "Get comments for an article",
-          "description": "Get the comments for an article. Auth is optional",
+          "summary": "Get comments for a recipe",
+          "description": "Get the comments for a recipe. Auth is optional",
           "tags": [
             "Comments"
           ],
-          "operationId": "GetArticleComments",
+          "operationId": "GetFoodComments",
           "parameters": [
             {
               "name": "slug",
               "in": "path",
               "required": true,
-              "description": "Slug of the article that you want to get comments for",
+              "description": "Slug of the recipe that you want to get comments for",
               "type": "string"
             }
           ],
@@ -603,8 +603,8 @@
           }
         },
         "post": {
-          "summary": "Create a comment for an article",
-          "description": "Create a comment for an article. Auth is required",
+          "summary": "Create a comment for a recipe",
+          "description": "Create a comment for a recipe. Auth is required",
           "tags": [
             "Comments"
           ],
@@ -613,13 +613,13 @@
               "Token": []
             }
           ],
-          "operationId": "CreateArticleComment",
+          "operationId": "CreateFoodComment",
           "parameters": [
             {
               "name": "slug",
               "in": "path",
               "required": true,
-              "description": "Slug of the article that you want to create a comment for",
+              "description": "Slug of the recipe that you want to create a comment for",
               "type": "string"
             },
             {
@@ -651,10 +651,10 @@
           }
         }
       },
-      "/articles/{slug}/comments/{id}": {
+      "/foods/{slug}/comments/{id}": {
         "delete": {
-          "summary": "Delete a comment for an article",
-          "description": "Delete a comment for an article. Auth is required",
+          "summary": "Delete a comment for a recipe",
+          "description": "Delete a comment for a recipe. Auth is required",
           "tags": [
             "Comments"
           ],
@@ -663,13 +663,13 @@
               "Token": []
             }
           ],
-          "operationId": "DeleteArticleComment",
+          "operationId": "DeletFoodComment",
           "parameters": [
             {
               "name": "slug",
               "in": "path",
               "required": true,
-              "description": "Slug of the article that you want to delete a comment for",
+              "description": "Slug of the recipe that you want to delete a comment for",
               "type": "string"
             },
             {
@@ -696,10 +696,10 @@
           }
         }
       },
-      "/articles/{slug}/favorite": {
+      "/foods/{slug}/favorite": {
         "post": {
-          "summary": "Favorite an article",
-          "description": "Favorite an article. Auth is required",
+          "summary": "Favorite a recipe",
+          "description": "Favorite a recipe. Auth is required",
           "tags": [
             "Favorites"
           ],
@@ -708,13 +708,13 @@
               "Token": []
             }
           ],
-          "operationId": "CreateArticleFavorite",
+          "operationId": "CreateFoodFavorite",
           "parameters": [
             {
               "name": "slug",
               "in": "path",
               "required": true,
-              "description": "Slug of the article that you want to favorite",
+              "description": "Slug of the recipe that you want to favorite",
               "type": "string"
             }
           ],
@@ -722,7 +722,7 @@
             "200": {
               "description": "OK",
               "schema": {
-                "$ref": "#/definitions/SingleArticleResponse"
+                "$ref": "#/definitions/SingleFoodResponse"
               }
             },
             "401": {
@@ -737,8 +737,8 @@
           }
         },
         "delete": {
-          "summary": "Unfavorite an article",
-          "description": "Unfavorite an article. Auth is required",
+          "summary": "Unfavorite a recipe",
+          "description": "Unfavorite a recipe. Auth is required",
           "tags": [
             "Favorites"
           ],
@@ -747,13 +747,13 @@
               "Token": []
             }
           ],
-          "operationId": "DeleteArticleFavorite",
+          "operationId": "DeleteFoodFavorite",
           "parameters": [
             {
               "name": "slug",
               "in": "path",
               "required": true,
-              "description": "Slug of the article that you want to unfavorite",
+              "description": "Slug of the recipe that you want to unfavorite",
               "type": "string"
             }
           ],
@@ -761,7 +761,7 @@
             "200": {
               "description": "OK",
               "schema": {
-                "$ref": "#/definitions/SingleArticleResponse"
+                "$ref": "#/definitions/SingleFoodResponse"
               }
             },
             "401": {
@@ -959,7 +959,7 @@
           "following"
         ]
       },
-      "Article": {
+      "Food": {
         "type": "object",
         "properties": {
           "slug": {
@@ -1011,36 +1011,36 @@
           "author"
         ]
       },
-      "SingleArticleResponse": {
+      "SingleFoodResponse": {
         "type": "object",
         "properties": {
-          "article": {
-            "$ref": "#/definitions/Article"
+          "food": {
+            "$ref": "#/definitions/Food"
           }
         },
         "required": [
-          "article"
+          "food"
         ]
       },
-      "MultipleArticlesResponse": {
+      "MultipleFoodsResponse": {
         "type": "object",
         "properties": {
-          "articles": {
+          "foods": {
             "type": "array",
             "items": {
-              "$ref": "#/definitions/Article"
+              "$ref": "#/definitions/Food"
             }
           },
-          "articlesCount": {
+          "foodsCount": {
             "type": "integer"
           }
         },
         "required": [
-          "articles",
-          "articlesCount"
+          "foods",
+          "foodsCount"
         ]
       },
-      "NewArticle": {
+      "NewFood": {
         "type": "object",
         "properties": {
           "title": {
@@ -1065,18 +1065,18 @@
           "body"
         ]
       },
-      "NewArticleRequest": {
+      "NewFoodRequest": {
         "type": "object",
         "properties": {
-          "article": {
-            "$ref": "#/definitions/NewArticle"
+          "food": {
+            "$ref": "#/definitions/NewFood"
           }
         },
         "required": [
-          "article"
+          "food"
         ]
       },
-      "UpdateArticle": {
+      "UpdateFood": {
         "type": "object",
         "properties": {
           "title": {
@@ -1090,15 +1090,15 @@
           }
         }
       },
-      "UpdateArticleRequest": {
+      "UpdateFoodRequest": {
         "type": "object",
         "properties": {
-          "article": {
-            "$ref": "#/definitions/UpdateArticle"
+          "food": {
+            "$ref": "#/definitions/UpdateFood"
           }
         },
         "required": [
-          "article"
+          "food"
         ]
       },
       "Comment": {
