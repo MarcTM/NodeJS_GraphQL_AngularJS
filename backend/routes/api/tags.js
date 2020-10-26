@@ -4,8 +4,8 @@ var Food = mongoose.model('Food');
 
 
 // return a list of tags
-router.get('/', function(req, res, next) {
-  Food.find().distinct('tagList').then(function(tags){
+router.get('/', async function(req, res, next) {
+  await Food.find().distinct('tagList').then(async function(tags){
     return res.json({tags: tags});
   }).catch(next);
 });

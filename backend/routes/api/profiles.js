@@ -5,8 +5,8 @@ var auth = require('../auth');
 
 
 // Preload user profile on routes with ':username'
-router.param('username', function(req, res, next, username){
-  User.findOne({username: username}).then(function(user){
+router.param('username', async function(req, res, next, username){
+  await User.findOne({username: username}).then(async function(user){
     if (!user) { return res.sendStatus(404); }
 
     req.profile = user;
@@ -19,9 +19,9 @@ router.param('username', function(req, res, next, username){
 
 
 // Get profile by username
-router.get('/:username', auth.optional, function(req, res, next){
+router.get('/:username', auth.optional, async function(req, res, next){
   if(req.payload){
-    User.findById(req.payload.id).then(function(user){
+    await User.findById(req.payload.id).then(async function(user){
       if(!user){ return res.json({profile: req.profile.toProfileJSONFor(false)}); }
 
       return res.json({profile: req.profile.toProfileJSONFor(user)});
@@ -36,13 +36,13 @@ router.get('/:username', auth.optional, function(req, res, next){
 
 
 // Follow user
-router.post('/:username/follow', auth.required, function(req, res, next){
+router.post('/:username/follow', auth.required, async function(req, res, next){
   var profileId = req.profile._id;
 
-  User.findById(req.payload.id).then(function(user){
+  await User.findById(req.payload.id).then(async function(user){
     if (!user) { return res.sendStatus(401); }
 
-    return user.follow(profileId).then(function(){
+    return await user.follow(profileId).then(async function(){
       return res.json({profile: req.profile.toProfileJSONFor(user)});
     });
   }).catch(next);
@@ -50,13 +50,13 @@ router.post('/:username/follow', auth.required, function(req, res, next){
 
 
 // Unfollow user
-router.delete('/:username/follow', auth.required, function(req, res, next){
+router.delete('/:username/follow', auth.required, async function(req, res, next){
   var profileId = req.profile._id;
 
-  User.findById(req.payload.id).then(function(user){
+  await User.findById(req.payload.id).then(async function(user){
     if (!user) { return res.sendStatus(401); }
 
-    return user.unfollow(profileId).then(function(){
+    return await user.unfollow(profileId).then(async function(){
       return res.json({profile: req.profile.toProfileJSONFor(user)});
     });
   }).catch(next);

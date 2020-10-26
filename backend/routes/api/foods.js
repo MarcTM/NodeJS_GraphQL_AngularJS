@@ -7,10 +7,11 @@ var auth = require('../auth');
 
 
 // Preload food objects on routes with ':food'
-router.param('food', function(req, res, next, slug) {
-  Food.findOne({ slug: slug})
+router.param('food', async function(req, res, next, slug) {
+  await Food.findOne({ slug: slug})
     .populate('author')
-    .then(function (food) {
+    .populate('comments')
+    .then(async function (food) {
       if (!food) { return res.sendStatus(404); }
 
       req.food = food;
@@ -20,8 +21,8 @@ router.param('food', function(req, res, next, slug) {
 });
 
 
-router.param('comment', function(req, res, next, id) {
-  Comment.findById(id).then(function(comment){
+router.param('comment', async function(req, res, next, id) {
+  await Comment.findById(id).then(async function(comment){
     if(!comment) { return res.sendStatus(404); }
 
     req.comment = comment;
@@ -33,7 +34,7 @@ router.param('comment', function(req, res, next, id) {
 
 
 // return all foods
-router.get('/', auth.optional, function(req, res, next) {
+router.get('/', auth.optional, async function(req, res, next) {
   var query = {};
   var limit = 20;
   var offset = 0;
@@ -51,9 +52,9 @@ router.get('/', auth.optional, function(req, res, next) {
   }
 
   Promise.all([
-    req.query.author ? User.findOne({username: req.query.author}) : null,
-    req.query.favorited ? User.findOne({username: req.query.favorited}) : null
-  ]).then(function(results){
+    req.query.author ? await User.findOne({username: req.query.author}) : null,
+    req.query.favorited ? await User.findOne({username: req.query.favorited}) : null
+  ]).then(async function(results){
     var author = results[0];
     var favoriter = results[1];
 
@@ -68,15 +69,15 @@ router.get('/', auth.optional, function(req, res, next) {
     }
 
     return Promise.all([
-      Food.find(query)
+      await Food.find(query)
         .limit(Number(limit))
         .skip(Number(offset))
         .sort({createdAt: 'desc'})
         .populate('author')
         .exec(),
-      Food.count(query).exec(),
-      req.payload ? User.findById(req.payload.id) : null,
-    ]).then(function(results){
+      await Food.count(query).exec(),
+      req.payload ? await User.findById(req.payload.id) : null,
+    ]).then(async function(results){
       var foods = results[0];
       var foodsCount = results[1];
       var user = results[2];
@@ -95,7 +96,7 @@ router.get('/', auth.optional, function(req, res, next) {
 
 
 // return your feed
-router.get('/feed', auth.required, function(req, res, next) {
+router.get('/feed', auth.required, async function(req, res, next) {
   var limit = 20;
   var offset = 0;
 
@@ -107,18 +108,18 @@ router.get('/feed', auth.required, function(req, res, next) {
     offset = req.query.offset;
   }
 
-  User.findById(req.payload.id).then(function(user){
+  await User.findById(req.payload.id).then(async function(user){
     console.log(user);
     if (!user) { return res.sendStatus(401); }
 
     Promise.all([
-      Food.find({ author: {$in: user.following}})
+      await Food.find({ author: {$in: user.following}})
         .limit(Number(limit))
         .skip(Number(offset))
         .populate('author')
         .exec(),
-      Food.count({ author: {$in: user.following}})
-    ]).then(function(results){
+      await Food.count({ author: {$in: user.following}})
+    ]).then(async function(results){
       var foods = results[0];
       var foodsCount = results[1];
 
@@ -138,15 +139,15 @@ router.get('/feed', auth.required, function(req, res, next) {
 
 
 // create a recipe/food
-router.post('/', auth.required, function(req, res, next) {
-  User.findById(req.payload.id).then(function(user){
+router.post('/', auth.required, async function(req, res, next) {
+  await User.findById(req.payload.id).then(async function(user){
     if (!user) { return res.sendStatus(401); }
 
-    var food = new Food(req.body.food);
+    var food = await new Food(req.body.food);
 
     food.author = user;
 
-    return food.save().then(function(){
+    return await food.save().then(async function(){
       console.log(food.author);
       return res.json({food: food.toJSONFor(user)});
     });
@@ -156,9 +157,8 @@ router.post('/', auth.required, function(req, res, next) {
 
 
 // update recipe/food
-router.put('/:food', auth.required, function(req, res, next) {
-  console.log("estic aci");
-  User.findById(req.payload.id).then(function(user){
+router.put('/:food', auth.required, async function(req, res, next) {
+  await User.findById(req.payload.id).then(async function(user){
     if(req.food.author._id.toString() === req.payload.id.toString()){
       if(typeof req.body.food.title !== 'undefined'){
         req.food.title = req.body.food.title;
@@ -176,7 +176,7 @@ router.put('/:food', auth.required, function(req, res, next) {
         req.food.tagList = req.body.food.tagList
       }
 
-      req.food.save().then(function(food){
+      await req.food.save().then(async function(food){
         return res.json({food: food.toJSONFor(user)});
       }).catch(next);
     } else {
@@ -189,11 +189,11 @@ router.put('/:food', auth.required, function(req, res, next) {
 
 
 // return a food
-router.get('/:food', auth.optional, function(req, res, next) {
+router.get('/:food', auth.optional, async function(req, res, next) {
   Promise.all([
-    req.payload ? User.findById(req.payload.id) : null,
+    req.payload ? await User.findById(req.payload.id) : null,
     req.food.populate('author').execPopulate()
-  ]).then(function(results){
+  ]).then(async function(results){
     var user = results[0];
 
     return res.json({food: req.food.toJSONFor(user)});
@@ -204,8 +204,8 @@ router.get('/:food', auth.optional, function(req, res, next) {
 
 
 // obtain categories
-router.get('/food/difficulty', function(req, res, next) {
-  Food.find().distinct('difficulty').then(function(difficulty){
+router.get('/food/difficulty', async function(req, res, next) {
+  await Food.find().distinct('difficulty').then(async function(difficulty){
     return res.json({difficulty: difficulty});
   }).catch(next);
  });
@@ -215,14 +215,14 @@ router.get('/food/difficulty', function(req, res, next) {
 
 
  // Favorite a recipe
-router.post('/:food/favorite', auth.required, function(req, res, next) {
+router.post('/:food/favorite', auth.required, async function(req, res, next) {
   var foodId = req.food._id;
 
-  User.findById(req.payload.id).then(function(user){
+  await User.findById(req.payload.id).then(async function(user){
     if (!user) { return res.sendStatus(401); }
 
-    return user.favorite(foodId).then(function(){
-      return req.food.updateFavoriteCount().then(function(food){
+    return await user.favorite(foodId).then(async function(){
+      return await req.food.updateFavoriteCount().then(async function(food){
         return res.json({food: food.toJSONFor(user)});
       });
     });
@@ -233,14 +233,14 @@ router.post('/:food/favorite', auth.required, function(req, res, next) {
 
 
 // Unfavorite a recipe
-router.delete('/:food/favorite', auth.required, function(req, res, next) {
+router.delete('/:food/favorite', auth.required, async function(req, res, next) {
   var foodId = req.food._id;
 
-  User.findById(req.payload.id).then(function (user){
+  await User.findById(req.payload.id).then(async function (user){
     if (!user) { return res.sendStatus(401); }
 
-    return user.unfavorite(foodId).then(function(){
-      return req.food.updateFavoriteCount().then(function(food){
+    return await user.unfavorite(foodId).then(async function(){
+      return await req.food.updateFavoriteCount().then(async function(food){
         return res.json({food: food.toJSONFor(user)});
       });
     });
@@ -251,14 +251,22 @@ router.delete('/:food/favorite', auth.required, function(req, res, next) {
 
 
 // delete recipe/food
-router.delete('/:food', auth.required, function(req, res, next) {
-  User.findById(req.payload.id).then(function(user){
+router.delete('/:food', auth.required, async function(req, res, next) {
+  await User.findById(req.payload.id).then(async function(user){
     if (!user) { return res.sendStatus(401); }
 
     if(req.food.author._id.toString() === req.payload.id.toString()){
-      return req.food.remove().then(function(){
-        return res.sendStatus(204);
-      });
+      let comments = req.food.comments;
+
+        // Delete recipe comments
+        for(let i=0; i<comments.length; i++){
+          await Comment.find({_id: comments[i]._id}).remove().exec();
+        }
+
+        // Delete recipe finally
+        return await req.food.remove().then(function(){
+          return res.sendStatus(204);
+        });
     } else {
       return res.sendStatus(403);
     }
@@ -268,7 +276,9 @@ router.delete('/:food', auth.required, function(req, res, next) {
 
 
 
-
+// ///////
+// No async await
+// ///////
 // return recipe's comments
 router.get('/:food/comments', auth.optional, function(req, res, next){
   Promise.resolve(req.payload ? User.findById(req.payload.id) : null).then(function(user){
@@ -293,18 +303,18 @@ router.get('/:food/comments', auth.optional, function(req, res, next){
 
 
 // create a new recipe's comment
-router.post('/:food/comments', auth.required, function(req, res, next) {
-  User.findById(req.payload.id).then(function(user){
+router.post('/:food/comments', auth.required, async function(req, res, next) {
+  await User.findById(req.payload.id).then(async function(user){
     if(!user){ return res.sendStatus(401); }
 
-    var comment = new Comment(req.body.comment);
+    var comment = await new Comment(req.body.comment);
     comment.food = req.food;
     comment.author = user;
 
-    return comment.save().then(function(){
+    return await comment.save().then(async function(){
       req.food.comments = req.food.comments.concat(comment);
 
-      return req.food.save().then(function(food) {
+      return await req.food.save().then(async function(food) {
         res.json({comment: comment.toJSONFor(user)});
       });
     });
@@ -314,12 +324,12 @@ router.post('/:food/comments', auth.required, function(req, res, next) {
 
 
 // delete recipe's comment
-router.delete('/:food/comments/:comment', auth.required, function(req, res, next) {
+router.delete('/:food/comments/:comment', auth.required, async function(req, res, next) {
   if(req.comment.author.toString() === req.payload.id.toString()){
-    req.food.comments.remove(req.comment._id);
-    req.food.save()
-      .then(Comment.find({_id: req.comment._id}).remove().exec())
-      .then(function(){
+    await req.food.comments.remove(req.comment._id);
+    await req.food.save()
+      .then(await Comment.find({_id: req.comment._id}).remove().exec())
+      .then(async function(){
         res.sendStatus(204);
       });
   } else {

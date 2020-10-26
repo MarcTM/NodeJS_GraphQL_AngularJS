@@ -30,6 +30,9 @@ router.delete('/:food', auth.required, async function(req, res, next) {
       if(req.food.author._id.toString() === req.payload.id.toString()){
         let comments = req.food.comments;
 
+        // await Comment.find({ _id: {$in: comments._id}}).then(async function(com){
+        //   console.log(com);
+        // });
         // Delete recipe comments
         for(let i=0; i<comments.length; i++){
           await Comment.find({_id: comments[i]._id}).remove().exec();

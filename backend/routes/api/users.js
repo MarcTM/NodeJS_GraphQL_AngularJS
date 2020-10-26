@@ -6,8 +6,8 @@ var auth = require('../auth');
 
 
 // Get user
-router.get('/user', auth.required, function(req, res, next){
-  User.findById(req.payload.id).then(function(user){
+router.get('/user', auth.required, async function(req, res, next){
+  await User.findById(req.payload.id).then(async function(user){
     if(!user){ return res.sendStatus(401); }
 
     return res.json({user: user.toAuthJSON()});
@@ -16,8 +16,8 @@ router.get('/user', auth.required, function(req, res, next){
 
 
 // Update user
-router.put('/user', auth.required, function(req, res, next){
-  User.findById(req.payload.id).then(function(user){
+router.put('/user', auth.required, async function(req, res, next){
+  await User.findById(req.payload.id).then(async function(user){
     if(!user){ return res.sendStatus(401); }
 
     // only update fields that were actually passed...
@@ -37,7 +37,7 @@ router.put('/user', auth.required, function(req, res, next){
       user.setPassword(req.body.user.password);
     }
 
-    return user.save().then(function(){
+    return await user.save().then(async function(){
       return res.json({user: user.toAuthJSON()});
     });
   }).catch(next);
@@ -46,7 +46,7 @@ router.put('/user', auth.required, function(req, res, next){
 
 
 // Login
-router.post('/users/login', function(req, res, next){
+router.post('/users/login', async function(req, res, next){
   if(!req.body.user.email){
     return res.status(422).json("Email can't be blank");
   }
@@ -55,7 +55,7 @@ router.post('/users/login', function(req, res, next){
     return res.status(422).json("Password can't be blank");
   }
 
-  passport.authenticate('local', {session: false}, function(err, user, info){
+  passport.authenticate('local', {session: false}, async function(err, user, info){
     if(err){ return next(err); }
 
     if(user){
@@ -69,21 +69,21 @@ router.post('/users/login', function(req, res, next){
 
 
 // Register
-router.post('/users', function(req, res, next){
+router.post('/users', async function(req, res, next){
  
-  User.find({$or: [{ email: req.body.user.email }, { username: req.body.user.username }]})
-  .then(function(user) {
+  await User.find({$or: [{ email: req.body.user.email }, { username: req.body.user.username }]})
+  .then(async function(user) {
     if (user[0]) {
       return res.status(422).json("The email or username already exists");
     } else {
-        var user = new User();
+        var user = await new User();
 
         user.idsocial = req.body.user.username;
         user.username = req.body.user.username;
         user.email = req.body.user.email;
         user.setPassword(req.body.user.password);
       
-        user.save().then(function(){
+        await user.save().then(async function(){
           return res.json({user: user.toAuthJSON()});
         }).catch(next);
     }
@@ -92,7 +92,7 @@ router.post('/users', function(req, res, next){
 
 
 // SOCIALLOGIN
-router.post("/users/sociallogin", function(req, res, next) {
+router.post("/users/sociallogin", async function(req, res, next) {
   let memorystore = req.sessionStore;
   let sessions = memorystore.sessions;
   let sessionUser;
@@ -100,7 +100,7 @@ router.post("/users/sociallogin", function(req, res, next) {
     sessionUser = JSON.parse(sessions[key]).passport.user;
   }
 
-  User.find({ _id: sessionUser }, function(err, user) {
+  await User.find({ _id: sessionUser }, async function(err, user) {
     user = user[0];
 
     if (err) return done(err);
