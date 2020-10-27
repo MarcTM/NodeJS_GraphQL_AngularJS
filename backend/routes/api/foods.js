@@ -276,12 +276,10 @@ router.delete('/:food', auth.required, async function(req, res, next) {
 
 
 
-// ///////
-// No async await
-// ///////
 // return recipe's comments
 router.get('/:food/comments', auth.optional, function(req, res, next){
-  Promise.resolve(req.payload ? User.findById(req.payload.id) : null).then(function(user){
+  Promise.resolve(req.payload ? User.findById(req.payload.id) : null)
+  .then(function(user){
     return req.food.populate({
       path: 'comments',
       populate: {

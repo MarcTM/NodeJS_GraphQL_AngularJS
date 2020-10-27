@@ -11,7 +11,6 @@ faker.locale = 'es';
 
 // Register a random user
 router.post('/users', async function(req, res, next){
- 
         let username = faker.internet.userName();
         let email = faker.internet.email();
 
@@ -19,7 +18,6 @@ router.post('/users', async function(req, res, next){
         .then(async function(user) {
           if (user[0]) {
             return res.status(422).json("The email or username already exists");
-
           }else{
             let user = await new User();
             user.idsocial = username;
@@ -29,16 +27,13 @@ router.post('/users', async function(req, res, next){
             
             await user.save();
             return res.sendStatus(200);
-
           }
         });
-
 });
 
 
 // Register a number of random users
 router.post('/users/:qty', async function(req, res, next){
- 
     let qty = req.params.qty;
     let username;
     let email;
@@ -51,7 +46,6 @@ router.post('/users/:qty', async function(req, res, next){
         .then(async function(user) {
           if (user[0]) {
               i-=1;
-
           }else{
               try{
                   let user = await new User();
@@ -61,17 +55,14 @@ router.post('/users/:qty', async function(req, res, next){
                   user.setPassword("holahola123");
                   
                   await user.save();
-                  
               }catch(e){
                 next(e);
               }
-
           }
         });
 
     }
     return res.sendStatus(200);
-
 });
 
 
