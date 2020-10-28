@@ -73,14 +73,36 @@ router.post('/users', async function(req, res, next){
  
   await User.find({$or: [{ email: req.body.user.email }, { username: req.body.user.username }]})
   .then(async function(user) {
-    if (user[0]) {
-      return res.status(422).json("The email or username already exists");
-    } else {
+    if(user){
+        let canRegister=true;
+        for(let i=0; i<user.length; i++){
+          if(user[i].type==="normal"){
+            canRegister=false;
+          }
+        }
+
+        if(!canRegister){
+            return res.status(422).json("The email or username already exists");
+        }else{
+            var user = await new User();
+
+            user.idsocial = req.body.user.username;
+            user.username = req.body.user.username;
+            user.email = req.body.user.email;
+            user.type = "normal";
+            user.setPassword(req.body.user.password);
+          
+            await user.save().then(async function(){
+              return res.json({user: user.toAuthJSON()});
+            }).catch(next);
+        }
+    }else{
         var user = await new User();
 
         user.idsocial = req.body.user.username;
         user.username = req.body.user.username;
         user.email = req.body.user.email;
+        user.type = "normal";
         user.setPassword(req.body.user.password);
       
         await user.save().then(async function(){

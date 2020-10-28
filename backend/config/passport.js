@@ -64,13 +64,12 @@ passport.use(new GithubStrategy({
                 idsocial: profile.id,
                 username: profile.username,
                 email: profile.emails[0].value,
+                type: "github",
                 image: profile.photos[0].value,
             });
             user.save(function(err) {
-                //if(err){
                   console.log(err);
                     return done(null, user);
-                //}
             });
           }
       }
@@ -102,13 +101,12 @@ passport.use(new GoogleStrategy({
                 idsocial: profile.id,
                 username: profile.given_name,
                 email: profile.emails[0].value,
+                type: "google",
                 image: profile.photos[0].value,
             });
             user.save(function(err) {
-                //if(err){
                   console.log(err);
                     return done(null, user);
-                //}
             });
           }
       }

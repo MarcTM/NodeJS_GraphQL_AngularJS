@@ -6,7 +6,8 @@ var secret = require('../config').secret;
 
 var UserSchema = new mongoose.Schema({
   username: {type: String, unique: true, required: [true, "can't be blank"]},
-  email: {type: String, unique: true, required: [true, "can't be blank"]},
+  email: {type: String, required: [true, "can't be blank"]},
+  type: String,
   bio: String,
   image: String,
   karma: {type: Number, default: 0},
