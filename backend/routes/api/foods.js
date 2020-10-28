@@ -22,7 +22,7 @@ router.param('food', async function(req, res, next, slug) {
 
 
 router.param('comment', async function(req, res, next, id) {
-  await Comment.findById(id).then(async function(comment){
+  await Comment.findById(id).populate('food').then(async function(comment){
     if(!comment) { return res.sendStatus(404); }
 
     req.comment = comment;
@@ -321,9 +321,9 @@ router.post('/:food/comments', auth.required, async function(req, res, next) {
 
 
 
-// delete recipe's comment
+// delete recipe's comment if you are the author of the comment, or if you are the author of the food
 router.delete('/:food/comments/:comment', auth.required, async function(req, res, next) {
-  if(req.comment.author.toString() === req.payload.id.toString()){
+  if(req.comment.author.toString() === req.payload.id.toString() || req.comment.food.author.toString() === req.payload.id.toString()){
     await req.food.comments.remove(req.comment._id);
     await req.food.save()
       .then(await Comment.find({_id: req.comment._id}).remove().exec())

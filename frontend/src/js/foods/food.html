@@ -49,7 +49,7 @@
       </div>
 
       <comment-food ng-repeat="cmt in $ctrl.comments"
-        data="cmt"
+        data="cmt" food-author="$ctrl.food.author"
         delete-cb="$ctrl.deleteComment(cmt.id, $index)">
       </comment-food>
 

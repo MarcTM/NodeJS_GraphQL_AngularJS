@@ -4,7 +4,13 @@ class CommentFoodCtrl {
   
         this.$onInit = () => {
             if (User.current) {
-                this.canModify = (User.current.username === this.data.author.username);
+              if (User.current.username === this.foodAuthor.username){
+                this.canModify = true;
+              }else if (User.current.username === this.data.author.username){
+                this.canModify = true;
+              }else{
+                this.canModify = false;
+              }
             } else {
                 this.canModify = false;
             }
@@ -16,6 +22,7 @@ class CommentFoodCtrl {
   let CommentFood = {
     bindings: {
       data: '=',
+      foodAuthor: '=',
       deleteCb: '&'
     },
     controller: CommentFoodCtrl,
