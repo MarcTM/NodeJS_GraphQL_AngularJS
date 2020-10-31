@@ -33,6 +33,7 @@ router.param('comment', async function(req, res, next, id) {
 
 
 
+
 // return all foods
 router.get('/', auth.optional, async function(req, res, next) {
   var query = {};
@@ -93,8 +94,6 @@ router.get('/', auth.optional, async function(req, res, next) {
 });
 
 
-
-
 // return your feed
 router.get('/feed', auth.required, async function(req, res, next) {
   var limit = 20;
@@ -134,10 +133,6 @@ router.get('/feed', auth.required, async function(req, res, next) {
 });
 
 
-
-
-
-
 // create a recipe/food
 router.post('/', auth.required, async function(req, res, next) {
   await User.findById(req.payload.id).then(async function(user){
@@ -153,7 +148,6 @@ router.post('/', auth.required, async function(req, res, next) {
     });
   }).catch(next);
 });
-
 
 
 // update recipe/food
@@ -186,8 +180,6 @@ router.put('/:food', auth.required, async function(req, res, next) {
 });
 
 
-
-
 // return a food
 router.get('/:food', auth.optional, async function(req, res, next) {
   Promise.all([
@@ -202,15 +194,12 @@ router.get('/:food', auth.optional, async function(req, res, next) {
 
 
 
-
 // obtain categories
 router.get('/food/difficulty', async function(req, res, next) {
   await Food.find().distinct('difficulty').then(async function(difficulty){
     return res.json({difficulty: difficulty});
   }).catch(next);
  });
-
-
 
 
 
@@ -228,8 +217,6 @@ router.post('/:food/favorite', auth.required, async function(req, res, next) {
     });
   }).catch(next);
 });
-
-
 
 
 // Unfavorite a recipe
@@ -275,7 +262,6 @@ router.delete('/:food', auth.required, async function(req, res, next) {
 
 
 
-
 // return recipe's comments
 router.get('/:food/comments', auth.optional, function(req, res, next){
   Promise.resolve(req.payload ? User.findById(req.payload.id) : null)
@@ -299,7 +285,6 @@ router.get('/:food/comments', auth.optional, function(req, res, next){
 });
 
 
-
 // create a new recipe's comment
 router.post('/:food/comments', auth.required, async function(req, res, next) {
   await User.findById(req.payload.id).then(async function(user){
@@ -312,13 +297,18 @@ router.post('/:food/comments', auth.required, async function(req, res, next) {
     return await comment.save().then(async function(){
       req.food.comments = req.food.comments.concat(comment);
 
-      return await req.food.save().then(async function(food) {
+      return await req.food.save().then(async function() {
+        if(!user.karma){
+          user.karma = 30;
+        }else{
+          user.karma+=30;
+        }
+        await user.save();
         res.json({comment: comment.toJSONFor(user)});
       });
     });
   }).catch(next);
 });
-
 
 
 // delete recipe's comment if you are the author of the comment, or if you are the author of the food
@@ -328,6 +318,14 @@ router.delete('/:food/comments/:comment', auth.required, async function(req, res
     await req.food.save()
       .then(await Comment.find({_id: req.comment._id}).remove().exec())
       .then(async function(){
+        if(req.comment.author.toString() === req.payload.id.toString()){
+          await User.findById(req.payload.id).then(async function(user){
+            if(!user){ return res.sendStatus(401); }
+
+            user.karma-=30;
+            await user.save();
+          }).catch(next);
+        }
         res.sendStatus(204);
       });
   } else {

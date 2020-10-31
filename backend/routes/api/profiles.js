@@ -16,8 +16,6 @@ router.param('username', async function(req, res, next, username){
 });
 
 
-
-
 // Get profile by username
 router.get('/:username', auth.optional, async function(req, res, next){
   if(req.payload){
@@ -30,7 +28,6 @@ router.get('/:username', auth.optional, async function(req, res, next){
     return res.json({profile: req.profile.toProfileJSONFor(false)});
   }
 });
-
 
 
 
@@ -61,8 +58,6 @@ router.delete('/:username/follow', auth.required, async function(req, res, next)
     });
   }).catch(next);
 });
-
-
 
 
 module.exports = router;

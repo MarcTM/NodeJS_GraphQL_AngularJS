@@ -70,7 +70,6 @@ router.post('/users/login', async function(req, res, next){
 
 // Register
 router.post('/users', async function(req, res, next){
- 
   await User.find({$or: [{ email: req.body.user.email }, { username: req.body.user.username }]})
   .then(async function(user) {
     if(user){
