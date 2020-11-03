@@ -20,6 +20,7 @@ import './home';
 import './profile';
 import './editor';
 import './foods';
+import './products';
 import './services';
 import './auth';
 import './settings';
@@ -36,6 +37,7 @@ const requires = [
   'app.profile',
   'app.editor',
   'app.foods',
+  'app.products',
   'app.services',
   'app.auth',
   'app.settings',

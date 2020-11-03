@@ -5,6 +5,9 @@ const userTypeDefs = gql`
         user(username: String!): User!
         users: [User]!
     }
+    extend type Mutation{
+        login(email: String!, password: String!): User!
+    }
     type User {
         id: ID!
         idsocial: String

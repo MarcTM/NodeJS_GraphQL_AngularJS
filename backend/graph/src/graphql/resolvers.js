@@ -1,6 +1,6 @@
 const { merge } = require('lodash');
-const UserResolvers = require('../resolvers/users/user.resolver');
-
+const UserResolvers = require('./users/user.resolver');
+const ProductResolvers = require('./products/product.resolver');
 
 const QueryResolvers = {
   Query: {
@@ -13,7 +13,8 @@ const QueryResolvers = {
 
 const resolvers = merge(
   QueryResolvers,
-  UserResolvers
+  UserResolvers,
+  ProductResolvers
 );
 
 
