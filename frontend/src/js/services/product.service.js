@@ -21,19 +21,20 @@ export default class Product {
             }
         `;  
         return this._GQL.get(query);
-    }
+    };
 
 
     newProduct(data){
+        let input = data;
         let query = `
-            mutation {
-                newProduct(name: "${data.name}", description: "${data.description}"){
+            mutation newProduct($input: NewProduct) {
+                newProduct(input: $input) {
                     name
                     description
                 }
-            }
-        `;  
-        return this._GQL.mutation(query);
+          }
+        `;
+        return this._GQL.mutation(query, input);
 
     }
   

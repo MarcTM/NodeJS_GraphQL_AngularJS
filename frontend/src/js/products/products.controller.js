@@ -15,7 +15,6 @@ class ProductsCtrl {
         },
         (err) => {
           console.log(err);
-          console.log("error");
         }
       )
     }

@@ -11,12 +11,12 @@ const ProductResolvers = {
       },
     },
     Mutation: {
-      newProduct: (_, {name, description}) => {
-            let product = new Product({name: name, description: description});
-            product.save();
-            return product;
+      newProduct: (_, {input}) => {
+          let product = new Product(input);
+          product.save();
+          return product;
       }
-  }
+    }
 };
 
 module.exports = ProductResolvers;

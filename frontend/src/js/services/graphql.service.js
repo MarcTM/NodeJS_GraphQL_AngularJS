@@ -39,18 +39,34 @@ import { subscribe } from 'graphql';
      }
 
      
-     mutation(query, server = this._AppConstants.gql) {
+     mutation(query, input = null, server = this._AppConstants.gql) {
         let deferred = this._$q.defer();
         if (!this._clients.has(server)) {
             this._clients.set(server, this.createClient(server));
         }
-        this._clients.get(server).mutate({
-            mutation: gql(query)
-        })
-        .then(
-            (res) => deferred.resolve(res.data),
-             (err) => deferred.reject(err)
-        );
+        if(input){
+            this._clients.get(server).mutate({
+                mutation: gql(query),
+                variables: {
+                    input: input
+                }
+            })
+            .then(
+                (res) => deferred.resolve(res.data),
+                 (err) => deferred.reject(err)
+            );
+            
+        }else{
+            this._clients.get(server).mutate({
+                mutation: gql(query)
+            })
+            .then(
+                (res) => deferred.resolve(res.data),
+                 (err) => deferred.reject(err)
+            );
+
+        }
+        
         return deferred.promise;
     }
  
