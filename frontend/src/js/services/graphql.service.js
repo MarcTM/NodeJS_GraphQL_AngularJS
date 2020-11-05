@@ -1,7 +1,7 @@
  import { ApolloClient } from 'apollo-client';
  import { createHttpLink } from 'apollo-link-http';
  import { InMemoryCache } from 'apollo-cache-inmemory';
-//  import { setContext } from 'apollo-link-context';
+ import { setContext } from 'apollo-link-context';
  import gql from 'graphql-tag';
 import { subscribe } from 'graphql';
  
@@ -12,7 +12,7 @@ import { subscribe } from 'graphql';
          this._AppConstants = AppConstants;
          this._$q = $q;
          this._clients = new Map([[this._AppConstants.gql, this.createClient()]]);
-        //  this._authClient = this.createAuthClient();
+         this._authClient = this.createAuthClient();
          this._JWT = JWT;
      }
  
@@ -21,6 +21,25 @@ import { subscribe } from 'graphql';
              link: createHttpLink({ uri: server }),
              cache: new InMemoryCache()
          });
+     }
+
+     createAuthClient() {
+        return new ApolloClient({
+            link: this.createAuthLink().concat(createHttpLink({ uri: "http://localhost:3003/api/graphqlauth" })),
+            cache: new InMemoryCache()
+        });
+     }
+
+     createAuthLink() {
+        return setContext((_, { headers }) => {
+            let token = this._JWT.get();
+
+            return {
+                headers: {
+                    Authorization: token ? `Bearer ${token}` : "",
+                }
+            }
+        });
      }
  
  
@@ -36,6 +55,19 @@ import { subscribe } from 'graphql';
              (err) => deferred.reject(err)
          );
          return deferred.promise;
+     }
+
+     getAuth(query) {
+        let deferred = this._$q.defer();
+
+        this._authClient.query({
+            query: gql(query)
+        }).then(
+            (res) => deferred.resolve(res.data),
+            (err) => deferred.reject(err)
+        );
+
+        return deferred.promise;
      }
 
      
@@ -68,7 +100,7 @@ import { subscribe } from 'graphql';
         }
         
         return deferred.promise;
-    }
+     }
  
  };
  

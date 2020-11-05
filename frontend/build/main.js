@@ -52075,7 +52075,7 @@ var InMemoryCache = function (_super) {
 exports.InMemoryCache = InMemoryCache;
 
 }).call(this,require('_process'))
-},{"_process":153,"apollo-cache":13,"apollo-utilities":23,"optimism":152,"ts-invariant":154,"tslib":155}],13:[function(require,module,exports){
+},{"_process":154,"apollo-cache":13,"apollo-utilities":24,"optimism":153,"ts-invariant":155,"tslib":156}],13:[function(require,module,exports){
 exports.__esModule = true;
 exports.Cache = exports.ApolloCache = void 0;
 
@@ -52271,7 +52271,7 @@ exports.Cache = Cache;
 
 (function (Cache) {})(Cache || (exports.Cache = Cache = {}));
 
-},{"apollo-utilities":23}],14:[function(require,module,exports){
+},{"apollo-utilities":24}],14:[function(require,module,exports){
 (function (process){
 (function (global, factory) {
   if (typeof define === "function" && define.amd) {
@@ -55008,7 +55008,7 @@ exports.Cache = Cache;
 });
 
 }).call(this,require('_process'))
-},{"_process":153,"apollo-link":20,"apollo-utilities":23,"graphql/language/visitor":71,"symbol-observable":15,"ts-invariant":154,"tslib":155}],15:[function(require,module,exports){
+},{"_process":154,"apollo-link":21,"apollo-utilities":24,"graphql/language/visitor":72,"symbol-observable":15,"ts-invariant":155,"tslib":156}],15:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -55065,6 +55065,36 @@ function symbolObservablePonyfill(root) {
 	return result;
 };
 },{}],17:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var tslib_1 = require("tslib");
+var apollo_link_1 = require("apollo-link");
+function setContext(setter) {
+    return new apollo_link_1.ApolloLink(function (operation, forward) {
+        var request = tslib_1.__rest(operation, []);
+        return new apollo_link_1.Observable(function (observer) {
+            var handle;
+            Promise.resolve(request)
+                .then(function (req) { return setter(req, operation.getContext()); })
+                .then(operation.setContext)
+                .then(function () {
+                handle = forward(operation).subscribe({
+                    next: observer.next.bind(observer),
+                    error: observer.error.bind(observer),
+                    complete: observer.complete.bind(observer),
+                });
+            })
+                .catch(observer.error.bind(observer));
+            return function () {
+                if (handle)
+                    handle.unsubscribe();
+            };
+        });
+    });
+}
+exports.setContext = setContext;
+
+},{"apollo-link":21,"tslib":156}],18:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var tslib_1 = require("tslib");
@@ -55189,7 +55219,7 @@ exports.selectURI = function (operation, fallbackURI) {
     }
 };
 
-},{"graphql/language/printer":68,"ts-invariant":154,"tslib":155}],18:[function(require,module,exports){
+},{"graphql/language/printer":69,"ts-invariant":155,"tslib":156}],19:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var tslib_1 = require("tslib");
@@ -55335,13 +55365,13 @@ var HttpLink = (function (_super) {
 }(apollo_link_1.ApolloLink));
 exports.HttpLink = HttpLink;
 
-},{"apollo-link":20,"apollo-link-http-common":17,"tslib":155}],19:[function(require,module,exports){
+},{"apollo-link":21,"apollo-link-http-common":18,"tslib":156}],20:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var tslib_1 = require("tslib");
 tslib_1.__exportStar(require("./httpLink"), exports);
 
-},{"./httpLink":18,"tslib":155}],20:[function(require,module,exports){
+},{"./httpLink":19,"tslib":156}],21:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var tslib_1 = require("tslib");
@@ -55356,7 +55386,7 @@ exports.getOperationName = linkUtils_1.getOperationName;
 var zen_observable_ts_1 = tslib_1.__importDefault(require("zen-observable-ts"));
 exports.Observable = zen_observable_ts_1.default;
 
-},{"./link":21,"./linkUtils":22,"tslib":155,"zen-observable-ts":156}],21:[function(require,module,exports){
+},{"./link":22,"./linkUtils":23,"tslib":156,"zen-observable-ts":157}],22:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var tslib_1 = require("tslib");
@@ -55444,7 +55474,7 @@ function execute(link, operation) {
 }
 exports.execute = execute;
 
-},{"./linkUtils":22,"ts-invariant":154,"tslib":155,"zen-observable-ts":156}],22:[function(require,module,exports){
+},{"./linkUtils":23,"ts-invariant":155,"tslib":156,"zen-observable-ts":157}],23:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var tslib_1 = require("tslib");
@@ -55567,7 +55597,7 @@ function getKey(operation) {
 }
 exports.getKey = getKey;
 
-},{"apollo-utilities":23,"ts-invariant":154,"tslib":155,"zen-observable-ts":156}],23:[function(require,module,exports){
+},{"apollo-utilities":24,"ts-invariant":155,"tslib":156,"zen-observable-ts":157}],24:[function(require,module,exports){
 (function (process){
 exports.__esModule = true;
 exports.addTypenameToDocument = addTypenameToDocument;
@@ -56696,7 +56726,7 @@ function stripSymbols(data) {
 }
 
 }).call(this,require('_process'))
-},{"@wry/equality":2,"_process":153,"fast-json-stable-stringify":24,"graphql/language/visitor":71,"ts-invariant":154,"tslib":155}],24:[function(require,module,exports){
+},{"@wry/equality":2,"_process":154,"fast-json-stable-stringify":25,"graphql/language/visitor":72,"ts-invariant":155,"tslib":156}],25:[function(require,module,exports){
 'use strict';
 
 module.exports = function (data, opts) {
@@ -56757,7 +56787,7 @@ module.exports = function (data, opts) {
     })(data);
 };
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
@@ -56948,7 +56978,7 @@ module.exports = gql;
 })));
 
 
-},{"graphql/language/parser":65}],26:[function(require,module,exports){
+},{"graphql/language/parser":66}],27:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -57238,7 +57268,7 @@ function printError(error) {
   return output;
 }
 
-},{"../jsutils/isObjectLike.js":46,"../language/location.js":64,"../language/printLocation.js":67,"../polyfills/symbols.js":78}],27:[function(require,module,exports){
+},{"../jsutils/isObjectLike.js":47,"../language/location.js":65,"../language/printLocation.js":68,"../polyfills/symbols.js":79}],28:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -57277,7 +57307,7 @@ function formatError(error) {
  * @see https://github.com/graphql/graphql-spec/blob/master/spec/Section%207%20--%20Response.md#errors
  */
 
-},{"../jsutils/devAssert.js":38}],28:[function(require,module,exports){
+},{"../jsutils/devAssert.js":39}],29:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -57322,7 +57352,7 @@ var _locatedError = require("./locatedError.js");
 
 var _formatError = require("./formatError.js");
 
-},{"./GraphQLError.js":26,"./formatError.js":27,"./locatedError.js":29,"./syntaxError.js":30}],29:[function(require,module,exports){
+},{"./GraphQLError.js":27,"./formatError.js":28,"./locatedError.js":30,"./syntaxError.js":31}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -57354,7 +57384,7 @@ function locatedError(rawOriginalError, nodes, path) {
   return new _GraphQLError.GraphQLError(originalError.message, (_nodes = originalError.nodes) !== null && _nodes !== void 0 ? _nodes : nodes, originalError.source, originalError.positions, path, originalError);
 }
 
-},{"../jsutils/inspect.js":41,"./GraphQLError.js":26}],30:[function(require,module,exports){
+},{"../jsutils/inspect.js":42,"./GraphQLError.js":27}],31:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -57372,7 +57402,7 @@ function syntaxError(source, position, description) {
   return new _GraphQLError.GraphQLError("Syntax Error: ".concat(description), undefined, source, [position]);
 }
 
-},{"./GraphQLError.js":26}],31:[function(require,module,exports){
+},{"./GraphQLError.js":27}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -58241,7 +58271,7 @@ function getFieldDef(schema, parentType, fieldName) {
   return parentType.getFields()[fieldName];
 }
 
-},{"../error/GraphQLError.js":26,"../error/locatedError.js":29,"../jsutils/Path.js":36,"../jsutils/devAssert.js":38,"../jsutils/inspect.js":41,"../jsutils/invariant.js":43,"../jsutils/isCollection.js":45,"../jsutils/isObjectLike.js":46,"../jsutils/isPromise.js":47,"../jsutils/memoize3.js":51,"../jsutils/promiseForObject.js":54,"../jsutils/promiseReduce.js":55,"../language/kinds.js":62,"../polyfills/arrayFrom.js":72,"../type/definition.js":82,"../type/directives.js":83,"../type/introspection.js":85,"../type/validate.js":88,"../utilities/getOperationRootType.js":101,"../utilities/typeFromAST.js":109,"./values.js":33}],32:[function(require,module,exports){
+},{"../error/GraphQLError.js":27,"../error/locatedError.js":30,"../jsutils/Path.js":37,"../jsutils/devAssert.js":39,"../jsutils/inspect.js":42,"../jsutils/invariant.js":44,"../jsutils/isCollection.js":46,"../jsutils/isObjectLike.js":47,"../jsutils/isPromise.js":48,"../jsutils/memoize3.js":52,"../jsutils/promiseForObject.js":55,"../jsutils/promiseReduce.js":56,"../language/kinds.js":63,"../polyfills/arrayFrom.js":73,"../type/definition.js":83,"../type/directives.js":84,"../type/introspection.js":86,"../type/validate.js":89,"../utilities/getOperationRootType.js":102,"../utilities/typeFromAST.js":110,"./values.js":34}],33:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -58290,7 +58320,7 @@ var _execute = require("./execute.js");
 
 var _values = require("./values.js");
 
-},{"../jsutils/Path.js":36,"./execute.js":31,"./values.js":33}],33:[function(require,module,exports){
+},{"../jsutils/Path.js":37,"./execute.js":32,"./values.js":34}],34:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -58520,7 +58550,7 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-},{"../error/GraphQLError.js":26,"../jsutils/inspect.js":41,"../jsutils/keyMap.js":48,"../jsutils/printPathArray.js":53,"../language/kinds.js":62,"../language/printer.js":68,"../polyfills/find.js":73,"../type/definition.js":82,"../utilities/coerceInputValue.js":94,"../utilities/typeFromAST.js":109,"../utilities/valueFromAST.js":110}],34:[function(require,module,exports){
+},{"../error/GraphQLError.js":27,"../jsutils/inspect.js":42,"../jsutils/keyMap.js":49,"../jsutils/printPathArray.js":54,"../language/kinds.js":63,"../language/printer.js":69,"../polyfills/find.js":74,"../type/definition.js":83,"../utilities/coerceInputValue.js":95,"../utilities/typeFromAST.js":110,"../utilities/valueFromAST.js":111}],35:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -58640,7 +58670,7 @@ function graphqlImpl(args) {
   });
 }
 
-},{"./execution/execute.js":31,"./jsutils/isPromise.js":47,"./language/parser.js":65,"./type/validate.js":88,"./validation/validate.js":150}],35:[function(require,module,exports){
+},{"./execution/execute.js":32,"./jsutils/isPromise.js":48,"./language/parser.js":66,"./type/validate.js":89,"./validation/validate.js":151}],36:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -59847,7 +59877,7 @@ var _index6 = require("./error/index.js");
 
 var _index7 = require("./utilities/index.js");
 
-},{"./error/index.js":28,"./execution/index.js":32,"./graphql.js":34,"./language/index.js":61,"./subscription/index.js":79,"./type/index.js":84,"./utilities/index.js":102,"./validation/index.js":113,"./version.js":151}],36:[function(require,module,exports){
+},{"./error/index.js":29,"./execution/index.js":33,"./graphql.js":35,"./language/index.js":62,"./subscription/index.js":80,"./type/index.js":85,"./utilities/index.js":103,"./validation/index.js":114,"./version.js":152}],37:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -59883,7 +59913,7 @@ function pathToArray(path) {
   return flattened.reverse();
 }
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -59910,7 +59940,7 @@ function defineInspect(classObject) {
   }
 }
 
-},{"./invariant.js":43,"./nodejsCustomInspectSymbol.js":52}],38:[function(require,module,exports){
+},{"./invariant.js":44,"./nodejsCustomInspectSymbol.js":53}],39:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -59926,7 +59956,7 @@ function devAssert(condition, message) {
   }
 }
 
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -59970,7 +60000,7 @@ function didYouMean(firstArg, secondArg) {
   return message + selected.join(', ') + ', or ' + lastItem + '?';
 }
 
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -59985,7 +60015,7 @@ function identityFunc(x) {
   return x;
 }
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -60120,7 +60150,7 @@ function getObjectTag(object) {
   return tag;
 }
 
-},{"./nodejsCustomInspectSymbol.js":52}],42:[function(require,module,exports){
+},{"./nodejsCustomInspectSymbol.js":53}],43:[function(require,module,exports){
 (function (process){
 "use strict";
 
@@ -60160,7 +60190,7 @@ function instanceOf(value, constructor) {
 exports.default = _default;
 
 }).call(this,require('_process'))
-},{"_process":153}],43:[function(require,module,exports){
+},{"_process":154}],44:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -60176,7 +60206,7 @@ function invariant(condition, message) {
   }
 }
 
-},{}],44:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -60197,7 +60227,7 @@ function isAsyncIterable(maybeAsyncIterable) {
   return typeof maybeAsyncIterable[_symbols.SYMBOL_ASYNC_ITERATOR] === 'function';
 }
 
-},{"../polyfills/symbols.js":78}],45:[function(require,module,exports){
+},{"../polyfills/symbols.js":79}],46:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -60246,7 +60276,7 @@ function isCollection(obj) {
   return typeof obj[_symbols.SYMBOL_ITERATOR] === 'function';
 }
 
-},{"../polyfills/symbols.js":78}],46:[function(require,module,exports){
+},{"../polyfills/symbols.js":79}],47:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -60264,7 +60294,7 @@ function isObjectLike(value) {
   return _typeof(value) == 'object' && value !== null;
 }
 
-},{}],47:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -60281,7 +60311,7 @@ function isPromise(value) {
   return typeof (value === null || value === void 0 ? void 0 : value.then) === 'function';
 }
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -60319,7 +60349,7 @@ function keyMap(list, keyFn) {
   }, Object.create(null));
 }
 
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -60351,7 +60381,7 @@ function keyValMap(list, keyFn, valFn) {
   }, Object.create(null));
 }
 
-},{}],50:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -60380,7 +60410,7 @@ function mapValue(map, fn) {
   return result;
 }
 
-},{"../polyfills/objectEntries.js":76}],51:[function(require,module,exports){
+},{"../polyfills/objectEntries.js":77}],52:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -60427,7 +60457,7 @@ function memoize3(fn) {
   };
 }
 
-},{}],52:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -60439,7 +60469,7 @@ var nodejsCustomInspectSymbol = typeof Symbol === 'function' && typeof Symbol.fo
 var _default = nodejsCustomInspectSymbol;
 exports.default = _default;
 
-},{}],53:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -60456,7 +60486,7 @@ function printPathArray(path) {
   }).join('');
 }
 
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -60484,7 +60514,7 @@ function promiseForObject(object) {
   });
 }
 
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -60511,7 +60541,7 @@ function promiseReduce(values, callback, initialValue) {
   }, initialValue);
 }
 
-},{"./isPromise.js":47}],56:[function(require,module,exports){
+},{"./isPromise.js":48}],57:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -60650,7 +60680,7 @@ function stringToArray(str) {
   return array;
 }
 
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -60680,7 +60710,7 @@ function toObjMap(obj) {
   return map;
 }
 
-},{"../polyfills/objectEntries.js":76}],58:[function(require,module,exports){
+},{"../polyfills/objectEntries.js":77}],59:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -60814,7 +60844,7 @@ function isNode(maybeNode) {
  * The list of all possible AST node types.
  */
 
-},{"../jsutils/defineInspect.js":37}],59:[function(require,module,exports){
+},{"../jsutils/defineInspect.js":38}],60:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -60950,7 +60980,7 @@ function printBlockString(value) {
   return '"""' + result.replace(/"""/g, '\\"""') + '"""';
 }
 
-},{}],60:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -60990,7 +61020,7 @@ var DirectiveLocation = Object.freeze({
 
 exports.DirectiveLocation = DirectiveLocation;
 
-},{}],61:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -61183,7 +61213,7 @@ var _predicates = require("./predicates.js");
 
 var _directiveLocation = require("./directiveLocation.js");
 
-},{"./ast.js":58,"./directiveLocation.js":60,"./kinds.js":62,"./lexer.js":63,"./location.js":64,"./parser.js":65,"./predicates.js":66,"./printLocation.js":67,"./printer.js":68,"./source.js":69,"./tokenKind.js":70,"./visitor.js":71}],62:[function(require,module,exports){
+},{"./ast.js":59,"./directiveLocation.js":61,"./kinds.js":63,"./lexer.js":64,"./location.js":65,"./parser.js":66,"./predicates.js":67,"./printLocation.js":68,"./printer.js":69,"./source.js":70,"./tokenKind.js":71,"./visitor.js":72}],63:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -61256,7 +61286,7 @@ var Kind = Object.freeze({
 
 exports.Kind = Kind;
 
-},{}],63:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -61948,7 +61978,7 @@ function isNameStart(code) {
   return code === 95 || code >= 65 && code <= 90 || code >= 97 && code <= 122;
 }
 
-},{"../error/syntaxError.js":30,"./ast.js":58,"./blockString.js":59,"./tokenKind.js":70}],64:[function(require,module,exports){
+},{"../error/syntaxError.js":31,"./ast.js":59,"./blockString.js":60,"./tokenKind.js":71}],65:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -61981,7 +62011,7 @@ function getLocation(source, position) {
   };
 }
 
-},{}],65:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -63549,7 +63579,7 @@ function getTokenKindDesc(kind) {
   return (0, _lexer.isPunctuatorTokenKind)(kind) ? "\"".concat(kind, "\"") : kind;
 }
 
-},{"../error/syntaxError.js":30,"./ast.js":58,"./directiveLocation.js":60,"./kinds.js":62,"./lexer.js":63,"./source.js":69,"./tokenKind.js":70}],66:[function(require,module,exports){
+},{"../error/syntaxError.js":31,"./ast.js":59,"./directiveLocation.js":61,"./kinds.js":63,"./lexer.js":64,"./source.js":70,"./tokenKind.js":71}],67:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -63603,7 +63633,7 @@ function isTypeExtensionNode(node) {
   return node.kind === _kinds.Kind.SCALAR_TYPE_EXTENSION || node.kind === _kinds.Kind.OBJECT_TYPE_EXTENSION || node.kind === _kinds.Kind.INTERFACE_TYPE_EXTENSION || node.kind === _kinds.Kind.UNION_TYPE_EXTENSION || node.kind === _kinds.Kind.ENUM_TYPE_EXTENSION || node.kind === _kinds.Kind.INPUT_OBJECT_TYPE_EXTENSION;
 }
 
-},{"./kinds.js":62}],67:[function(require,module,exports){
+},{"./kinds.js":63}],68:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -63680,7 +63710,7 @@ function leftPad(len, str) {
   return whitespace(len - str.length) + str;
 }
 
-},{"./location.js":64}],68:[function(require,module,exports){
+},{"./location.js":65}],69:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -64004,7 +64034,7 @@ function hasMultilineItems(maybeArray) {
   return maybeArray != null && maybeArray.some(isMultiline);
 }
 
-},{"./blockString.js":59,"./visitor.js":71}],69:[function(require,module,exports){
+},{"./blockString.js":60,"./visitor.js":72}],70:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -64073,7 +64103,7 @@ function isSource(source) {
   return (0, _instanceOf.default)(source, Source);
 }
 
-},{"../jsutils/devAssert.js":38,"../jsutils/inspect.js":41,"../jsutils/instanceOf.js":42,"../polyfills/symbols.js":78}],70:[function(require,module,exports){
+},{"../jsutils/devAssert.js":39,"../jsutils/inspect.js":42,"../jsutils/instanceOf.js":43,"../polyfills/symbols.js":79}],71:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -64115,7 +64145,7 @@ var TokenKind = Object.freeze({
 
 exports.TokenKind = TokenKind;
 
-},{}],71:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -64514,7 +64544,7 @@ function getVisitFn(visitor, kind, isLeaving) {
   }
 }
 
-},{"../jsutils/inspect.js":41,"./ast.js":58}],72:[function(require,module,exports){
+},{"../jsutils/inspect.js":42,"./ast.js":59}],73:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -64573,7 +64603,7 @@ var arrayFrom = Array.from || function (obj, mapFn, thisArg) {
 var _default = arrayFrom;
 exports.default = _default;
 
-},{"./symbols.js":78}],73:[function(require,module,exports){
+},{"./symbols.js":79}],74:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -64597,7 +64627,7 @@ var find = Array.prototype.find ? function (list, predicate) {
 var _default = find;
 exports.default = _default;
 
-},{}],74:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -64614,7 +64644,7 @@ var isFinitePolyfill = Number.isFinite || function (value) {
 var _default = isFinitePolyfill;
 exports.default = _default;
 
-},{}],75:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -64631,7 +64661,7 @@ var isInteger = Number.isInteger || function (value) {
 var _default = isInteger;
 exports.default = _default;
 
-},{}],76:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -64650,7 +64680,7 @@ var objectEntries = Object.entries || function (obj) {
 var _default = objectEntries;
 exports.default = _default;
 
-},{}],77:[function(require,module,exports){
+},{}],78:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -64669,7 +64699,7 @@ var objectValues = Object.values || function (obj) {
 var _default = objectValues;
 exports.default = _default;
 
-},{}],78:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -64688,7 +64718,7 @@ exports.SYMBOL_ASYNC_ITERATOR = SYMBOL_ASYNC_ITERATOR;
 var SYMBOL_TO_STRING_TAG = typeof Symbol === 'function' && Symbol.toStringTag != null ? Symbol.toStringTag : '@@toStringTag';
 exports.SYMBOL_TO_STRING_TAG = SYMBOL_TO_STRING_TAG;
 
-},{}],79:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -64709,7 +64739,7 @@ Object.defineProperty(exports, "createSourceEventStream", {
 
 var _subscribe = require("./subscribe.js");
 
-},{"./subscribe.js":81}],80:[function(require,module,exports){
+},{"./subscribe.js":82}],81:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -64797,7 +64827,7 @@ function iteratorResult(value) {
   };
 }
 
-},{"../polyfills/symbols.js":78}],81:[function(require,module,exports){
+},{"../polyfills/symbols.js":79}],82:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -64991,7 +65021,7 @@ function executeSubscription(exeContext) {
   });
 }
 
-},{"../error/GraphQLError.js":26,"../error/locatedError.js":29,"../execution/execute.js":31,"../execution/values.js":33,"../jsutils/Path.js":36,"../jsutils/inspect.js":41,"../jsutils/isAsyncIterable.js":44,"../utilities/getOperationRootType.js":101,"./mapAsyncIterator.js":80}],82:[function(require,module,exports){
+},{"../error/GraphQLError.js":27,"../error/locatedError.js":30,"../execution/execute.js":32,"../execution/values.js":34,"../jsutils/Path.js":37,"../jsutils/inspect.js":42,"../jsutils/isAsyncIterable.js":45,"../utilities/getOperationRootType.js":102,"./mapAsyncIterator.js":81}],83:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -66218,7 +66248,7 @@ function isRequiredInputField(field) {
   return isNonNullType(field.type) && field.defaultValue === undefined;
 }
 
-},{"../error/GraphQLError.js":26,"../jsutils/defineInspect.js":37,"../jsutils/devAssert.js":38,"../jsutils/didYouMean.js":39,"../jsutils/identityFunc.js":40,"../jsutils/inspect.js":41,"../jsutils/instanceOf.js":42,"../jsutils/isObjectLike.js":46,"../jsutils/keyMap.js":48,"../jsutils/keyValMap.js":49,"../jsutils/mapValue.js":50,"../jsutils/suggestionList.js":56,"../jsutils/toObjMap.js":57,"../language/kinds.js":62,"../language/printer.js":68,"../polyfills/objectEntries.js":76,"../polyfills/symbols.js":78,"../utilities/valueFromASTUntyped.js":111}],83:[function(require,module,exports){
+},{"../error/GraphQLError.js":27,"../jsutils/defineInspect.js":38,"../jsutils/devAssert.js":39,"../jsutils/didYouMean.js":40,"../jsutils/identityFunc.js":41,"../jsutils/inspect.js":42,"../jsutils/instanceOf.js":43,"../jsutils/isObjectLike.js":47,"../jsutils/keyMap.js":49,"../jsutils/keyValMap.js":50,"../jsutils/mapValue.js":51,"../jsutils/suggestionList.js":57,"../jsutils/toObjMap.js":58,"../language/kinds.js":63,"../language/printer.js":69,"../polyfills/objectEntries.js":77,"../polyfills/symbols.js":79,"../utilities/valueFromASTUntyped.js":112}],84:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -66425,7 +66455,7 @@ function isSpecifiedDirective(directive) {
   });
 }
 
-},{"../jsutils/defineInspect.js":37,"../jsutils/devAssert.js":38,"../jsutils/inspect.js":41,"../jsutils/instanceOf.js":42,"../jsutils/isObjectLike.js":46,"../jsutils/toObjMap.js":57,"../language/directiveLocation.js":60,"../polyfills/objectEntries.js":76,"../polyfills/symbols.js":78,"./definition.js":82,"./scalars.js":86}],84:[function(require,module,exports){
+},{"../jsutils/defineInspect.js":38,"../jsutils/devAssert.js":39,"../jsutils/inspect.js":42,"../jsutils/instanceOf.js":43,"../jsutils/isObjectLike.js":47,"../jsutils/toObjMap.js":58,"../language/directiveLocation.js":61,"../polyfills/objectEntries.js":77,"../polyfills/symbols.js":79,"./definition.js":83,"./scalars.js":87}],85:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -66936,7 +66966,7 @@ var _introspection = require("./introspection.js");
 
 var _validate = require("./validate.js");
 
-},{"./definition.js":82,"./directives.js":83,"./introspection.js":85,"./scalars.js":86,"./schema.js":87,"./validate.js":88}],85:[function(require,module,exports){
+},{"./definition.js":83,"./directives.js":84,"./introspection.js":86,"./scalars.js":87,"./schema.js":88,"./validate.js":89}],86:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -67553,7 +67583,7 @@ function isIntrospectionType(type) {
   });
 }
 
-},{"../jsutils/inspect.js":41,"../jsutils/invariant.js":43,"../language/directiveLocation.js":60,"../language/printer.js":68,"../polyfills/objectValues.js":77,"../utilities/astFromValue.js":91,"./definition.js":82,"./scalars.js":86}],86:[function(require,module,exports){
+},{"../jsutils/inspect.js":42,"../jsutils/invariant.js":44,"../language/directiveLocation.js":61,"../language/printer.js":69,"../polyfills/objectValues.js":78,"../utilities/astFromValue.js":92,"./definition.js":83,"./scalars.js":87}],87:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -67839,7 +67869,7 @@ function isSpecifiedScalarType(type) {
   });
 }
 
-},{"../error/GraphQLError.js":26,"../jsutils/inspect.js":41,"../jsutils/isObjectLike.js":46,"../language/kinds.js":62,"../language/printer.js":68,"../polyfills/isFinite.js":74,"../polyfills/isInteger.js":75,"./definition.js":82}],87:[function(require,module,exports){
+},{"../error/GraphQLError.js":27,"../jsutils/inspect.js":42,"../jsutils/isObjectLike.js":47,"../language/kinds.js":63,"../language/printer.js":69,"../polyfills/isFinite.js":75,"../polyfills/isInteger.js":76,"./definition.js":83}],88:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -68225,7 +68255,7 @@ function collectReferencedTypes(type, typeSet) {
   return typeSet;
 }
 
-},{"../jsutils/devAssert.js":38,"../jsutils/inspect.js":41,"../jsutils/instanceOf.js":42,"../jsutils/isObjectLike.js":46,"../jsutils/toObjMap.js":57,"../polyfills/arrayFrom.js":72,"../polyfills/find.js":73,"../polyfills/objectValues.js":77,"../polyfills/symbols.js":78,"./definition.js":82,"./directives.js":83,"./introspection.js":85}],88:[function(require,module,exports){
+},{"../jsutils/devAssert.js":39,"../jsutils/inspect.js":42,"../jsutils/instanceOf.js":43,"../jsutils/isObjectLike.js":47,"../jsutils/toObjMap.js":58,"../polyfills/arrayFrom.js":73,"../polyfills/find.js":74,"../polyfills/objectValues.js":78,"../polyfills/symbols.js":79,"./definition.js":83,"./directives.js":84,"./introspection.js":86}],89:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -68776,7 +68806,7 @@ function getDeprecatedDirectiveNode(definitionNode) {
   });
 }
 
-},{"../error/GraphQLError.js":26,"../error/locatedError.js":29,"../jsutils/inspect.js":41,"../polyfills/find.js":73,"../polyfills/objectValues.js":77,"../utilities/assertValidName.js":90,"../utilities/typeComparators.js":108,"./definition.js":82,"./directives.js":83,"./introspection.js":85,"./schema.js":87}],89:[function(require,module,exports){
+},{"../error/GraphQLError.js":27,"../error/locatedError.js":30,"../jsutils/inspect.js":42,"../polyfills/find.js":74,"../polyfills/objectValues.js":78,"../utilities/assertValidName.js":91,"../utilities/typeComparators.js":109,"./definition.js":83,"./directives.js":84,"./introspection.js":86,"./schema.js":88}],90:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -69175,7 +69205,7 @@ function visitWithTypeInfo(typeInfo, visitor) {
   };
 }
 
-},{"../language/ast.js":58,"../language/kinds.js":62,"../language/visitor.js":71,"../polyfills/find.js":73,"../type/definition.js":82,"../type/introspection.js":85,"./typeFromAST.js":109}],90:[function(require,module,exports){
+},{"../language/ast.js":59,"../language/kinds.js":63,"../language/visitor.js":72,"../polyfills/find.js":74,"../type/definition.js":83,"../type/introspection.js":86,"./typeFromAST.js":110}],91:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -69221,7 +69251,7 @@ function isValidNameError(name) {
   }
 }
 
-},{"../error/GraphQLError.js":26,"../jsutils/devAssert.js":38}],91:[function(require,module,exports){
+},{"../error/GraphQLError.js":27,"../jsutils/devAssert.js":39}],92:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -69421,7 +69451,7 @@ function astFromValue(value, type) {
 
 var integerStringRegExp = /^-?(?:0|[1-9][0-9]*)$/;
 
-},{"../jsutils/inspect.js":41,"../jsutils/invariant.js":43,"../jsutils/isCollection.js":45,"../jsutils/isObjectLike.js":46,"../language/kinds.js":62,"../polyfills/arrayFrom.js":72,"../polyfills/isFinite.js":74,"../polyfills/objectValues.js":77,"../type/definition.js":82,"../type/scalars.js":86}],92:[function(require,module,exports){
+},{"../jsutils/inspect.js":42,"../jsutils/invariant.js":44,"../jsutils/isCollection.js":46,"../jsutils/isObjectLike.js":47,"../language/kinds.js":63,"../polyfills/arrayFrom.js":73,"../polyfills/isFinite.js":75,"../polyfills/objectValues.js":78,"../type/definition.js":83,"../type/scalars.js":87}],93:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -69540,7 +69570,7 @@ function buildSchema(source, options) {
   });
 }
 
-},{"../jsutils/devAssert.js":38,"../language/kinds.js":62,"../language/parser.js":65,"../type/directives.js":83,"../type/schema.js":87,"../validation/validate.js":150,"./extendSchema.js":96}],93:[function(require,module,exports){
+},{"../jsutils/devAssert.js":39,"../language/kinds.js":63,"../language/parser.js":66,"../type/directives.js":84,"../type/schema.js":88,"../validation/validate.js":151,"./extendSchema.js":97}],94:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -69876,7 +69906,7 @@ function buildClientSchema(introspection, options) {
   }
 }
 
-},{"../jsutils/devAssert.js":38,"../jsutils/inspect.js":41,"../jsutils/isObjectLike.js":46,"../jsutils/keyValMap.js":49,"../language/parser.js":65,"../polyfills/objectValues.js":77,"../type/definition.js":82,"../type/directives.js":83,"../type/introspection.js":85,"../type/scalars.js":86,"../type/schema.js":87,"./valueFromAST.js":110}],94:[function(require,module,exports){
+},{"../jsutils/devAssert.js":39,"../jsutils/inspect.js":42,"../jsutils/isObjectLike.js":47,"../jsutils/keyValMap.js":50,"../language/parser.js":66,"../polyfills/objectValues.js":78,"../type/definition.js":83,"../type/directives.js":84,"../type/introspection.js":86,"../type/scalars.js":87,"../type/schema.js":88,"./valueFromAST.js":111}],95:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -70027,7 +70057,7 @@ function coerceInputValueImpl(inputValue, type, onError, path) {
   false || (0, _invariant.default)(0, 'Unexpected input type: ' + (0, _inspect.default)(type));
 }
 
-},{"../error/GraphQLError.js":26,"../jsutils/Path.js":36,"../jsutils/didYouMean.js":39,"../jsutils/inspect.js":41,"../jsutils/invariant.js":43,"../jsutils/isCollection.js":45,"../jsutils/isObjectLike.js":46,"../jsutils/printPathArray.js":53,"../jsutils/suggestionList.js":56,"../polyfills/arrayFrom.js":72,"../polyfills/objectValues.js":77,"../type/definition.js":82}],95:[function(require,module,exports){
+},{"../error/GraphQLError.js":27,"../jsutils/Path.js":37,"../jsutils/didYouMean.js":40,"../jsutils/inspect.js":42,"../jsutils/invariant.js":44,"../jsutils/isCollection.js":46,"../jsutils/isObjectLike.js":47,"../jsutils/printPathArray.js":54,"../jsutils/suggestionList.js":57,"../polyfills/arrayFrom.js":73,"../polyfills/objectValues.js":78,"../type/definition.js":83}],96:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -70054,7 +70084,7 @@ function concatAST(documents) {
   };
 }
 
-},{}],96:[function(require,module,exports){
+},{}],97:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -70775,7 +70805,7 @@ function getLeadingCommentBlock(node) {
   return comments.length > 0 ? comments.reverse().join('\n') : undefined;
 }
 
-},{"../execution/values.js":33,"../jsutils/devAssert.js":38,"../jsutils/inspect.js":41,"../jsutils/invariant.js":43,"../jsutils/keyMap.js":48,"../jsutils/mapValue.js":50,"../language/blockString.js":59,"../language/kinds.js":62,"../language/predicates.js":66,"../language/tokenKind.js":70,"../polyfills/objectValues.js":77,"../type/definition.js":82,"../type/directives.js":83,"../type/introspection.js":85,"../type/scalars.js":86,"../type/schema.js":87,"../validation/validate.js":150,"./valueFromAST.js":110}],97:[function(require,module,exports){
+},{"../execution/values.js":34,"../jsutils/devAssert.js":39,"../jsutils/inspect.js":42,"../jsutils/invariant.js":44,"../jsutils/keyMap.js":49,"../jsutils/mapValue.js":51,"../language/blockString.js":60,"../language/kinds.js":63,"../language/predicates.js":67,"../language/tokenKind.js":71,"../polyfills/objectValues.js":78,"../type/definition.js":83,"../type/directives.js":84,"../type/introspection.js":86,"../type/scalars.js":87,"../type/schema.js":88,"../validation/validate.js":151,"./valueFromAST.js":111}],98:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -71295,7 +71325,7 @@ function diff(oldArray, newArray) {
   };
 }
 
-},{"../jsutils/inspect.js":41,"../jsutils/invariant.js":43,"../jsutils/keyMap.js":48,"../language/printer.js":68,"../language/visitor.js":71,"../polyfills/objectValues.js":77,"../type/definition.js":82,"../type/scalars.js":86,"./astFromValue.js":91}],98:[function(require,module,exports){
+},{"../jsutils/inspect.js":42,"../jsutils/invariant.js":44,"../jsutils/keyMap.js":49,"../language/printer.js":69,"../language/visitor.js":72,"../polyfills/objectValues.js":78,"../type/definition.js":83,"../type/scalars.js":87,"./astFromValue.js":92}],99:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -71324,7 +71354,7 @@ function findDeprecatedUsages(schema, ast) {
   return (0, _validate.validate)(schema, ast, [_NoDeprecatedCustomRule.NoDeprecatedCustomRule]);
 }
 
-},{"../validation/rules/custom/NoDeprecatedCustomRule.js":147,"../validation/validate.js":150}],99:[function(require,module,exports){
+},{"../validation/rules/custom/NoDeprecatedCustomRule.js":148,"../validation/validate.js":151}],100:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -71353,7 +71383,7 @@ function getIntrospectionQuery(options) {
   return "\n    query IntrospectionQuery {\n      __schema {\n        ".concat(schemaDescription, "\n        queryType { name }\n        mutationType { name }\n        subscriptionType { name }\n        types {\n          ...FullType\n        }\n        directives {\n          name\n          ").concat(descriptions, "\n          ").concat(directiveIsRepeatable, "\n          locations\n          args {\n            ...InputValue\n          }\n        }\n      }\n    }\n\n    fragment FullType on __Type {\n      kind\n      name\n      ").concat(descriptions, "\n      ").concat(specifiedByUrl, "\n      fields(includeDeprecated: true) {\n        name\n        ").concat(descriptions, "\n        args {\n          ...InputValue\n        }\n        type {\n          ...TypeRef\n        }\n        isDeprecated\n        deprecationReason\n      }\n      inputFields {\n        ...InputValue\n      }\n      interfaces {\n        ...TypeRef\n      }\n      enumValues(includeDeprecated: true) {\n        name\n        ").concat(descriptions, "\n        isDeprecated\n        deprecationReason\n      }\n      possibleTypes {\n        ...TypeRef\n      }\n    }\n\n    fragment InputValue on __InputValue {\n      name\n      ").concat(descriptions, "\n      type { ...TypeRef }\n      defaultValue\n    }\n\n    fragment TypeRef on __Type {\n      kind\n      name\n      ofType {\n        kind\n        name\n        ofType {\n          kind\n          name\n          ofType {\n            kind\n            name\n            ofType {\n              kind\n              name\n              ofType {\n                kind\n                name\n                ofType {\n                  kind\n                  name\n                  ofType {\n                    kind\n                    name\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  ");
 }
 
-},{}],100:[function(require,module,exports){
+},{}],101:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -71395,7 +71425,7 @@ function getOperationAST(documentAST, operationName) {
   return operation;
 }
 
-},{"../language/kinds.js":62}],101:[function(require,module,exports){
+},{"../language/kinds.js":63}],102:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -71442,7 +71472,7 @@ function getOperationRootType(schema, operation) {
   throw new _GraphQLError.GraphQLError('Can only have query, mutation and subscription operations.', operation);
 }
 
-},{"../error/GraphQLError.js":26}],102:[function(require,module,exports){
+},{"../error/GraphQLError.js":27}],103:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -71691,7 +71721,7 @@ var _findBreakingChanges = require("./findBreakingChanges.js");
 
 var _findDeprecatedUsages = require("./findDeprecatedUsages.js");
 
-},{"./TypeInfo.js":89,"./assertValidName.js":90,"./astFromValue.js":91,"./buildASTSchema.js":92,"./buildClientSchema.js":93,"./coerceInputValue.js":94,"./concatAST.js":95,"./extendSchema.js":96,"./findBreakingChanges.js":97,"./findDeprecatedUsages.js":98,"./getIntrospectionQuery.js":99,"./getOperationAST.js":100,"./getOperationRootType.js":101,"./introspectionFromSchema.js":103,"./lexicographicSortSchema.js":104,"./printSchema.js":105,"./separateOperations.js":106,"./stripIgnoredCharacters.js":107,"./typeComparators.js":108,"./typeFromAST.js":109,"./valueFromAST.js":110,"./valueFromASTUntyped.js":111}],103:[function(require,module,exports){
+},{"./TypeInfo.js":90,"./assertValidName.js":91,"./astFromValue.js":92,"./buildASTSchema.js":93,"./buildClientSchema.js":94,"./coerceInputValue.js":95,"./concatAST.js":96,"./extendSchema.js":97,"./findBreakingChanges.js":98,"./findDeprecatedUsages.js":99,"./getIntrospectionQuery.js":100,"./getOperationAST.js":101,"./getOperationRootType.js":102,"./introspectionFromSchema.js":104,"./lexicographicSortSchema.js":105,"./printSchema.js":106,"./separateOperations.js":107,"./stripIgnoredCharacters.js":108,"./typeComparators.js":109,"./typeFromAST.js":110,"./valueFromAST.js":111,"./valueFromASTUntyped.js":112}],104:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -71739,7 +71769,7 @@ function introspectionFromSchema(schema, options) {
   return result.data;
 }
 
-},{"../execution/execute.js":31,"../jsutils/invariant.js":43,"../language/parser.js":65,"./getIntrospectionQuery.js":99}],104:[function(require,module,exports){
+},{"../execution/execute.js":32,"../jsutils/invariant.js":44,"../language/parser.js":66,"./getIntrospectionQuery.js":100}],105:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -71941,7 +71971,7 @@ function sortBy(array, mapToKey) {
   });
 }
 
-},{"../jsutils/inspect.js":41,"../jsutils/invariant.js":43,"../jsutils/keyValMap.js":49,"../polyfills/objectValues.js":77,"../type/definition.js":82,"../type/directives.js":83,"../type/introspection.js":85,"../type/schema.js":87}],105:[function(require,module,exports){
+},{"../jsutils/inspect.js":42,"../jsutils/invariant.js":44,"../jsutils/keyValMap.js":50,"../polyfills/objectValues.js":78,"../type/definition.js":83,"../type/directives.js":84,"../type/introspection.js":86,"../type/schema.js":88}],106:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -72232,7 +72262,7 @@ function printDescriptionWithComments(description, indentation, firstInBlock) {
   return prefix + comment + '\n';
 }
 
-},{"../jsutils/inspect.js":41,"../jsutils/invariant.js":43,"../language/blockString.js":59,"../language/printer.js":68,"../polyfills/objectValues.js":77,"../type/definition.js":82,"../type/directives.js":83,"../type/introspection.js":85,"../type/scalars.js":86,"./astFromValue.js":91}],106:[function(require,module,exports){
+},{"../jsutils/inspect.js":42,"../jsutils/invariant.js":44,"../language/blockString.js":60,"../language/printer.js":69,"../polyfills/objectValues.js":78,"../type/definition.js":83,"../type/directives.js":84,"../type/introspection.js":86,"../type/scalars.js":87,"./astFromValue.js":92}],107:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -72322,7 +72352,7 @@ function collectTransitiveDependencies(collected, depGraph, fromName) {
   }
 }
 
-},{"../language/kinds.js":62,"../language/visitor.js":71}],107:[function(require,module,exports){
+},{"../language/kinds.js":63,"../language/visitor.js":72}],108:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -72447,7 +72477,7 @@ function dedentBlockString(blockStr) {
   return '"""' + body + '"""';
 }
 
-},{"../language/blockString.js":59,"../language/lexer.js":63,"../language/source.js":69,"../language/tokenKind.js":70}],108:[function(require,module,exports){
+},{"../language/blockString.js":60,"../language/lexer.js":64,"../language/source.js":70,"../language/tokenKind.js":71}],109:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -72564,7 +72594,7 @@ function doTypesOverlap(schema, typeA, typeB) {
   return false;
 }
 
-},{"../type/definition.js":82}],109:[function(require,module,exports){
+},{"../type/definition.js":83}],110:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -72605,7 +72635,7 @@ function typeFromAST(schema, typeNode) {
   false || (0, _invariant.default)(0, 'Unexpected type node: ' + (0, _inspect.default)(typeNode));
 }
 
-},{"../jsutils/inspect.js":41,"../jsutils/invariant.js":43,"../language/kinds.js":62,"../type/definition.js":82}],110:[function(require,module,exports){
+},{"../jsutils/inspect.js":42,"../jsutils/invariant.js":44,"../language/kinds.js":63,"../type/definition.js":83}],111:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -72793,7 +72823,7 @@ function isMissingVariable(valueNode, variables) {
   return valueNode.kind === _kinds.Kind.VARIABLE && (variables == null || variables[valueNode.name.value] === undefined);
 }
 
-},{"../jsutils/inspect.js":41,"../jsutils/invariant.js":43,"../jsutils/keyMap.js":48,"../language/kinds.js":62,"../polyfills/objectValues.js":77,"../type/definition.js":82}],111:[function(require,module,exports){
+},{"../jsutils/inspect.js":42,"../jsutils/invariant.js":44,"../jsutils/keyMap.js":49,"../language/kinds.js":63,"../polyfills/objectValues.js":78,"../type/definition.js":83}],112:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -72863,7 +72893,7 @@ function valueFromASTUntyped(valueNode, variables) {
   false || (0, _invariant.default)(0, 'Unexpected value node: ' + (0, _inspect.default)(valueNode));
 }
 
-},{"../jsutils/inspect.js":41,"../jsutils/invariant.js":43,"../jsutils/keyValMap.js":49,"../language/kinds.js":62}],112:[function(require,module,exports){
+},{"../jsutils/inspect.js":42,"../jsutils/invariant.js":44,"../jsutils/keyValMap.js":50,"../language/kinds.js":63}],113:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -73106,7 +73136,7 @@ var ValidationContext = /*#__PURE__*/function (_ASTValidationContext2) {
 
 exports.ValidationContext = ValidationContext;
 
-},{"../language/kinds.js":62,"../language/visitor.js":71,"../utilities/TypeInfo.js":89}],113:[function(require,module,exports){
+},{"../language/kinds.js":63,"../language/visitor.js":72,"../utilities/TypeInfo.js":90}],114:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -73417,7 +73447,7 @@ var _NoDeprecatedCustomRule = require("./rules/custom/NoDeprecatedCustomRule.js"
 
 var _NoSchemaIntrospectionCustomRule = require("./rules/custom/NoSchemaIntrospectionCustomRule.js");
 
-},{"./ValidationContext.js":112,"./rules/ExecutableDefinitionsRule.js":114,"./rules/FieldsOnCorrectTypeRule.js":115,"./rules/FragmentsOnCompositeTypesRule.js":116,"./rules/KnownArgumentNamesRule.js":117,"./rules/KnownDirectivesRule.js":118,"./rules/KnownFragmentNamesRule.js":119,"./rules/KnownTypeNamesRule.js":120,"./rules/LoneAnonymousOperationRule.js":121,"./rules/LoneSchemaDefinitionRule.js":122,"./rules/NoFragmentCyclesRule.js":123,"./rules/NoUndefinedVariablesRule.js":124,"./rules/NoUnusedFragmentsRule.js":125,"./rules/NoUnusedVariablesRule.js":126,"./rules/OverlappingFieldsCanBeMergedRule.js":127,"./rules/PossibleFragmentSpreadsRule.js":128,"./rules/PossibleTypeExtensionsRule.js":129,"./rules/ProvidedRequiredArgumentsRule.js":130,"./rules/ScalarLeafsRule.js":131,"./rules/SingleFieldSubscriptionsRule.js":132,"./rules/UniqueArgumentNamesRule.js":133,"./rules/UniqueDirectiveNamesRule.js":134,"./rules/UniqueDirectivesPerLocationRule.js":135,"./rules/UniqueEnumValueNamesRule.js":136,"./rules/UniqueFieldDefinitionNamesRule.js":137,"./rules/UniqueFragmentNamesRule.js":138,"./rules/UniqueInputFieldNamesRule.js":139,"./rules/UniqueOperationNamesRule.js":140,"./rules/UniqueOperationTypesRule.js":141,"./rules/UniqueTypeNamesRule.js":142,"./rules/UniqueVariableNamesRule.js":143,"./rules/ValuesOfCorrectTypeRule.js":144,"./rules/VariablesAreInputTypesRule.js":145,"./rules/VariablesInAllowedPositionRule.js":146,"./rules/custom/NoDeprecatedCustomRule.js":147,"./rules/custom/NoSchemaIntrospectionCustomRule.js":148,"./specifiedRules.js":149,"./validate.js":150}],114:[function(require,module,exports){
+},{"./ValidationContext.js":113,"./rules/ExecutableDefinitionsRule.js":115,"./rules/FieldsOnCorrectTypeRule.js":116,"./rules/FragmentsOnCompositeTypesRule.js":117,"./rules/KnownArgumentNamesRule.js":118,"./rules/KnownDirectivesRule.js":119,"./rules/KnownFragmentNamesRule.js":120,"./rules/KnownTypeNamesRule.js":121,"./rules/LoneAnonymousOperationRule.js":122,"./rules/LoneSchemaDefinitionRule.js":123,"./rules/NoFragmentCyclesRule.js":124,"./rules/NoUndefinedVariablesRule.js":125,"./rules/NoUnusedFragmentsRule.js":126,"./rules/NoUnusedVariablesRule.js":127,"./rules/OverlappingFieldsCanBeMergedRule.js":128,"./rules/PossibleFragmentSpreadsRule.js":129,"./rules/PossibleTypeExtensionsRule.js":130,"./rules/ProvidedRequiredArgumentsRule.js":131,"./rules/ScalarLeafsRule.js":132,"./rules/SingleFieldSubscriptionsRule.js":133,"./rules/UniqueArgumentNamesRule.js":134,"./rules/UniqueDirectiveNamesRule.js":135,"./rules/UniqueDirectivesPerLocationRule.js":136,"./rules/UniqueEnumValueNamesRule.js":137,"./rules/UniqueFieldDefinitionNamesRule.js":138,"./rules/UniqueFragmentNamesRule.js":139,"./rules/UniqueInputFieldNamesRule.js":140,"./rules/UniqueOperationNamesRule.js":141,"./rules/UniqueOperationTypesRule.js":142,"./rules/UniqueTypeNamesRule.js":143,"./rules/UniqueVariableNamesRule.js":144,"./rules/ValuesOfCorrectTypeRule.js":145,"./rules/VariablesAreInputTypesRule.js":146,"./rules/VariablesInAllowedPositionRule.js":147,"./rules/custom/NoDeprecatedCustomRule.js":148,"./rules/custom/NoSchemaIntrospectionCustomRule.js":149,"./specifiedRules.js":150,"./validate.js":151}],115:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -73454,7 +73484,7 @@ function ExecutableDefinitionsRule(context) {
   };
 }
 
-},{"../../error/GraphQLError.js":26,"../../language/kinds.js":62,"../../language/predicates.js":66}],115:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27,"../../language/kinds.js":63,"../../language/predicates.js":67}],116:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -73586,7 +73616,7 @@ function getSuggestedFieldNames(type, fieldName) {
   return [];
 }
 
-},{"../../error/GraphQLError.js":26,"../../jsutils/didYouMean.js":39,"../../jsutils/suggestionList.js":56,"../../polyfills/arrayFrom.js":72,"../../type/definition.js":82}],116:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27,"../../jsutils/didYouMean.js":40,"../../jsutils/suggestionList.js":57,"../../polyfills/arrayFrom.js":73,"../../type/definition.js":83}],117:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -73634,7 +73664,7 @@ function FragmentsOnCompositeTypesRule(context) {
   };
 }
 
-},{"../../error/GraphQLError.js":26,"../../language/printer.js":68,"../../type/definition.js":82,"../../utilities/typeFromAST.js":109}],117:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27,"../../language/printer.js":69,"../../type/definition.js":83,"../../utilities/typeFromAST.js":110}],118:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -73740,7 +73770,7 @@ function KnownArgumentNamesOnDirectivesRule(context) {
   };
 }
 
-},{"../../error/GraphQLError.js":26,"../../jsutils/didYouMean.js":39,"../../jsutils/suggestionList.js":56,"../../language/kinds.js":62,"../../type/directives.js":83}],118:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27,"../../jsutils/didYouMean.js":40,"../../jsutils/suggestionList.js":57,"../../language/kinds.js":63,"../../type/directives.js":84}],119:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -73890,7 +73920,7 @@ function getDirectiveLocationForOperation(operation) {
   false || (0, _invariant.default)(0, 'Unexpected operation: ' + (0, _inspect.default)(operation));
 }
 
-},{"../../error/GraphQLError.js":26,"../../jsutils/inspect.js":41,"../../jsutils/invariant.js":43,"../../language/directiveLocation.js":60,"../../language/kinds.js":62,"../../type/directives.js":83}],119:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27,"../../jsutils/inspect.js":42,"../../jsutils/invariant.js":44,"../../language/directiveLocation.js":61,"../../language/kinds.js":63,"../../type/directives.js":84}],120:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -73919,7 +73949,7 @@ function KnownFragmentNamesRule(context) {
   };
 }
 
-},{"../../error/GraphQLError.js":26}],120:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27}],121:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -73994,7 +74024,7 @@ function isSDLNode(value) {
   return !Array.isArray(value) && ((0, _predicates.isTypeSystemDefinitionNode)(value) || (0, _predicates.isTypeSystemExtensionNode)(value));
 }
 
-},{"../../error/GraphQLError.js":26,"../../jsutils/didYouMean.js":39,"../../jsutils/suggestionList.js":56,"../../language/predicates.js":66,"../../type/introspection.js":85,"../../type/scalars.js":86}],121:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27,"../../jsutils/didYouMean.js":40,"../../jsutils/suggestionList.js":57,"../../language/predicates.js":67,"../../type/introspection.js":86,"../../type/scalars.js":87}],122:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -74028,7 +74058,7 @@ function LoneAnonymousOperationRule(context) {
   };
 }
 
-},{"../../error/GraphQLError.js":26,"../../language/kinds.js":62}],122:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27,"../../language/kinds.js":63}],123:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -74065,7 +74095,7 @@ function LoneSchemaDefinitionRule(context) {
   };
 }
 
-},{"../../error/GraphQLError.js":26}],123:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27}],124:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -74137,7 +74167,7 @@ function NoFragmentCyclesRule(context) {
   }
 }
 
-},{"../../error/GraphQLError.js":26}],124:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27}],125:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -74180,7 +74210,7 @@ function NoUndefinedVariablesRule(context) {
   };
 }
 
-},{"../../error/GraphQLError.js":26}],125:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27}],126:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -74234,7 +74264,7 @@ function NoUnusedFragmentsRule(context) {
   };
 }
 
-},{"../../error/GraphQLError.js":26}],126:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27}],127:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -74283,7 +74313,7 @@ function NoUnusedVariablesRule(context) {
   };
 }
 
-},{"../../error/GraphQLError.js":26}],127:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27}],128:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -74869,7 +74899,7 @@ var PairSet = /*#__PURE__*/function () {
   return PairSet;
 }();
 
-},{"../../error/GraphQLError.js":26,"../../jsutils/inspect.js":41,"../../language/kinds.js":62,"../../language/printer.js":68,"../../polyfills/find.js":73,"../../polyfills/objectEntries.js":76,"../../type/definition.js":82,"../../utilities/typeFromAST.js":109}],128:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27,"../../jsutils/inspect.js":42,"../../language/kinds.js":63,"../../language/printer.js":69,"../../polyfills/find.js":74,"../../polyfills/objectEntries.js":77,"../../type/definition.js":83,"../../utilities/typeFromAST.js":110}],129:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -74934,7 +74964,7 @@ function getFragmentType(context, name) {
   }
 }
 
-},{"../../error/GraphQLError.js":26,"../../jsutils/inspect.js":41,"../../type/definition.js":82,"../../utilities/typeComparators.js":108,"../../utilities/typeFromAST.js":109}],129:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27,"../../jsutils/inspect.js":42,"../../type/definition.js":83,"../../utilities/typeComparators.js":109,"../../utilities/typeFromAST.js":110}],130:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -75077,7 +75107,7 @@ function extensionKindToTypeName(kind) {
   false || (0, _invariant.default)(0, 'Unexpected kind: ' + (0, _inspect.default)(kind));
 }
 
-},{"../../error/GraphQLError.js":26,"../../jsutils/didYouMean.js":39,"../../jsutils/inspect.js":41,"../../jsutils/invariant.js":43,"../../jsutils/suggestionList.js":56,"../../language/kinds.js":62,"../../language/predicates.js":66,"../../type/definition.js":82}],130:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27,"../../jsutils/didYouMean.js":40,"../../jsutils/inspect.js":42,"../../jsutils/invariant.js":44,"../../jsutils/suggestionList.js":57,"../../language/kinds.js":63,"../../language/predicates.js":67,"../../type/definition.js":83}],131:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -75215,7 +75245,7 @@ function isRequiredArgumentNode(arg) {
   return arg.type.kind === _kinds.Kind.NON_NULL_TYPE && arg.defaultValue == null;
 }
 
-},{"../../error/GraphQLError.js":26,"../../jsutils/inspect.js":41,"../../jsutils/keyMap.js":48,"../../language/kinds.js":62,"../../language/printer.js":68,"../../type/definition.js":82,"../../type/directives.js":83}],131:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27,"../../jsutils/inspect.js":42,"../../jsutils/keyMap.js":49,"../../language/kinds.js":63,"../../language/printer.js":69,"../../type/definition.js":83,"../../type/directives.js":84}],132:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -75262,7 +75292,7 @@ function ScalarLeafsRule(context) {
   };
 }
 
-},{"../../error/GraphQLError.js":26,"../../jsutils/inspect.js":41,"../../type/definition.js":82}],132:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27,"../../jsutils/inspect.js":42,"../../type/definition.js":83}],133:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -75289,7 +75319,7 @@ function SingleFieldSubscriptionsRule(context) {
   };
 }
 
-},{"../../error/GraphQLError.js":26}],133:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27}],134:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -75328,7 +75358,7 @@ function UniqueArgumentNamesRule(context) {
   };
 }
 
-},{"../../error/GraphQLError.js":26}],134:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27}],135:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -75366,7 +75396,7 @@ function UniqueDirectiveNamesRule(context) {
   };
 }
 
-},{"../../error/GraphQLError.js":26}],135:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27}],136:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -75450,7 +75480,7 @@ function UniqueDirectivesPerLocationRule(context) {
   };
 }
 
-},{"../../error/GraphQLError.js":26,"../../language/kinds.js":62,"../../language/predicates.js":66,"../../type/directives.js":83}],136:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27,"../../language/kinds.js":63,"../../language/predicates.js":67,"../../type/directives.js":84}],137:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -75507,7 +75537,7 @@ function UniqueEnumValueNamesRule(context) {
   }
 }
 
-},{"../../error/GraphQLError.js":26,"../../type/definition.js":82}],137:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27,"../../type/definition.js":83}],138:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -75575,7 +75605,7 @@ function hasField(type, fieldName) {
   return false;
 }
 
-},{"../../error/GraphQLError.js":26,"../../type/definition.js":82}],138:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27,"../../type/definition.js":83}],139:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -75610,7 +75640,7 @@ function UniqueFragmentNamesRule(context) {
   };
 }
 
-},{"../../error/GraphQLError.js":26}],139:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27}],140:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -75651,7 +75681,7 @@ function UniqueInputFieldNamesRule(context) {
   };
 }
 
-},{"../../error/GraphQLError.js":26}],140:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27}],141:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -75688,7 +75718,7 @@ function UniqueOperationNamesRule(context) {
   };
 }
 
-},{"../../error/GraphQLError.js":26}],141:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27}],142:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -75740,7 +75770,7 @@ function UniqueOperationTypesRule(context) {
   }
 }
 
-},{"../../error/GraphQLError.js":26}],142:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27}],143:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -75785,7 +75815,7 @@ function UniqueTypeNamesRule(context) {
   }
 }
 
-},{"../../error/GraphQLError.js":26}],143:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27}],144:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -75818,7 +75848,7 @@ function UniqueVariableNamesRule(context) {
   };
 }
 
-},{"../../error/GraphQLError.js":26}],144:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27}],145:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -75963,7 +75993,7 @@ function isValidValueNode(context, node) {
   }
 }
 
-},{"../../error/GraphQLError.js":26,"../../jsutils/didYouMean.js":39,"../../jsutils/inspect.js":41,"../../jsutils/keyMap.js":48,"../../jsutils/suggestionList.js":56,"../../language/printer.js":68,"../../polyfills/objectValues.js":77,"../../type/definition.js":82}],145:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27,"../../jsutils/didYouMean.js":40,"../../jsutils/inspect.js":42,"../../jsutils/keyMap.js":49,"../../jsutils/suggestionList.js":57,"../../language/printer.js":69,"../../polyfills/objectValues.js":78,"../../type/definition.js":83}],146:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -75999,7 +76029,7 @@ function VariablesAreInputTypesRule(context) {
   };
 }
 
-},{"../../error/GraphQLError.js":26,"../../language/printer.js":68,"../../type/definition.js":82,"../../utilities/typeFromAST.js":109}],146:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27,"../../language/printer.js":69,"../../type/definition.js":83,"../../utilities/typeFromAST.js":110}],147:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -76088,7 +76118,7 @@ function allowedVariableUsage(schema, varType, varDefaultValue, locationType, lo
   return (0, _typeComparators.isTypeSubTypeOf)(schema, varType, locationType);
 }
 
-},{"../../error/GraphQLError.js":26,"../../jsutils/inspect.js":41,"../../language/kinds.js":62,"../../type/definition.js":82,"../../utilities/typeComparators.js":108,"../../utilities/typeFromAST.js":109}],147:[function(require,module,exports){
+},{"../../error/GraphQLError.js":27,"../../jsutils/inspect.js":42,"../../language/kinds.js":63,"../../type/definition.js":83,"../../utilities/typeComparators.js":109,"../../utilities/typeFromAST.js":110}],148:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -76169,7 +76199,7 @@ function NoDeprecatedCustomRule(context) {
   };
 }
 
-},{"../../../error/GraphQLError.js":26,"../../../jsutils/invariant.js":43,"../../../type/definition.js":82}],148:[function(require,module,exports){
+},{"../../../error/GraphQLError.js":27,"../../../jsutils/invariant.js":44,"../../../type/definition.js":83}],149:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -76205,7 +76235,7 @@ function NoSchemaIntrospectionCustomRule(context) {
   };
 }
 
-},{"../../../error/GraphQLError.js":26,"../../../type/definition.js":82,"../../../type/introspection.js":85}],149:[function(require,module,exports){
+},{"../../../error/GraphQLError.js":27,"../../../type/definition.js":83,"../../../type/introspection.js":86}],150:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -76322,7 +76352,7 @@ exports.specifiedRules = specifiedRules;
 var specifiedSDLRules = Object.freeze([_LoneSchemaDefinitionRule.LoneSchemaDefinitionRule, _UniqueOperationTypesRule.UniqueOperationTypesRule, _UniqueTypeNamesRule.UniqueTypeNamesRule, _UniqueEnumValueNamesRule.UniqueEnumValueNamesRule, _UniqueFieldDefinitionNamesRule.UniqueFieldDefinitionNamesRule, _UniqueDirectiveNamesRule.UniqueDirectiveNamesRule, _KnownTypeNamesRule.KnownTypeNamesRule, _KnownDirectivesRule.KnownDirectivesRule, _UniqueDirectivesPerLocationRule.UniqueDirectivesPerLocationRule, _PossibleTypeExtensionsRule.PossibleTypeExtensionsRule, _KnownArgumentNamesRule.KnownArgumentNamesOnDirectivesRule, _UniqueArgumentNamesRule.UniqueArgumentNamesRule, _UniqueInputFieldNamesRule.UniqueInputFieldNamesRule, _ProvidedRequiredArgumentsRule.ProvidedRequiredArgumentsOnDirectivesRule]);
 exports.specifiedSDLRules = specifiedSDLRules;
 
-},{"./rules/ExecutableDefinitionsRule.js":114,"./rules/FieldsOnCorrectTypeRule.js":115,"./rules/FragmentsOnCompositeTypesRule.js":116,"./rules/KnownArgumentNamesRule.js":117,"./rules/KnownDirectivesRule.js":118,"./rules/KnownFragmentNamesRule.js":119,"./rules/KnownTypeNamesRule.js":120,"./rules/LoneAnonymousOperationRule.js":121,"./rules/LoneSchemaDefinitionRule.js":122,"./rules/NoFragmentCyclesRule.js":123,"./rules/NoUndefinedVariablesRule.js":124,"./rules/NoUnusedFragmentsRule.js":125,"./rules/NoUnusedVariablesRule.js":126,"./rules/OverlappingFieldsCanBeMergedRule.js":127,"./rules/PossibleFragmentSpreadsRule.js":128,"./rules/PossibleTypeExtensionsRule.js":129,"./rules/ProvidedRequiredArgumentsRule.js":130,"./rules/ScalarLeafsRule.js":131,"./rules/SingleFieldSubscriptionsRule.js":132,"./rules/UniqueArgumentNamesRule.js":133,"./rules/UniqueDirectiveNamesRule.js":134,"./rules/UniqueDirectivesPerLocationRule.js":135,"./rules/UniqueEnumValueNamesRule.js":136,"./rules/UniqueFieldDefinitionNamesRule.js":137,"./rules/UniqueFragmentNamesRule.js":138,"./rules/UniqueInputFieldNamesRule.js":139,"./rules/UniqueOperationNamesRule.js":140,"./rules/UniqueOperationTypesRule.js":141,"./rules/UniqueTypeNamesRule.js":142,"./rules/UniqueVariableNamesRule.js":143,"./rules/ValuesOfCorrectTypeRule.js":144,"./rules/VariablesAreInputTypesRule.js":145,"./rules/VariablesInAllowedPositionRule.js":146}],150:[function(require,module,exports){
+},{"./rules/ExecutableDefinitionsRule.js":115,"./rules/FieldsOnCorrectTypeRule.js":116,"./rules/FragmentsOnCompositeTypesRule.js":117,"./rules/KnownArgumentNamesRule.js":118,"./rules/KnownDirectivesRule.js":119,"./rules/KnownFragmentNamesRule.js":120,"./rules/KnownTypeNamesRule.js":121,"./rules/LoneAnonymousOperationRule.js":122,"./rules/LoneSchemaDefinitionRule.js":123,"./rules/NoFragmentCyclesRule.js":124,"./rules/NoUndefinedVariablesRule.js":125,"./rules/NoUnusedFragmentsRule.js":126,"./rules/NoUnusedVariablesRule.js":127,"./rules/OverlappingFieldsCanBeMergedRule.js":128,"./rules/PossibleFragmentSpreadsRule.js":129,"./rules/PossibleTypeExtensionsRule.js":130,"./rules/ProvidedRequiredArgumentsRule.js":131,"./rules/ScalarLeafsRule.js":132,"./rules/SingleFieldSubscriptionsRule.js":133,"./rules/UniqueArgumentNamesRule.js":134,"./rules/UniqueDirectiveNamesRule.js":135,"./rules/UniqueDirectivesPerLocationRule.js":136,"./rules/UniqueEnumValueNamesRule.js":137,"./rules/UniqueFieldDefinitionNamesRule.js":138,"./rules/UniqueFragmentNamesRule.js":139,"./rules/UniqueInputFieldNamesRule.js":140,"./rules/UniqueOperationNamesRule.js":141,"./rules/UniqueOperationTypesRule.js":142,"./rules/UniqueTypeNamesRule.js":143,"./rules/UniqueVariableNamesRule.js":144,"./rules/ValuesOfCorrectTypeRule.js":145,"./rules/VariablesAreInputTypesRule.js":146,"./rules/VariablesInAllowedPositionRule.js":147}],151:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -76452,7 +76482,7 @@ function assertValidSDLExtension(documentAST, schema) {
   }
 }
 
-},{"../error/GraphQLError.js":26,"../jsutils/devAssert.js":38,"../language/visitor.js":71,"../type/validate.js":88,"../utilities/TypeInfo.js":89,"./ValidationContext.js":112,"./specifiedRules.js":149}],151:[function(require,module,exports){
+},{"../error/GraphQLError.js":27,"../jsutils/devAssert.js":39,"../language/visitor.js":72,"../type/validate.js":89,"../utilities/TypeInfo.js":90,"./ValidationContext.js":113,"./specifiedRules.js":150}],152:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -76482,7 +76512,7 @@ var versionInfo = Object.freeze({
 });
 exports.versionInfo = versionInfo;
 
-},{}],152:[function(require,module,exports){
+},{}],153:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -76992,7 +77022,7 @@ exports.defaultMakeCacheKey = defaultMakeCacheKey;
 exports.wrap = wrap;
 
 
-},{"@wry/context":1}],153:[function(require,module,exports){
+},{"@wry/context":1}],154:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -77178,7 +77208,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],154:[function(require,module,exports){
+},{}],155:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -77249,7 +77279,7 @@ exports.invariant = invariant;
 
 
 }).call(this,require('_process'))
-},{"_process":153,"tslib":155}],155:[function(require,module,exports){
+},{"_process":154,"tslib":156}],156:[function(require,module,exports){
 (function (global){
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation.
@@ -77537,7 +77567,7 @@ var __createBinding;
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],156:[function(require,module,exports){
+},{}],157:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var tslib_1 = require("tslib");
@@ -77545,17 +77575,17 @@ var zenObservable_1 = require("./zenObservable");
 tslib_1.__exportStar(require("./zenObservable"), exports);
 exports.default = zenObservable_1.Observable;
 
-},{"./zenObservable":157,"tslib":155}],157:[function(require,module,exports){
+},{"./zenObservable":158,"tslib":156}],158:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var tslib_1 = require("tslib");
 var zen_observable_1 = tslib_1.__importDefault(require("zen-observable"));
 exports.Observable = zen_observable_1.default;
 
-},{"tslib":155,"zen-observable":158}],158:[function(require,module,exports){
+},{"tslib":156,"zen-observable":159}],159:[function(require,module,exports){
 module.exports = require('./lib/Observable.js').Observable;
 
-},{"./lib/Observable.js":159}],159:[function(require,module,exports){
+},{"./lib/Observable.js":160}],160:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -78173,7 +78203,7 @@ if (hasSymbols()) {
     configurable: true
   });
 }
-},{}],160:[function(require,module,exports){
+},{}],161:[function(require,module,exports){
 'use strict';
 
 var _angular = require('angular');
@@ -78251,7 +78281,7 @@ _angular2.default.bootstrap(document, ['app'], {
   strictDi: true
 });
 
-},{"./auth":163,"./components":171,"./config/app.config":174,"./config/app.constants":175,"./config/app.run":176,"./config/app.templates":177,"./editor":181,"./foods":187,"./home":191,"./layout":194,"./products":195,"./profile":198,"./services":205,"./settings":212,"angular":11,"angular-messages":4,"angular-toastr":6,"angular-ui-bootstrap":8,"angular-ui-router":9}],161:[function(require,module,exports){
+},{"./auth":164,"./components":172,"./config/app.config":175,"./config/app.constants":176,"./config/app.run":177,"./config/app.templates":178,"./editor":182,"./foods":188,"./home":192,"./layout":195,"./products":196,"./profile":199,"./services":206,"./settings":213,"angular":11,"angular-messages":4,"angular-toastr":6,"angular-ui-bootstrap":8,"angular-ui-router":9}],162:[function(require,module,exports){
 'use strict';
 
 AuthConfig.$inject = ["$stateProvider", "$httpProvider"];
@@ -78295,7 +78325,7 @@ function AuthConfig($stateProvider, $httpProvider) {
 
 exports.default = AuthConfig;
 
-},{}],162:[function(require,module,exports){
+},{}],163:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -78345,7 +78375,7 @@ var AuthCtrl = function () {
 
 exports.default = AuthCtrl;
 
-},{}],163:[function(require,module,exports){
+},{}],164:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -78385,7 +78415,7 @@ authModule.controller('SocialCtrl', _social2.default);
 
 exports.default = authModule;
 
-},{"./auth.config":161,"./auth.controller":162,"./social.controller":164,"angular":11}],164:[function(require,module,exports){
+},{"./auth.config":162,"./auth.controller":163,"./social.controller":165,"angular":11}],165:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -78424,7 +78454,7 @@ SocialCtrl.$inject = ["User", "$state", "$scope"];
 
 exports.default = SocialCtrl;
 
-},{}],165:[function(require,module,exports){
+},{}],166:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -78489,7 +78519,7 @@ var FavoriteFoodBtn = {
 
 exports.default = FavoriteFoodBtn;
 
-},{}],166:[function(require,module,exports){
+},{}],167:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -78555,7 +78585,7 @@ var FollowBtn = {
 
 exports.default = FollowBtn;
 
-},{}],167:[function(require,module,exports){
+},{}],168:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -78616,7 +78646,7 @@ var FoodActions = {
 
 exports.default = FoodActions;
 
-},{}],168:[function(require,module,exports){
+},{}],169:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -78730,7 +78760,7 @@ var FoodsList = {
 
 exports.default = FoodsList;
 
-},{}],169:[function(require,module,exports){
+},{}],170:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -78745,7 +78775,7 @@ var FoodsPreview = {
 
 exports.default = FoodsPreview;
 
-},{}],170:[function(require,module,exports){
+},{}],171:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -78798,7 +78828,7 @@ var ListPaginationFoods = {
 
 exports.default = ListPaginationFoods;
 
-},{}],171:[function(require,module,exports){
+},{}],172:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -78863,7 +78893,7 @@ componentsModule.component('listPaginationFoods', _listPaginationFoods2.default)
 
 exports.default = componentsModule;
 
-},{"./buttons/favorite-food-btn.component":165,"./buttons/follow-btn.component":166,"./foods-helpers/food-actions.component":167,"./foods-helpers/foods-list.component":168,"./foods-helpers/foods-preview.component":169,"./foods-helpers/list-pagination-foods.component":170,"./list-errors.component":172,"./show-authed.directive":173,"angular":11}],172:[function(require,module,exports){
+},{"./buttons/favorite-food-btn.component":166,"./buttons/follow-btn.component":167,"./foods-helpers/food-actions.component":168,"./foods-helpers/foods-list.component":169,"./foods-helpers/foods-preview.component":170,"./foods-helpers/list-pagination-foods.component":171,"./list-errors.component":173,"./show-authed.directive":174,"angular":11}],173:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -78878,7 +78908,7 @@ var ListErrors = {
 
 exports.default = ListErrors;
 
-},{}],173:[function(require,module,exports){
+},{}],174:[function(require,module,exports){
 'use strict';
 
 ShowAuthed.$inject = ["User"];
@@ -78917,7 +78947,7 @@ function ShowAuthed(User) {
 
 exports.default = ShowAuthed;
 
-},{}],174:[function(require,module,exports){
+},{}],175:[function(require,module,exports){
 'use strict';
 
 AppConfig.$inject = ["$httpProvider", "$stateProvider", "$locationProvider", "$urlRouterProvider"];
@@ -78957,7 +78987,7 @@ function AppConfig($httpProvider, $stateProvider, $locationProvider, $urlRouterP
 
 exports.default = AppConfig;
 
-},{"./auth.interceptor":178}],175:[function(require,module,exports){
+},{"./auth.interceptor":179}],176:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -78972,7 +79002,7 @@ var AppConstants = {
 
 exports.default = AppConstants;
 
-},{}],176:[function(require,module,exports){
+},{}],177:[function(require,module,exports){
 'use strict';
 
 AppRun.$inject = ["AppConstants", "$rootScope"];
@@ -79001,23 +79031,23 @@ function AppRun(AppConstants, $rootScope) {
 
 exports.default = AppRun;
 
-},{}],177:[function(require,module,exports){
+},{}],178:[function(require,module,exports){
 "use strict";
 
 angular.module("templates", []).run(["$templateCache", function ($templateCache) {
   $templateCache.put("auth/auth.html", "<div class=\"auth-page\">\n  <div class=\"container page\">\n    <div class=\"row\">\n\n      <div class=\"col-md-6 offset-md-3 col-xs-12\">\n        <h1 class=\"text-xs-center\" ng-bind=\"::$ctrl.title\"></h1>\n        <p class=\"text-xs-center\">\n          <a ui-sref=\"app.login\"\n            ng-show=\"$ctrl.authType === \'register\'\">\n            Have an account?\n          </a>\n          <a ui-sref=\"app.register\"\n            ng-show=\"$ctrl.authType === \'login\'\">\n            Need an account?\n          </a>\n        </p>\n\n        <a href=\"http://localhost:3000/api/auth/github\" style=\"font-size: 25px; color:black\">Github</a><br>\n        <a href=\"http://localhost:3000/api/auth/googleplus\" style=\"font-size: 25px; color:black\">Google</a>\n\n        <list-errors errors=\"$ctrl.errors\"></list-errors>\n\n        <form name=\"formData\" ng-submit=\"$ctrl.submitForm()\">\n          <fieldset ng-disabled=\"$ctrl.isSubmitting\">\n\n            <!-- Form -->\n            <fieldset class=\"form-group\" ng-show=\"$ctrl.authType === \'register\'\" ng-disabled=\"$ctrl.authType != \'register\'\">\n              <input class=\"form-control form-control-lg\" type=\"text\" placeholder=\"Username\"\n                ng-model=\"$ctrl.formData.username\" name=\"Username\" ng-minlength=\"3\" ng-maxlength=\"16\" required/>\n              <div ng-messages=\"formData.Username.$error\" style=\"color: red;\">\n                <p ng-message=\"required\" ng-show = \"formData.Username.$dirty\">Username is required</p>\n                <p ng-message=\"minlength\">Enter more than 3 characters</p>\n                <p ng-message=\"maxlength\">Enter less than 16 characters</p>\n              </div>\n            </fieldset>\n            \n\n            <fieldset class=\"form-group\">\n              <input class=\"form-control form-control-lg\" type=\"email\" placeholder=\"Email\"\n                ng-model=\"$ctrl.formData.email\" name=\"Email\" required/>\n              <div ng-messages=\"formData.Email.$error\" style=\"color: red;\">\n                <p ng-message=\"required\" ng-show=\"formData.Email.$dirty\">Email is required</p>\n              </div>\n            </fieldset>\n\n\n            <fieldset class=\"form-group\">\n              <input required class=\"form-control form-control-lg\" type=\"password\" placeholder=\"Password\"\n                 ng-model=\"$ctrl.formData.password\" name=\"Password\" ng-minlength=\"6\" ng-maxlength=\"20\"/>\n              <div ng-messages=\"formData.Password.$error\" style=\"color: red;\">\n                <p ng-message=\"required\" ng-show=\"formData.Password.$dirty\">Password is required</p>\n                <p ng-message=\"minlength\">Enter more than 6 charecters</p>\n                <p ng-message=\"maxlength\">Enter less than 20 characters</p>\n              </div>\n            </fieldset>\n\n\n            <!-- Buttons -->\n            <fieldset ng-show=\"$ctrl.authType === \'register\'\">\n              <button class=\"btn btn-lg btn-primary pull-xs-right\"\n                type=\"submit\" ng-bind=\"::$ctrl.title\"\n                ng-show=\"formData.Username.$valid && formData.Email.$valid && formData.Password.$valid\">\n              </button>\n            </fieldset>\n\n            <fieldset ng-show=\"$ctrl.authType === \'login\'\">\n              <button class=\"btn btn-lg btn-primary pull-xs-right\"\n                type=\"submit\" ng-bind=\"::$ctrl.title\"\n                ng-show=\"formData.Email.$valid && formData.Password.$valid\">\n              </button>\n            </fieldset> \n\n          </fieldset>\n        </form>\n      </div>\n\n    </div>\n  </div>\n</div>\n\n\n\n\n\n       ");
-  $templateCache.put("editor/editor.html", "<div class=\"editor-page\">\n    <div class=\"container page\">\n      <div class=\"row\">\n        <div class=\"col-md-10 offset-md-1 col-xs-12\">\n          \n          <h1>New Recipe</h1>\n          <list-errors errors=\"$ctrl.errors\"></list-errors>\n  \n          <form>\n            <fieldset ng-disabled=\"$ctrl.isSubmitting\">\n  \n              <fieldset class=\"form-group\">\n                <input class=\"form-control form-control-lg\"\n                  ng-model=\"$ctrl.food.title\"\n                  type=\"text\"\n                  placeholder=\"Recipe Name\"/>\n              </fieldset>\n  \n              <fieldset class=\"form-group\">\n                <input class=\"form-control\"\n                  ng-model=\"$ctrl.food.description\"\n                  type=\"text\"\n                  placeholder=\"What\'s this recipe about?\" />\n              </fieldset>\n  \n              <fieldset class=\"form-group\">\n                <textarea class=\"form-control\"\n                  rows=\"8\"\n                  ng-model=\"$ctrl.food.body\"\n                  placeholder=\"Write your recipe\">\n                </textarea>\n              </fieldset>\n\n              <fieldset class=\"form-group\">\n                <textarea class=\"form-control\"\n                  ng-model=\"$ctrl.food.difficulty\"\n                  placeholder=\"Describe the difficulty in one or two words: Easy, Medium, Hard, etc\">\n                </textarea>\n              </fieldset>\n\n              <fieldset class=\"form-group\">\n                <input class=\"form-control\"\n                  type=\"text\"\n                  placeholder=\"Enter tags\"\n                  ng-model=\"$ctrl.tagField\"\n                  ng-keyup=\"$event.keyCode == 13 && $ctrl.addTag()\" />\n\n                <div class=\"tag-list\">\n                  <span ng-repeat=\"tag in $ctrl.food.tagList\"\n                    class=\"tag-default tag-pill\">\n                    <i class=\"ion-close-round\" ng-click=\"$ctrl.removeTag(tag)\"></i>\n                    {{ tag }}\n                  </span>\n                </div>\n              </fieldset>\n  \n              <button class=\"btn btn-lg pull-xs-right btn-primary\" type=\"button\" ng-hide=\"$ctrl.toUpdate\" ng-click=\"$ctrl.submit()\">\n                Publish Recipe\n              </button>\n\n              <button class=\"btn btn-lg pull-xs-right btn-primary\" type=\"button\" ng-show=\"$ctrl.toUpdate\" ng-click=\"$ctrl.submit()\">\n                Update Recipe\n              </button>\n  \n            </fieldset>\n          </form>\n  \n        </div>\n      </div>\n    </div>\n  </div>\n  ");
   $templateCache.put("components/list-errors.html", "<ul class=\"error-messages\" ng-show=\"$ctrl.errors\">\n  <div ng-repeat=\"(field, errors) in $ctrl.errors\">\n    <li ng-repeat=\"error in errors\">\n      {{field}} {{error}}\n    </li>\n  </div>\n</ul>\n");
+  $templateCache.put("editor/editor.html", "<div class=\"editor-page\">\n    <div class=\"container page\">\n      <div class=\"row\">\n        <div class=\"col-md-10 offset-md-1 col-xs-12\">\n          \n          <h1>New Recipe</h1>\n          <list-errors errors=\"$ctrl.errors\"></list-errors>\n  \n          <form>\n            <fieldset ng-disabled=\"$ctrl.isSubmitting\">\n  \n              <fieldset class=\"form-group\">\n                <input class=\"form-control form-control-lg\"\n                  ng-model=\"$ctrl.food.title\"\n                  type=\"text\"\n                  placeholder=\"Recipe Name\"/>\n              </fieldset>\n  \n              <fieldset class=\"form-group\">\n                <input class=\"form-control\"\n                  ng-model=\"$ctrl.food.description\"\n                  type=\"text\"\n                  placeholder=\"What\'s this recipe about?\" />\n              </fieldset>\n  \n              <fieldset class=\"form-group\">\n                <textarea class=\"form-control\"\n                  rows=\"8\"\n                  ng-model=\"$ctrl.food.body\"\n                  placeholder=\"Write your recipe\">\n                </textarea>\n              </fieldset>\n\n              <fieldset class=\"form-group\">\n                <textarea class=\"form-control\"\n                  ng-model=\"$ctrl.food.difficulty\"\n                  placeholder=\"Describe the difficulty in one or two words: Easy, Medium, Hard, etc\">\n                </textarea>\n              </fieldset>\n\n              <fieldset class=\"form-group\">\n                <input class=\"form-control\"\n                  type=\"text\"\n                  placeholder=\"Enter tags\"\n                  ng-model=\"$ctrl.tagField\"\n                  ng-keyup=\"$event.keyCode == 13 && $ctrl.addTag()\" />\n\n                <div class=\"tag-list\">\n                  <span ng-repeat=\"tag in $ctrl.food.tagList\"\n                    class=\"tag-default tag-pill\">\n                    <i class=\"ion-close-round\" ng-click=\"$ctrl.removeTag(tag)\"></i>\n                    {{ tag }}\n                  </span>\n                </div>\n              </fieldset>\n  \n              <button class=\"btn btn-lg pull-xs-right btn-primary\" type=\"button\" ng-hide=\"$ctrl.toUpdate\" ng-click=\"$ctrl.submit()\">\n                Publish Recipe\n              </button>\n\n              <button class=\"btn btn-lg pull-xs-right btn-primary\" type=\"button\" ng-show=\"$ctrl.toUpdate\" ng-click=\"$ctrl.submit()\">\n                Update Recipe\n              </button>\n  \n            </fieldset>\n          </form>\n  \n        </div>\n      </div>\n    </div>\n  </div>\n  ");
+  $templateCache.put("foods/comment-food.html", "<hr>\n\n<div class=\"card\">\n    <div class=\"card-block\">\n      <p class=\"card-text\" ng-bind=\"$ctrl.data.body\"></p>\n    </div>\n    <div class=\"card-footer\">\n      <a class=\"comment-author\" ui-sref=\"app.profile.main({ username: $ctrl.data.author.username })\">\n        <img ng-src=\"{{$ctrl.data.author.image}}\" class=\"comment-author-img\" />\n      </a>\n      &nbsp;\n      <a class=\"comment-author\" ui-sref=\"app.profile.main({ username: $ctrl.data.author.username })\" ng-bind=\"$ctrl.data.author.username\">\n      </a>\n      <span class=\"date-posted\"\n        ng-bind=\"$ctrl.data.createdAt | date: \'longDate\'\">\n      </span>\n      &nbsp;\n      <span class=\"mod-options\" ng-show=\"$ctrl.canModify\">\n        <i class=\"ion-trash-a\" ng-click=\"$ctrl.deleteCb()\"></i>\n      </span>\n    </div>\n  </div>");
+  $templateCache.put("foods/filterfoods.html", "<hr>\n<blockquote>\n  <button class=\"button-deletefilters\" ui-sref=\"app.foods\">DELETE FILTERS</button>\n  <br><br>\n\n  <div ng-repeat=\"food in $ctrl.filteredFoods\">\n      <hr>\n      <label>Author:</label> <a class=\"author\"\n        ui-sref=\"app.profile.main({ username:food.author.username })\"\n        ng-bind=\"food.author.username\">\n      </a>\n\n      <a ui-sref=\"app.detailsFood({ slug:food.slug })\" class=\"preview-link\">\n        <h1 ng-bind=\"food.title\"></h1>\n        <p style=\"font-size: 12px;\">Difficulty: {{food.difficulty}}</p>\n        <p ng-bind=\"food.description\"></p>\n        <button class=\"button-details\">Read recipe...</span>\n      </a>\n  </div>\n  <hr>\n</blockquote>");
+  $templateCache.put("foods/food.html", "<hr>\n<blockquote>\n  <div>\n    <label>Author:</label> <a class=\"author\"\n      ui-sref=\"app.profile.main({ username:$ctrl.food.author.username })\"\n      ng-bind=\"$ctrl.food.author.username\">\n    </a>\n    <food-actions food=\"$ctrl.food\"></food-actions>\n  \n    <h1>{{$ctrl.food.title}}</h1>\n    <p style=\"font-size: 12px;\">Difficulty: {{$ctrl.food.difficulty}}</p>\n    <p>{{$ctrl.food.description}}</p>\n    <p>{{$ctrl.food.body}}</p>\n\n    <ul class=\"tag-list\">\n      <li class=\"tag-default tag-pill tag-outline\"\n        ng-repeat=\"tag in $ctrl.food.tagList\">\n        {{tag}}\n      </li>\n    </ul>\n  </div><br>\n\n  <!-- Comments section -->\n  <div class=\"row\">\n    <div class=\"col-xs-12 col-md-8 offset-md-2\">\n\n      <div show-authed=\"true\">\n        <list-errors from=\"$crl.commentForm.errors\"></list-errors>\n        <form class=\"card comment-form\" ng-submit=\"$ctrl.addComment()\">\n          <fieldset ng-disabled=\"$ctrl.commentForm.isSubmitting\">\n            <div class=\"card-block\">\n              <textarea class=\"form-control\"\n                placeholder=\"Write a comment...\"\n                rows=\"3\"\n                ng-model=\"$ctrl.commentForm.body\"></textarea>\n            </div>\n            <div class=\"card-footer\">\n              <img ng-src=\"{{$ctrl.currentUser.image}}\" class=\"comment-author-img\" />\n              <button class=\"btn btn-sm btn-primary\" type=\"submit\">\n               Post Comment\n              </button>\n            </div>\n          </fieldset>\n        </form>\n      </div>\n\n      <div show-authed=\"false\">\n        <a ui-sref=\"app.login\">Sign in</a> or <a ui-sref=\"app.register\">sign up</a> to add comments on this article.\n      </div>\n\n      <comment-food ng-repeat=\"cmt in $ctrl.comments\"\n        data=\"cmt\" food-author=\"$ctrl.food.author\"\n        delete-cb=\"$ctrl.deleteComment(cmt.id, $index)\">\n      </comment-food>\n\n    </div>\n  </div>\n</blockquote>");
+  $templateCache.put("foods/foods.html", "<div class=\"col-md-9\">\n    <!-- Tabs for toggling between feed, article lists -->\n    <div class=\"feed-toggle\">\n      <ul class=\"nav nav-pills outline-active\">\n\n        <li class=\"nav-item\">\n          <a href=\"\" class=\"nav-link\"\n            ng-class=\"{ active: $ctrl.listConfig.type === \'all\' && !$ctrl.listConfig.filters }\"\n            ng-click=\"$ctrl.changeList({ type: \'all\' })\">\n            Global Feed\n          </a>\n        </li>\n\n        <li class=\"nav-item\" show-authed=\"true\">\n            <a href=\"\" class=\"nav-link\"\n              ng-class=\"{ active: $ctrl.listConfig.type === \'feed\' }\"\n              ng-click=\"$ctrl.changeList({ type: \'feed\' })\">\n              Your Feed\n            </a>\n        </li>\n\n        <li class=\"nav-item\" ng-show=\"$ctrl.listConfig.filters.tag\">\n          <a href=\"\" class=\"nav-link active\">\n            <i class=\"ion-pound\"></i> {{$ctrl.listConfig.filters.tag}}\n          </a>\n        </li>\n\n      </ul>\n    </div>\n\n    <!-- List the current foods -->\n    <foods-list limit=\"5\" list-config=\"$ctrl.listConfig\"></foods-list>\n    \n  </div>\n\n\n  <!-- Tags -->\n  <div class=\"col-md-3\">\n    <div class=\"sidebar\">\n\n      <p>Popular Tags</p>\n      <div class=\"tag-list\" ng-show=\"$ctrl.tags\">\n        <a href=\"\" class=\"tag-default tag-pill\"\n          ng-click=\"$ctrl.changeList({ type: \'all\', filters: { tag: tagName } })\"\n          ng-repeat=\"tagName in $ctrl.tags\"\n          ng-bind=\"tagName\">\n        </a>\n      </div>\n\n      <div ng-show=\"!$ctrl.tagsLoaded\">\n        Loading tags...\n      </div>\n\n      <div class=\"post-preview\"\n        ng-show=\"$ctrl.tagsLoaded && !$ctrl.tags.length\">\n        No tags are here... yet.\n      </div>\n\n    </div>\n  </div>\n\n\n\n");
   $templateCache.put("home/home-slider.html", "<div style=\"height: 400px\">\n    <div uib-carousel active=\"active\" interval=\"$ctrl.myInterval\" no-wrap=\"$ctrl.noWrapSlides\">\n        <div uib-slide ng-repeat=\"slide in $ctrl.slides track by slide.id\" index=\"slide.id\" style=\"height: 400px\">\n            <img ng-src=\"{{slide.image}}\" class=\"img-fluid\" style=\"filter: blur(2px);\">\n            <div class = \"carousel-caption\" style = \"padding-bottom: 100px;\">\n                <h2>{{slide.text}}</h2>\n            </div>\n        </div>\n    </div>\n</div>");
   $templateCache.put("home/home.html", " <div class=\"home-page\">\n\n  <!-- Splash banner that only shows when not logged in -->\n  <div class=\"banner\" show-authed=\"false\">\n    <div class=\"container\">\n      <h1 class=\"logo-font\" ng-bind=\"::$ctrl.appName | lowercase\"></h1>\n      <p>A place to share your knowledge.</p>\n    </div>\n  </div>\n\n  <home-slider></home-slider>\n\n\n\n  <h1 class=\"findbycat\">Find by Categories</h1>\n\n  <div class=\"cats\">\n    <div class=\"cats__cat\" ng-repeat=\"d in $ctrl.difficulty\">\n      <button class=\"button-categories\" ui-sref=\"app.filterFoods({filter:d})\">{{ d }}</button>\n    </div>\n  </div>\n\n</div>\n");
   $templateCache.put("layout/app-view.html", "<app-header></app-header>\n\n<div ui-view></div>\n\n<app-footer></app-footer>\n");
   $templateCache.put("layout/footer.html", "<footer>\n  <div class=\"container\">\n    <a class=\"logo-font\" ui-sref=\"app.home\" ng-bind=\"::$ctrl.appName | lowercase\"></a>\n    <span class=\"attribution\">\n      &copy; {{::$ctrl.date | date:\'yyyy\'}}.\n      An interactive learning project from <a href=\"https://thinkster.io\">Thinkster</a>.\n      Code licensed under MIT.\n    </span>\n  </div>\n</footer>\n");
   $templateCache.put("layout/header.html", "<nav class=\"navbar navbar-light\">\n  <div class=\"container\">\n\n    <a class=\"navbar-brand\"\n      ui-sref=\"app.home\"\n      ng-bind=\"::$ctrl.appName\">\n    </a>\n\n<!--  -->\n    <!-- Show this for logged out users -->\n    <ul show-authed=\"false\"\n      class=\"nav navbar-nav pull-xs-right\">\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.home\">\n          Home\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.login\">\n          Sign in\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.register\">\n          Sign up\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.foods\">\n          Foods\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.products\">\n          Products\n        </a>\n      </li>\n\n    </ul>\n\n<!--  -->\n    <!-- Show this for logged in users -->\n    <ul show-authed=\"true\"\n      class=\"nav navbar-nav pull-xs-right\">\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.home\">\n          Home\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.editor\">\n          <i class=\"ion-compose\"></i>&nbsp;New Recipe\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.settings\">\n          <i class=\"ion-gear-a\"></i>&nbsp;Settings\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.profile.main({ username: $ctrl.currentUser.username})\">\n          <img ng-src=\"{{$ctrl.currentUser.image}}\" class=\"user-pic\" />\n          {{ $ctrl.currentUser.username }}\n        </a>\n      </li>\n\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.foods\">\n          Foods\n        </a>\n      </li>\n\n      <li class=\"nav-item\">\n        <a class=\"nav-link\"\n          ui-sref-active=\"active\"\n          ui-sref=\"app.products\">\n          Products\n        </a>\n      </li>\n\n    </ul>\n\n\n  </div>\n</nav>\n");
-  $templateCache.put("foods/comment-food.html", "<hr>\n\n<div class=\"card\">\n    <div class=\"card-block\">\n      <p class=\"card-text\" ng-bind=\"$ctrl.data.body\"></p>\n    </div>\n    <div class=\"card-footer\">\n      <a class=\"comment-author\" ui-sref=\"app.profile.main({ username: $ctrl.data.author.username })\">\n        <img ng-src=\"{{$ctrl.data.author.image}}\" class=\"comment-author-img\" />\n      </a>\n      &nbsp;\n      <a class=\"comment-author\" ui-sref=\"app.profile.main({ username: $ctrl.data.author.username })\" ng-bind=\"$ctrl.data.author.username\">\n      </a>\n      <span class=\"date-posted\"\n        ng-bind=\"$ctrl.data.createdAt | date: \'longDate\'\">\n      </span>\n      &nbsp;\n      <span class=\"mod-options\" ng-show=\"$ctrl.canModify\">\n        <i class=\"ion-trash-a\" ng-click=\"$ctrl.deleteCb()\"></i>\n      </span>\n    </div>\n  </div>");
-  $templateCache.put("foods/filterfoods.html", "<hr>\n<blockquote>\n  <button class=\"button-deletefilters\" ui-sref=\"app.foods\">DELETE FILTERS</button>\n  <br><br>\n\n  <div ng-repeat=\"food in $ctrl.filteredFoods\">\n      <hr>\n      <label>Author:</label> <a class=\"author\"\n        ui-sref=\"app.profile.main({ username:food.author.username })\"\n        ng-bind=\"food.author.username\">\n      </a>\n\n      <a ui-sref=\"app.detailsFood({ slug:food.slug })\" class=\"preview-link\">\n        <h1 ng-bind=\"food.title\"></h1>\n        <p style=\"font-size: 12px;\">Difficulty: {{food.difficulty}}</p>\n        <p ng-bind=\"food.description\"></p>\n        <button class=\"button-details\">Read recipe...</span>\n      </a>\n  </div>\n  <hr>\n</blockquote>");
-  $templateCache.put("foods/food.html", "<hr>\n<blockquote>\n  <div>\n    <label>Author:</label> <a class=\"author\"\n      ui-sref=\"app.profile.main({ username:$ctrl.food.author.username })\"\n      ng-bind=\"$ctrl.food.author.username\">\n    </a>\n    <food-actions food=\"$ctrl.food\"></food-actions>\n  \n    <h1>{{$ctrl.food.title}}</h1>\n    <p style=\"font-size: 12px;\">Difficulty: {{$ctrl.food.difficulty}}</p>\n    <p>{{$ctrl.food.description}}</p>\n    <p>{{$ctrl.food.body}}</p>\n\n    <ul class=\"tag-list\">\n      <li class=\"tag-default tag-pill tag-outline\"\n        ng-repeat=\"tag in $ctrl.food.tagList\">\n        {{tag}}\n      </li>\n    </ul>\n  </div><br>\n\n  <!-- Comments section -->\n  <div class=\"row\">\n    <div class=\"col-xs-12 col-md-8 offset-md-2\">\n\n      <div show-authed=\"true\">\n        <list-errors from=\"$crl.commentForm.errors\"></list-errors>\n        <form class=\"card comment-form\" ng-submit=\"$ctrl.addComment()\">\n          <fieldset ng-disabled=\"$ctrl.commentForm.isSubmitting\">\n            <div class=\"card-block\">\n              <textarea class=\"form-control\"\n                placeholder=\"Write a comment...\"\n                rows=\"3\"\n                ng-model=\"$ctrl.commentForm.body\"></textarea>\n            </div>\n            <div class=\"card-footer\">\n              <img ng-src=\"{{$ctrl.currentUser.image}}\" class=\"comment-author-img\" />\n              <button class=\"btn btn-sm btn-primary\" type=\"submit\">\n               Post Comment\n              </button>\n            </div>\n          </fieldset>\n        </form>\n      </div>\n\n      <div show-authed=\"false\">\n        <a ui-sref=\"app.login\">Sign in</a> or <a ui-sref=\"app.register\">sign up</a> to add comments on this article.\n      </div>\n\n      <comment-food ng-repeat=\"cmt in $ctrl.comments\"\n        data=\"cmt\" food-author=\"$ctrl.food.author\"\n        delete-cb=\"$ctrl.deleteComment(cmt.id, $index)\">\n      </comment-food>\n\n    </div>\n  </div>\n</blockquote>");
-  $templateCache.put("foods/foods.html", "<div class=\"col-md-9\">\n    <!-- Tabs for toggling between feed, article lists -->\n    <div class=\"feed-toggle\">\n      <ul class=\"nav nav-pills outline-active\">\n\n        <li class=\"nav-item\">\n          <a href=\"\" class=\"nav-link\"\n            ng-class=\"{ active: $ctrl.listConfig.type === \'all\' && !$ctrl.listConfig.filters }\"\n            ng-click=\"$ctrl.changeList({ type: \'all\' })\">\n            Global Feed\n          </a>\n        </li>\n\n        <li class=\"nav-item\" show-authed=\"true\">\n            <a href=\"\" class=\"nav-link\"\n              ng-class=\"{ active: $ctrl.listConfig.type === \'feed\' }\"\n              ng-click=\"$ctrl.changeList({ type: \'feed\' })\">\n              Your Feed\n            </a>\n        </li>\n\n        <li class=\"nav-item\" ng-show=\"$ctrl.listConfig.filters.tag\">\n          <a href=\"\" class=\"nav-link active\">\n            <i class=\"ion-pound\"></i> {{$ctrl.listConfig.filters.tag}}\n          </a>\n        </li>\n\n      </ul>\n    </div>\n\n    <!-- List the current foods -->\n    <foods-list limit=\"5\" list-config=\"$ctrl.listConfig\"></foods-list>\n    \n  </div>\n\n\n  <!-- Tags -->\n  <div class=\"col-md-3\">\n    <div class=\"sidebar\">\n\n      <p>Popular Tags</p>\n      <div class=\"tag-list\" ng-show=\"$ctrl.tags\">\n        <a href=\"\" class=\"tag-default tag-pill\"\n          ng-click=\"$ctrl.changeList({ type: \'all\', filters: { tag: tagName } })\"\n          ng-repeat=\"tagName in $ctrl.tags\"\n          ng-bind=\"tagName\">\n        </a>\n      </div>\n\n      <div ng-show=\"!$ctrl.tagsLoaded\">\n        Loading tags...\n      </div>\n\n      <div class=\"post-preview\"\n        ng-show=\"$ctrl.tagsLoaded && !$ctrl.tags.length\">\n        No tags are here... yet.\n      </div>\n\n    </div>\n  </div>\n\n\n\n");
-  $templateCache.put("products/products.html", "<form name=\"formData\" ng-submit=\"$ctrl.submit()\">\n    <span><b>NEW PRODUCT</b></span><br><br>\n    <label>Name: </label><input type=\"text\" ng-model=\"$ctrl.formData.name\" placeholder=\"New product name\"><br><br>\n    <label>Decription: </label><input type=\"text\" ng-model=\"$ctrl.formData.description\" placeholder=\"Decription of product\"><br><br>\n    <button class=\"btn\" type=\"submit\">Create</button>\n</form>\n\n<hr>\n\n<div class=\"products\">\n    <div class=\"products__product\" ng-repeat=\"prod in $ctrl.products\">\n        <p>{{prod.name}}</p>\n        <p>{{prod.description}}</p>\n        <hr>\n    </div>\n</div>");
+  $templateCache.put("products/products.html", "<button ng-click=\"$ctrl.clickAuth()\">Try Auth (see in console.log)</button>\n<hr>\n\n<form name=\"formData\" ng-submit=\"$ctrl.submit()\">\n    <span><b>NEW PRODUCT</b></span><br><br>\n    <label>Name: </label><input type=\"text\" ng-model=\"$ctrl.formData.name\" placeholder=\"New product name\"><br><br>\n    <label>Decription: </label><input type=\"text\" ng-model=\"$ctrl.formData.description\" placeholder=\"Decription of product\"><br><br>\n    <button class=\"btn\" type=\"submit\">Create</button>\n</form>\n\n<hr>\n\n<div class=\"products\">\n    <div class=\"products__product\" ng-repeat=\"prod in $ctrl.products\">\n        <p>{{prod.name}}</p>\n        <p>{{prod.description}}</p>\n        <hr>\n    </div>\n</div>");
   $templateCache.put("profile/profile-foods.html", "<foods-list limit=\"5\" list-config=\"$ctrl.listConfig\"></foods-list>");
   $templateCache.put("profile/profile.html", "<div class=\"profile-page\">\n\n  <!-- User\'s basic info & action buttons -->\n  <div class=\"user-info\">\n    <div class=\"container\">\n      <div class=\"row\">\n        <div class=\"col-xs-12 col-md-10 offset-md-1\">\n\n          <img ng-src=\"{{::$ctrl.profile.image}}\" class=\"user-img\" />\n          <h4 ng-bind=\"::$ctrl.profile.username\"></h4>\n          <p ng-bind=\"::$ctrl.profile.bio\"></p>\n\n          <a ui-sref=\"app.settings\"\n            class=\"btn btn-sm btn-outline-secondary action-btn\"\n            ng-show=\"$ctrl.isUser\">\n            <i class=\"ion-gear-a\"></i> Edit Profile Settings\n          </a>\n\n          <follow-btn user=\"$ctrl.profile\" ng-hide=\"$ctrl.isUser\"></follow-btn>\n\n        </div>\n      </div>\n    </div>\n  </div>\n\n  <!-- Container where User\'s posts & favs are list w/ toggle tabs -->\n  <div class=\"container\">\n    <div class=\"row\">\n\n      <div class=\"col-xs-12 col-md-10 offset-md-1\">\n\n        <!-- Tabs for switching between author recipes & favorites -->\n        <div class=\"articles-toggle\">\n          <ul class=\"nav nav-pills outline-active\">\n\n            <li class=\"nav-item\">\n              <a class=\"nav-link active\"\n                ui-sref-active=\"active\"\n                ui-sref=\"app.profile.main({username: $ctrl.profile.username})\">\n                My Recipes\n              </a>\n            </li>\n\n            <li class=\"nav-item\">\n              <a class=\"nav-link\"\n                ui-sref-active=\"active\"\n                ui-sref=\"app.profile.favorites({username: $ctrl.profile.username})\">\n                Favorited Recipes\n              </a>\n            </li>\n\n          </ul>\n        </div>\n\n        <!-- List of recipes -->\n        <div ui-view></div>\n\n\n      </div>\n\n    <!-- End row & container divs -->\n    </div>\n  </div>\n\n</div>\n");
   $templateCache.put("settings/settings.html", "<div class=\"settings-page\">\n  <div class=\"container page\">\n    <div class=\"row\">\n      <div class=\"col-md-6 offset-md-3 col-xs-12\">\n\n        <h1 class=\"text-xs-center\">Your Settings</h1>\n\n        <list-errors errors=\"$ctrl.errors\"></list-errors>\n\n        <form ng-submit=\"$ctrl.submitForm()\">\n          <fieldset ng-disabled=\"$ctrl.isSubmitting\">\n\n            <fieldset class=\"form-group\">\n              <input class=\"form-control\"\n                type=\"text\"\n                placeholder=\"URL of profile picture\"\n                ng-model=\"$ctrl.formData.image\" />\n            </fieldset>\n\n            <fieldset class=\"form-group\">\n              <input class=\"form-control form-control-lg\"\n                type=\"text\"\n                placeholder=\"Username\"\n                ng-model=\"$ctrl.formData.username\" />\n            </fieldset>\n\n            <fieldset class=\"form-group\">\n              <textarea class=\"form-control form-control-lg\"\n                rows=\"8\"\n                placeholder=\"Short bio about you\"\n                ng-model=\"$ctrl.formData.bio\">\n              </textarea>\n            </fieldset>\n\n            <fieldset class=\"form-group\">\n              <input class=\"form-control form-control-lg\"\n                type=\"email\"\n                placeholder=\"Email\"\n                ng-model=\"$ctrl.formData.email\" />\n            </fieldset>\n\n            <fieldset class=\"form-group\">\n              <input class=\"form-control form-control-lg\"\n                type=\"password\"\n                placeholder=\"New Password\"\n                ng-model=\"$ctrl.formData.password\" />\n            </fieldset>\n\n            <button class=\"btn btn-lg btn-primary pull-xs-right\"\n              type=\"submit\">\n              Update Settings\n            </button>\n\n          </fieldset>\n        </form>\n\n        <!-- Line break for logout button -->\n        <hr />\n\n        <button class=\"btn btn-outline-danger\"\n          ng-click=\"$ctrl.logout()\">\n          Or click here to logout.\n        </button>\n\n      </div>\n    </div>\n  </div>\n</div>\n");
@@ -79030,7 +79060,7 @@ angular.module("templates", []).run(["$templateCache", function ($templateCache)
   $templateCache.put("components/foods-helpers/list-pagination-foods.html", "<nav>\n    <ul class=\"pagination\">\n  \n      <li class=\"page-item\"\n        ng-class=\"{active: pageNumber === $ctrl.currentPage }\"\n        ng-repeat=\"pageNumber in $ctrl.pageRange($ctrl.totalPages)\"\n        ng-click=\"$ctrl.changePage(pageNumber)\">\n  \n        <a class=\"page-link\" href=\"\">{{ pageNumber }}</a>\n  \n      </li>\n  \n    </ul>\n  </nav>\n  ");
 }]);
 
-},{}],178:[function(require,module,exports){
+},{}],179:[function(require,module,exports){
 'use strict';
 
 authInterceptor.$inject = ["JWT", "AppConstants", "$window", "$q"];
@@ -79065,7 +79095,7 @@ function authInterceptor(JWT, AppConstants, $window, $q) {
 
 exports.default = authInterceptor;
 
-},{}],179:[function(require,module,exports){
+},{}],180:[function(require,module,exports){
 'use strict';
 
 EditorConfig.$inject = ["$stateProvider", "$httpProvider"];
@@ -79107,7 +79137,7 @@ function EditorConfig($stateProvider, $httpProvider) {
 
 exports.default = EditorConfig;
 
-},{}],180:[function(require,module,exports){
+},{}],181:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -79181,7 +79211,7 @@ var EditorCtrl = function () {
 
 exports.default = EditorCtrl;
 
-},{}],181:[function(require,module,exports){
+},{}],182:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -79215,7 +79245,7 @@ editorModule.controller('EditorCtrl', _editor4.default);
 
 exports.default = editorModule;
 
-},{"./editor.config":179,"./editor.controller":180,"angular":11}],182:[function(require,module,exports){
+},{"./editor.config":180,"./editor.controller":181,"angular":11}],183:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -79259,7 +79289,7 @@ var CommentFood = {
 
 exports.default = CommentFood;
 
-},{}],183:[function(require,module,exports){
+},{}],184:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -79293,7 +79323,7 @@ FilterFoodsCtrl.$inject = ["foods", "$state", "$scope", "$stateParams"];
 
 exports.default = FilterFoodsCtrl;
 
-},{}],184:[function(require,module,exports){
+},{}],185:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -79360,7 +79390,7 @@ var FoodCtrl = function () {
 
 exports.default = FoodCtrl;
 
-},{}],185:[function(require,module,exports){
+},{}],186:[function(require,module,exports){
 'use strict';
 
 FoodsConfig.$inject = ["$stateProvider", "$httpProvider"];
@@ -79419,7 +79449,7 @@ function FoodsConfig($stateProvider, $httpProvider) {
 
 exports.default = FoodsConfig;
 
-},{}],186:[function(require,module,exports){
+},{}],187:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -79466,7 +79496,7 @@ var FoodsCtrl = function () {
 
 exports.default = FoodsCtrl;
 
-},{}],187:[function(require,module,exports){
+},{}],188:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -79518,7 +79548,7 @@ foodsModule.component('commentFood', _commentFood2.default);
 
 exports.default = foodsModule;
 
-},{"./comment-food.component":182,"./filterfoods.controller":183,"./food.controller":184,"./foods.config":185,"./foods.controller":186,"angular":11}],188:[function(require,module,exports){
+},{"./comment-food.component":183,"./filterfoods.controller":184,"./food.controller":185,"./foods.config":186,"./foods.controller":187,"angular":11}],189:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -79543,7 +79573,7 @@ var HomeSlider = {
 
 exports.default = HomeSlider;
 
-},{}],189:[function(require,module,exports){
+},{}],190:[function(require,module,exports){
 'use strict';
 
 HomeConfig.$inject = ["$stateProvider"];
@@ -79571,7 +79601,7 @@ function HomeConfig($stateProvider) {
 
 exports.default = HomeConfig;
 
-},{}],190:[function(require,module,exports){
+},{}],191:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -79619,7 +79649,7 @@ var HomeCtrl = function () {
 
 exports.default = HomeCtrl;
 
-},{}],191:[function(require,module,exports){
+},{}],192:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -79661,7 +79691,7 @@ homeModule.component('homeSlider', _homeSlider2.default);
 
 exports.default = homeModule;
 
-},{"./home-slider.component":188,"./home.config":189,"./home.controller":190,"angular":11}],192:[function(require,module,exports){
+},{"./home-slider.component":189,"./home.config":190,"./home.controller":191,"angular":11}],193:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -79689,7 +79719,7 @@ var AppFooter = {
 
 exports.default = AppFooter;
 
-},{}],193:[function(require,module,exports){
+},{}],194:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -79721,7 +79751,7 @@ var AppHeader = {
 
 exports.default = AppHeader;
 
-},{}],194:[function(require,module,exports){
+},{}],195:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -79753,7 +79783,7 @@ layoutModule.component('appFooter', _footer2.default);
 
 exports.default = layoutModule;
 
-},{"./footer.component":192,"./header.component":193,"angular":11}],195:[function(require,module,exports){
+},{"./footer.component":193,"./header.component":194,"angular":11}],196:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -79787,7 +79817,7 @@ productsModule.controller('ProductsCtrl', _products4.default);
 
 exports.default = productsModule;
 
-},{"./products.config":196,"./products.controller":197,"angular":11}],196:[function(require,module,exports){
+},{"./products.config":197,"./products.controller":198,"angular":11}],197:[function(require,module,exports){
 'use strict';
 
 ProductsConfig.$inject = ["$stateProvider", "$httpProvider"];
@@ -79820,7 +79850,7 @@ function ProductsConfig($stateProvider, $httpProvider) {
 
 exports.default = ProductsConfig;
 
-},{}],197:[function(require,module,exports){
+},{}],198:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -79844,6 +79874,15 @@ var ProductsCtrl = function () {
   }
 
   _createClass(ProductsCtrl, [{
+    key: 'clickAuth',
+    value: function clickAuth() {
+      this._Product.user().then(function (data) {
+        console.log(data);
+      }, function (err) {
+        console.log(err);
+      });
+    }
+  }, {
     key: 'submit',
     value: function submit() {
       this._Product.newProduct(this.formData).then(function (data) {
@@ -79859,7 +79898,7 @@ var ProductsCtrl = function () {
 
 exports.default = ProductsCtrl;
 
-},{}],198:[function(require,module,exports){
+},{}],199:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -79899,7 +79938,7 @@ profileModule.controller('ProfileFoodsCtrl', _profileFoods2.default);
 
 exports.default = profileModule;
 
-},{"./profile-foods.controller":199,"./profile.config":200,"./profile.controller":201,"angular":11}],199:[function(require,module,exports){
+},{"./profile-foods.controller":200,"./profile.config":201,"./profile.controller":202,"angular":11}],200:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -79937,7 +79976,7 @@ ProfileFoodsCtrl.$inject = ["profile", "$state", "$rootScope"];
 
 exports.default = ProfileFoodsCtrl;
 
-},{}],200:[function(require,module,exports){
+},{}],201:[function(require,module,exports){
 'use strict';
 
 ProfileConfig.$inject = ["$stateProvider"];
@@ -79980,7 +80019,7 @@ function ProfileConfig($stateProvider) {
 
 exports.default = ProfileConfig;
 
-},{}],201:[function(require,module,exports){
+},{}],202:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80007,7 +80046,7 @@ ProfileCtrl.$inject = ["profile", "User"];
 
 exports.default = ProfileCtrl;
 
-},{}],202:[function(require,module,exports){
+},{}],203:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80074,7 +80113,7 @@ var Comments = function () {
 
 exports.default = Comments;
 
-},{}],203:[function(require,module,exports){
+},{}],204:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80209,7 +80248,7 @@ var Foods = function () {
 
 exports.default = Foods;
 
-},{}],204:[function(require,module,exports){
+},{}],205:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80217,14 +80256,14 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-//  import { setContext } from 'apollo-link-context';
-
 
 var _apolloClient = require('apollo-client');
 
 var _apolloLinkHttp = require('apollo-link-http');
 
 var _apolloCacheInmemory = require('apollo-cache-inmemory');
+
+var _apolloLinkContext = require('apollo-link-context');
 
 var _graphqlTag = require('graphql-tag');
 
@@ -80246,7 +80285,7 @@ var GraphQL = function () {
         this._AppConstants = AppConstants;
         this._$q = $q;
         this._clients = new Map([[this._AppConstants.gql, this.createClient()]]);
-        //  this._authClient = this.createAuthClient();
+        this._authClient = this.createAuthClient();
         this._JWT = JWT;
     }
 
@@ -80258,6 +80297,31 @@ var GraphQL = function () {
             return new _apolloClient.ApolloClient({
                 link: (0, _apolloLinkHttp.createHttpLink)({ uri: server }),
                 cache: new _apolloCacheInmemory.InMemoryCache()
+            });
+        }
+    }, {
+        key: 'createAuthClient',
+        value: function createAuthClient() {
+            return new _apolloClient.ApolloClient({
+                link: this.createAuthLink().concat((0, _apolloLinkHttp.createHttpLink)({ uri: "http://localhost:3003/api/graphqlauth" })),
+                cache: new _apolloCacheInmemory.InMemoryCache()
+            });
+        }
+    }, {
+        key: 'createAuthLink',
+        value: function createAuthLink() {
+            var _this = this;
+
+            return (0, _apolloLinkContext.setContext)(function (_, _ref) {
+                var headers = _ref.headers;
+
+                var token = _this._JWT.get();
+
+                return {
+                    headers: {
+                        Authorization: token ? 'Bearer ' + token : ""
+                    }
+                };
             });
         }
     }, {
@@ -80276,6 +80340,21 @@ var GraphQL = function () {
             }, function (err) {
                 return deferred.reject(err);
             });
+            return deferred.promise;
+        }
+    }, {
+        key: 'getAuth',
+        value: function getAuth(query) {
+            var deferred = this._$q.defer();
+
+            this._authClient.query({
+                query: (0, _graphqlTag2.default)(query)
+            }).then(function (res) {
+                return deferred.resolve(res.data);
+            }, function (err) {
+                return deferred.reject(err);
+            });
+
             return deferred.promise;
         }
     }, {
@@ -80319,7 +80398,7 @@ var GraphQL = function () {
 exports.default = GraphQL;
 ;
 
-},{"apollo-cache-inmemory":12,"apollo-client":14,"apollo-link-http":19,"graphql":35,"graphql-tag":25}],205:[function(require,module,exports){
+},{"apollo-cache-inmemory":12,"apollo-client":14,"apollo-link-context":17,"apollo-link-http":20,"graphql":36,"graphql-tag":26}],206:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80391,7 +80470,7 @@ servicesModule.service('Tags', _tags2.default);
 
 exports.default = servicesModule;
 
-},{"./comments.service":202,"./foods.service":203,"./graphql.service":204,"./jwt.service":206,"./product.service":207,"./profile.service":208,"./tags.service":209,"./toastr.service":210,"./user.service":211,"angular":11}],206:[function(require,module,exports){
+},{"./comments.service":203,"./foods.service":204,"./graphql.service":205,"./jwt.service":207,"./product.service":208,"./profile.service":209,"./tags.service":210,"./toastr.service":211,"./user.service":212,"angular":11}],207:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80435,7 +80514,7 @@ var JWT = function () {
 
 exports.default = JWT;
 
-},{}],207:[function(require,module,exports){
+},{}],208:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -80472,6 +80551,12 @@ var Product = function () {
             return this._GQL.get(query);
         }
     }, {
+        key: "user",
+        value: function user() {
+            var query = "\n            query {\n                user(username:\"marct\"){\n                    idsocial\n                    username\n                    email\n                }\n            }\n        ";
+            return this._GQL.getAuth(query);
+        }
+    }, {
         key: "newProduct",
         value: function newProduct(data) {
             var input = data;
@@ -80485,7 +80570,7 @@ var Product = function () {
 
 exports.default = Product;
 
-},{"graphql-tag":25}],208:[function(require,module,exports){
+},{"graphql-tag":26}],209:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80544,7 +80629,7 @@ var Profile = function () {
 
 exports.default = Profile;
 
-},{}],209:[function(require,module,exports){
+},{}],210:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80583,7 +80668,7 @@ var Tags = function () {
 
 exports.default = Tags;
 
-},{}],210:[function(require,module,exports){
+},{}],211:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80630,7 +80715,7 @@ var Toastr = function () {
 
 exports.default = Toastr;
 
-},{}],211:[function(require,module,exports){
+},{}],212:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -80761,7 +80846,7 @@ var User = function () {
 
 exports.default = User;
 
-},{}],212:[function(require,module,exports){
+},{}],213:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80794,7 +80879,7 @@ settingsModule.controller('SettingsCtrl', _settings4.default);
 
 exports.default = settingsModule;
 
-},{"./settings.config":213,"./settings.controller":214,"angular":11}],213:[function(require,module,exports){
+},{"./settings.config":214,"./settings.controller":215,"angular":11}],214:[function(require,module,exports){
 'use strict';
 
 SettingsConfig.$inject = ["$stateProvider"];
@@ -80820,7 +80905,7 @@ function SettingsConfig($stateProvider) {
 
 exports.default = SettingsConfig;
 
-},{}],214:[function(require,module,exports){
+},{}],215:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -80871,4 +80956,4 @@ var SettingsCtrl = function () {
 
 exports.default = SettingsCtrl;
 
-},{}]},{},[160]);
+},{}]},{},[161]);

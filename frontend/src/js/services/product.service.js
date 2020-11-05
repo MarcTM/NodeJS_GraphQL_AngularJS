@@ -21,7 +21,21 @@ export default class Product {
             }
         `;  
         return this._GQL.get(query);
-    };
+    }
+
+
+    user(){
+        let query = `
+            query {
+                user(username:"marct"){
+                    idsocial
+                    username
+                    email
+                }
+            }
+        `;  
+        return this._GQL.getAuth(query);
+    }
 
 
     newProduct(data){
