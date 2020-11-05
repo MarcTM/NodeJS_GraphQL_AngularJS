@@ -40,6 +40,13 @@ router.post('/:username/follow', auth.required, async function(req, res, next){
     if (!user) { return res.sendStatus(401); }
 
     return await user.follow(profileId).then(async function(){
+      if(!user.karma){
+        user.karma = 30;
+      }else{
+        user.karma+=30;
+      }
+      await user.save();
+
       return res.json({profile: req.profile.toProfileJSONFor(user)});
     });
   }).catch(next);
@@ -54,6 +61,9 @@ router.delete('/:username/follow', auth.required, async function(req, res, next)
     if (!user) { return res.sendStatus(401); }
 
     return await user.unfollow(profileId).then(async function(){
+      user.karma-=30;
+      user.save();
+      
       return res.json({profile: req.profile.toProfileJSONFor(user)});
     });
   }).catch(next);

@@ -211,6 +211,13 @@ router.post('/:food/favorite', auth.required, async function(req, res, next) {
     if (!user) { return res.sendStatus(401); }
 
     return await user.favorite(foodId).then(async function(){
+      if(!user.karma){
+        user.karma = 30;
+      }else{
+        user.karma+=20;
+      }
+      await user.save();
+
       return await req.food.updateFavoriteCount().then(async function(food){
         return res.json({food: food.toJSONFor(user)});
       });
@@ -227,6 +234,9 @@ router.delete('/:food/favorite', auth.required, async function(req, res, next) {
     if (!user) { return res.sendStatus(401); }
 
     return await user.unfavorite(foodId).then(async function(){
+      user.karma-=20;
+      await user.save();
+
       return await req.food.updateFavoriteCount().then(async function(food){
         return res.json({food: food.toJSONFor(user)});
       });
