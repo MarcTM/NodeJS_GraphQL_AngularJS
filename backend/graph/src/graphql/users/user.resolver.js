@@ -10,7 +10,7 @@ const UserResolvers = {
       },
       users: () => {
         return User.find().exec();
-      },
+      }
     },
     Mutation: {
       login: (_, {email, password}) => {

@@ -12,10 +12,12 @@ const productTypeDefs = gql`
         id: ID!
         name: String!
         description: String
+        user: User
     }
     input NewProduct{
         name: String!
         description: String!
+        user: String!
     }
 `;
 

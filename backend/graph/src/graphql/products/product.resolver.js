@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Product = mongoose.model('Product');
+const User = mongoose.model('User');
 
 const ProductResolvers = {
     Query: {
@@ -15,6 +16,11 @@ const ProductResolvers = {
           let product = new Product(input);
           product.save();
           return product;
+      }
+    },
+    Product: {
+      user: (parent) => {
+          return User.findOne({_id: parent.user}).exec();
       }
     }
 };
