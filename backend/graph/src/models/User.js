@@ -11,6 +11,7 @@ var UserSchema = new mongoose.Schema({
   bio: String,
   image: String,
   karma: {type: Number, default: 0},
+  products: {type: Number, default: 0},
   favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Article' }],
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   hash: String,

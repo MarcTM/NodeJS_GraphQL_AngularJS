@@ -31,11 +31,23 @@ router.get('/:username', auth.optional, async function(req, res, next){
 
 
 
-// Update user's karma when he creates a Product (GraphQL)
+// Update user's karma when he creates a Product (GraphQL)(Fetch)
 router.post('/updatekarma', async function(req, res, next){
   await User.findById(req.body.id).then(
     async (user) => {
       user.karma+=20;
+      await user.save();
+      return res.status(200);
+    }
+  )
+});
+
+
+// When a user creates a product, his products count increase by 1 (GraphQL)(Axios)
+router.post('/updateproducts', async function(req, res, next){
+  await User.findById(req.body.id).then(
+    async (user) => {
+      user.products+=1;
       await user.save();
       return res.status(200);
     }

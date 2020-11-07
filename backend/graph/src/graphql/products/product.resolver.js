@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const axios = require('axios');
 const mongoose = require('mongoose');
 const Product = mongoose.model('Product');
 const User = mongoose.model('User');
@@ -25,7 +26,9 @@ const ProductResolvers = {
               method: 'POST',
               body: JSON.stringify(postInput),
               headers: { 'Content-Type': 'application/json' }
-          })
+          });
+
+          axios.post('http://0.0.0.0:3000/api/profiles/updateproducts', postInput);
 
           return product;
       }
