@@ -1,7 +1,8 @@
-2DAW FIRST PROJECT
+<h1>2DAW FIRST PROJECT<h1>
 
 This web page works with 2 backends (GraphQL and Rest) and the fronten (AngularJS 1.5).  
 Poject developed by *Marc Torres Martínez*.
+Imagine a community of people who likes sharing his cooking recipes. This page is about it, it was the first idea I had and I kept doing this project with that idea. You can share your foods, favorite recipes, follow users, etc.
 
 ---
 
