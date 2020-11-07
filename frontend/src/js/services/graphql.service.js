@@ -71,7 +71,7 @@ import { subscribe } from 'graphql';
      }
 
      
-     mutation(query, input = null, server = this._AppConstants.gql) {
+     mutate(query, input = null, server = this._AppConstants.gql) {
         let deferred = this._$q.defer();
         if (!this._clients.has(server)) {
             this._clients.set(server, this.createClient(server));
@@ -90,6 +90,36 @@ import { subscribe } from 'graphql';
             
         }else{
             this._clients.get(server).mutate({
+                mutation: gql(query)
+            })
+            .then(
+                (res) => deferred.resolve(res.data),
+                 (err) => deferred.reject(err)
+            );
+
+        }
+        
+        return deferred.promise;
+     }
+
+
+     mutateAuth(query, input = null) {
+        let deferred = this._$q.defer();
+
+        if(input){
+            this._authClient.mutate({
+                mutation: gql(query),
+                variables: {
+                    input: input
+                }
+            })
+            .then(
+                (res) => deferred.resolve(res.data),
+                 (err) => deferred.reject(err)
+            );
+            
+        }else{
+            this._authClient.mutate({
                 mutation: gql(query)
             })
             .then(

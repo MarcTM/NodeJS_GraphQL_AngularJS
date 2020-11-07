@@ -1,17 +1,20 @@
 import gql from "graphql-tag";
 
 export default class Product {
-    constructor(AppConstants, $http, $q, GraphQLClient) {
+    constructor(AppConstants, $http, $q, GraphQLClient, JWT) {
       'ngInject';
   
       this._AppConstants = AppConstants;
       this._$http = $http;
       this._$q = $q;
       this._GQL = GraphQLClient;
+      this._JWT = JWT;
   
     }
   
-    products(){
+
+    // Return all products
+    getProducts(){
         let query = `
             query {
                 products{
@@ -24,33 +27,23 @@ export default class Product {
     }
 
 
-    user(){
-        let query = `
-            query {
-                user(username:"marct"){
-                    idsocial
-                    username
-                    email
-                }
-            }
-        `;  
-        return this._GQL.getAuth(query);
-    }
-
-
+    // Create a product
     newProduct(data){
-        let input = data;
         let query = `
-            mutation newProduct($input: NewProduct) {
-                newProduct(input: $input) {
+            mutation {
+                newProduct(name:"${data.name}", description:"${data.description}") {
                     name
                     description
+                    user{
+                        username
+                        email
+                    }
                 }
           }
         `;
-        return this._GQL.mutation(query, input);
-
+        return this._GQL.mutateAuth(query);
     }
+
   
   }
   

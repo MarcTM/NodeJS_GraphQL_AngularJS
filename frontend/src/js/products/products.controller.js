@@ -8,28 +8,6 @@ class ProductsCtrl {
       
     }
   
-    clickAuth(){
-      this._Product.user().then(
-        (data) => {
-          console.log(data);
-        },
-        (err) => {
-          console.log(err);
-        }
-      )
-    }
-
-    submit(){
-      this._Product.newProduct(this.formData).then(
-        (data) => {
-            console.log(data);
-        },
-        (err) => {
-          console.log(err);
-        }
-      )
-    }
-  
 }
   
 export default ProductsCtrl;

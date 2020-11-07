@@ -3,6 +3,17 @@ function ProductsConfig($stateProvider, $httpProvider) {
   
     $stateProvider
   
+
+    .state('app.newproduct', {
+      url: '/editorproduct/:slug',
+      controller: 'EditorProductsCtrl',
+      controllerAs: '$ctrl',
+      templateUrl: 'products/editor.html',
+      title: 'Products Editor',
+    })
+
+
+
     .state('app.products', {
         url: '/products',
         controller: 'ProductsCtrl',
@@ -23,8 +34,6 @@ function ProductsConfig($stateProvider, $httpProvider) {
               )
             }
           }
-
-        
       })
 
 

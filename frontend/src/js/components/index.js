@@ -27,4 +27,7 @@ componentsModule.component('foodActions', FoodActions);
 import ListPaginationFoods from './foods-helpers/list-pagination-foods.component';
 componentsModule.component('listPaginationFoods', ListPaginationFoods);
 
+import ProductsList from './products-helpers/products-list.component';
+componentsModule.component('productsList', ProductsList);
+
 export default componentsModule;

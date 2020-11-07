@@ -11,13 +11,7 @@ const UserResolvers = {
       users: () => {
         return User.find().exec();
       }
-    },
-    Mutation: {
-      login: (_, {email, password}) => {
-            let user = User.findOne({email: email});
-            return user;
-      }
-  }
+    }
 };
 
 module.exports = UserResolvers;

@@ -9,6 +9,11 @@ productsModule.config(ProductsConfig);
 
 
 // Include controllers
+import EditorProductsCtrl from './editor-products.controller';
+productsModule.controller('EditorProductsCtrl', EditorProductsCtrl);
+
+
+// Include controllers
 import ProductsCtrl from './products.controller';
 productsModule.controller('ProductsCtrl', ProductsCtrl);
 

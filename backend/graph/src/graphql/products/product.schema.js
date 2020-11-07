@@ -6,7 +6,7 @@ const productTypeDefs = gql`
         products: [Product]!
     }
     extend type Mutation{
-        newProduct(input: NewProduct): Product
+        newProduct(name: String!, description: String!): Product!
     }
     type Product {
         id: ID!
@@ -17,7 +17,6 @@ const productTypeDefs = gql`
     input NewProduct{
         name: String!
         description: String!
-        user: String!
     }
 `;
 

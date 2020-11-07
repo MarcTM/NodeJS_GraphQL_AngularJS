@@ -12,7 +12,10 @@ const ProductResolvers = {
       },
     },
     Mutation: {
-      newProduct: (_, {input}) => {
+      newProduct: (_, {name, description}, context) => {
+          if (!context.user) throw new context.AuthenticationError('You must be logged in');
+
+          let input = {name: name, description: description, user: context.user.id};
           let product = new Product(input);
           product.save();
           return product;
