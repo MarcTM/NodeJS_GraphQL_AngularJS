@@ -1,4 +1,4 @@
-<h1>2DAW FIRST PROJECT<h1>
+<h1>2DAW FIRST PROJECT</h1>
 
 This web page works with 2 backends (GraphQL and Rest) and the fronten (AngularJS 1.5).  
 Poject developed by *Marc Torres Martínez*.
