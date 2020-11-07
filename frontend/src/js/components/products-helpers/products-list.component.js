@@ -6,7 +6,13 @@ class ProductsListCtrl {
       this._$scope = $scope;
       this._Product = Product;
 
+      this.products = Product.getProducts().then((data)=> {return data.products});
+      console.log(this.products);
+
     }
+
+
+
 
   }
   

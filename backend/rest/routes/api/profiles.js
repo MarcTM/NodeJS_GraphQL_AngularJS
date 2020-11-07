@@ -31,6 +31,18 @@ router.get('/:username', auth.optional, async function(req, res, next){
 
 
 
+// Update user's karma when he creates a Product (GraphQL)
+router.post('/updatekarma', async function(req, res, next){
+  await User.findById(req.body.id).then(
+    async (user) => {
+      user.karma+=20;
+      await user.save();
+      return res.status(200);
+    }
+  )
+});
+
+
 
 // Follow user
 router.post('/:username/follow', auth.required, async function(req, res, next){

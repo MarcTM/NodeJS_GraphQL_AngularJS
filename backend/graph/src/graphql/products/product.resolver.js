@@ -1,3 +1,4 @@
+const fetch = require('node-fetch');
 const mongoose = require('mongoose');
 const Product = mongoose.model('Product');
 const User = mongoose.model('User');
@@ -18,6 +19,14 @@ const ProductResolvers = {
           let input = {name: name, description: description, user: context.user.id};
           let product = new Product(input);
           product.save();
+
+          let postInput = {id: context.user.id};
+          fetch('http://0.0.0.0:3000/api/profiles/updatekarma', {
+              method: 'POST',
+              body: JSON.stringify(postInput),
+              headers: { 'Content-Type': 'application/json' }
+          })
+
           return product;
       }
     },

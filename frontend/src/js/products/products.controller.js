@@ -1,13 +1,12 @@
 class ProductsCtrl {
-    constructor(Product, products, $state) {
+    constructor(Product, $state) {
       'ngInject';
   
       this._Product = Product;
-      this.products = products;
       this._$state = $state;
       
     }
-  
+
 }
   
 export default ProductsCtrl;
