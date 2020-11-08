@@ -1,0 +1,37 @@
+version: "3"
+
+services:
+    rest:
+        image: mhart/alpine-node:8
+        command: npm start
+        restart: on-failure
+        working_dir: /app
+        volumes:
+            - ./rest:/app
+        ports:
+            - "3000:3000"
+        links: 
+            - 'mongo'
+        depends_on:
+            - 'mongo'
+
+    graphql:
+        image: mhart/alpine-node:8
+        command: npm start
+        restart: on-failure
+        working_dir: /app
+        volumes:
+            - ./graph:/app
+        ports:
+            - "3003:3003"
+        links: 
+            - 'mongo'
+        depends_on:
+            - 'mongo'
+
+    mongo:
+        image: mvertes/alpine-mongo
+        ports:
+            - "27017:27017"
+        volumes:
+            - /data/db

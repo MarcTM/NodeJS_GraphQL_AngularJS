@@ -4,7 +4,7 @@ require('./models/User');
 require('./models/Product');
 
 const startServer = async () => {
-    await mongoose.connect("mongodb://localhost:27017/conduit_nodejs", {
+    await mongoose.connect("mongodb://mongo/conduit_nodejs", {
         useNewUrlParser: true
     });
 
