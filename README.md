@@ -76,6 +76,7 @@ If you want to run this repository locally:
 * Mongoose
 * Axios
 * Fetch
+* Docker Compose
 
 ---
 
